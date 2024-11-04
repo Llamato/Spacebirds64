@@ -1,103 +1,89 @@
+;---------------------------------------
+;This file handles all disk io
+;Saving, loading,
+;complaining about melfunctions
+;you name it
+
+;Tina Guessbacher 2024
+;---------------------------------------
+;Constants
+
 ActionKernalLoad = 0
 ActionKernalSave = 1
 
 LoadToAdressInFile = 0
 LoadToAddressInAX = 1
 
-DataStart = PlayerName
-DataLength = 40
-DataEnd = PlayerName + DataLength
+DataStart = 1024
+DataLength = 40 * 25
+DataEnd = DataStart + DataLength + 1
 
-Filenumber = 8
+primery_iec_channel_address = 2
 device = 8
-channel = 2
-
-;Testing KernalSave to disk
-.ifeq DebugAssembly
-TestHighScoreSaving
-    lda #42
-    sta PlayerScore
-    lda #0
-    sta PlayerScore +1
-    ;#cpb MyName, PlayerName, LenMyName
-    jsr SaveHighScores
-    ldx #0
-    jsr KernalPrintInt16
-    rts
-
-TestHighScoreLoading
-    jsr LoadHighScores
-    ldx #0
-    jsr KernalPrintInt16
-    ldx #0
-printChar
-    lda DataStart, x
-    jsr KernalPrintChar
-    inx
-    cpx #DataLength
-    bne printChar
-    rts
-.endif
+seconday_address_read_to_xy = 0
+seconday_address_write = 1
+seconday_address_read_to_prg = 2
+;--------------------------------------
+;Rotines
 
 LoadHighScores
-    lda #device
-    ldx #Filenumber
-    ldy #0
+    lda #primery_iec_channel_address
+    ldx #device
+    ldy #seconday_address_read_to_prg
     jsr KernalSetlfs
-    ldx #<FilenamePrefix
-    ldy #>FilenamePrefix
-    lda #>FilenamePrefix - FilenameEnd
+    lda #FilenameSuffix-FilenameStart
+    ldx #<FilenameStart
+    ldy #>FilenameStart
     jsr KernalSetnam
-    lda #ActionKernalLoad
-    ldx #<PlayerName
-    ldy #>PlayerName
+    lda #0
+    ldx #$00
+    ldy #$00
     jsr KernalLoad
-    BCS HandleKernalLoadError
-    jsr KernalClose
-    jsr KernalClearIO
+    bcs LoadError
     rts
 
-HandleKernalLoadError
-    ldx #0
-.ifeq DebugAssembly
-    sta 53280
-.endif
+LoadError
+    sta 53281
     rts
 
 SaveHighScores
-    cli
-    lda #FilenameEnd-FilenamePrefixOverwrite
-    ldx #<FilenamePrefixOverwrite
-    ldy #>FilenamePrefixOverwrite
-    jsr KernalSetnam
-    ldx $BA ;get last used drive number
-    bne FoundLastUsedDrive
-    ldx #8 ;default to drive 8
-
-FoundLastUsedDrive
-    ldy #0
+    lda #primery_iec_channel_address
+    ldx #device
+    ldy #seconday_address_write
     jsr KernalSetlfs
-    lda #<DataStart
-    sta $C1 ;start address container
-    lda #>DataStart
-    sta $C2
+    lda #FilenameSuffix-FilenameStart
+    ldx #<FilenameStart
+    ldy #>FilenameStart
+    jsr KernalSetnam
+    #poke r0, $00
+    #poke r1, $04
     ldx #<DataEnd
     ldy #>DataEnd
-    lda $C1
+    lda #<r0
     jsr KernalSave
-    bcs HandleKernalSaveError
+    bcs SaveError
     rts
 
-HandleKernalSaveError
-    ldx #0
-.ifeq DebugAssembly
+SaveError
     sta 53280
-.endif
+    jsr $BDCD
     rts
 
-.ifeq DebugAssembly
+;--------------------------------------
+;Tests
 
-FilenameLength = FilenameEnd - FilenameStart
+TestHighScoreSaving
+    #poke 53280, 1
+    jsr SaveHighScores
+    rts
+
+TestHighScoreLoading
+    #poke 53280, 0
+    jsr LoadHighScores
+    rts
+;---------------------------------------
+;Data
+
 FilenamePrefixOverwrite
     .byte $40
 FilenamePrefix
@@ -105,6 +91,9 @@ FilenamePrefix
 FilenameStart
     .text "high scores"
 FilenameSuffix
-
+    .text ".S.W"
 FilenameEnd
     .byte 0
+
+PlayerScore
+.word 0

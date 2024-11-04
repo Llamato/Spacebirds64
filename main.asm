@@ -11,9 +11,12 @@
 jmp init
 
 init
+jsr TestHighScoreSaving
+jsr TestHighScoreLoading
 
 gameloop
 
 jmp gameloop
 
+.include "disk-subrotines.asm"
 .include "vic-subrotines.asm"
