@@ -1,0 +1,37 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "tmpx assemble",
+            "type": "shell",
+            "command": "tmpx -i ${relativeFile} -o build/${fileBasenameNoExtension}.prg",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "pack program disk",
+            "type": "shell",
+            "command": "c1541 -format ${workspaceFolderBasename},0 d64 build/${workspaceFolderBasename}.d64 -attach build/${workspaceFolderBasename}.d64 -write build/${fileBasenameNoExtension}.prg ${fileBasenameNoExtension}",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn":["tmpx assemble"],
+        },
+        {
+            "label": "launch in vice",
+            "type": "shell",
+            "command": "x64sc build/${workspaceFolderBasename}.d64",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn":["pack program disk"]
+        }
+    ]
+}
