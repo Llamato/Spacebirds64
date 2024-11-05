@@ -5,6 +5,7 @@
 ;you name it
 
 ;Tina Guessbacher 2024
+
 ;---------------------------------------
 ;Constants
 
@@ -23,45 +24,79 @@ device = 8
 seconday_address_read_to_xy = 0
 seconday_address_write = 1
 seconday_address_read_to_prg = 2
+
 ;--------------------------------------
+;Marcos
+
+;lfd = LoadFileFromDisk(/1,/2,/3,/4,/5)
+;Input
+;\1 = logical file number
+;\2 = device number
+;\3 = filename pointer
+;\4 = filename_length (less then 40)
+;\5 = (0 prg file addr, else r0/r1 addr)
+;Output
+;carry set on error with A = error code
+lfd .macro
+    lda #\1
+    ldx #\2
+    ldy #\5
+    jsr KernalSetlfs
+    lda #\4
+    ldx #<\3
+    ldy #>\3
+    jsr KernalSetnam
+    lda #0
+    .ifeq \5
+        ldx #0
+        ldy #0
+    .endif
+    .ifne \5
+        ldx r0
+        ldy r1
+    .endif
+    jsr KernalLoad
+.endm
+
+;sfd SaveFileToDisk(/1,/2,/3,/4,/5)
+;\1 = logical file number
+;\2 = device number
+;\3 = filename pointer
+;\4 = filename_length (less then 40)
+;r0 = LB of DataStart
+;r1 = HB of DataStart
+;r2 = LB of DataEnd
+;r3 = HB of DataEnd
+;Output
+;carry set on error with A = error code
+sfd .macro
+    lda #\1
+    ldx #\2
+    ldy #seconday_address_write
+    jsr KernalSetlfs
+    lda #\4
+    ldx #<FilenameStart
+    ldy #>FilenameStart
+    jsr KernalSetnam
+    ldx r2
+    ldy r3
+    lda #<r0
+    jsr KernalSave
+    rts
+.endm
+
 ;Rotines
 
 LoadHighScores
-    lda #primery_iec_channel_address
-    ldx #device
-    ldy #seconday_address_read_to_prg
-    jsr KernalSetlfs
-    lda #FilenameSuffix-FilenameStart
-    ldx #<FilenameStart
-    ldy #>FilenameStart
-    jsr KernalSetnam
-    lda #0
-    ldx #$00
-    ldy #$00
-    jsr KernalLoad
-    bcs LoadError
-    rts
-
-LoadError
-    sta 53281
+    #lfd 2, 8, FilenameStart, 11, 2, 0
     rts
 
 SaveHighScores
-    lda #primery_iec_channel_address
-    ldx #device
-    ldy #seconday_address_write
-    jsr KernalSetlfs
-    lda #FilenameSuffix-FilenameStart
-    ldx #<FilenameStart
-    ldy #>FilenameStart
-    jsr KernalSetnam
-    #poke r0, $00
-    #poke r1, $04
-    ldx #<DataEnd
-    ldy #>DataEnd
-    lda #<r0
-    jsr KernalSave
-    bcs SaveError
+    #poke r0, <DataStart
+    #poke r1, >DataStart
+    #poke r2, <DataEnd
+    #poke r3, >DataEnd
+    #sfd 2, 8, FilenameStart, 11
     rts
 
 SaveError
@@ -81,6 +116,7 @@ TestHighScoreLoading
     #poke 53280, 0
     jsr LoadHighScores
     rts
+
 ;---------------------------------------
 ;Data
 
