@@ -1,3 +1,4 @@
+IncludeTests = 0
 *=$0801
 ;Basic starter jumping to $1000 (4096)
 .byte $0C,$08,$0A,$00,$9E,$20,$34,$30
@@ -13,8 +14,7 @@
 jmp init
 
 init
-jsr TestHighScoreSaving
-jsr TestHighScoreLoading
+
 
 gameloop
 

@@ -103,9 +103,10 @@ SaveError
     sta 53280
     jsr $BDCD
     rts
-
+    
 ;--------------------------------------
 ;Tests
+.ifne IncludeTests
 
 TestHighScoreSaving
     #poke 53280, 1
@@ -116,7 +117,7 @@ TestHighScoreLoading
     #poke 53280, 0
     jsr LoadHighScores
     rts
-
+.endif
 ;---------------------------------------
 ;Data
 
