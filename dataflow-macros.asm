@@ -10,6 +10,16 @@ ldi16 .macro
     sta #<\1
 .endm
 
+lsl .macro
+    clc
+    rol
+.endm
+
+lslz .macro
+    clc
+    rol \1
+.endm
+
 fmb .macro 
     lda #>\1
     sta r1
@@ -52,4 +62,45 @@ CopyByte
     iny
     cpy #\3
     bne CopyByte
+.endm
+
+;Macro wrapper for basic rom PrintNull
+;function by max integrated by Tina
+;Input 
+; \1 = address of null terminated string
+;Output
+;string from \1
+;without the null terminator
+;beginning at location of basic cursor
+print .macro 
+    ;put low byte of address in a
+    lda  #<\1
+    ;put high byte of address in y
+    ldy  #>\1
+    jsr BasicPrintNull
+.endm
+
+crlf .macro; Carriage Return Line Feed
+    ldx $d6; Read current cursor row
+    inx; Increment row by one
+    ldy #0; Set cursor column to 0
+    clc; Clear carry to indicate set
+    jsr KernalPlot; hit it!
+.endm
+
+;The ASM equivalent of basics input func
+;Including everything but the forced
+;question mark.
+;Input
+;\1 = char storage address
+input .macro
+    ldx #0
+GetNextChar
+    jsr KernalGetChr
+    beq GetNextChar; temp
+    cmp #$0D; Carriage return
+    beq done; We are done here
+    sta \1, x
+    jmp GetNextChar
+done
 .endm
