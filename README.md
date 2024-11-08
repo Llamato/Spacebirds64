@@ -5,6 +5,8 @@ A flappy bird inspired obstacle avoidance game for the commodore c64 of 1982 dev
 
 # Coding Conventions
 
+**Caution: All labels must be lowercase only to maintain compatiblity with Turbo Macro pro version v1.2 by style.**
+
 ### Register-Sicherung in Subroutinen
 
 - Wenn eine Subroutine ein Register verändert, speichert sie dessen Wert vor der Nutzung auf dem Stack (oder in temporären Variablen im Zero-Page-Bereich), damit Register beim Aufrufer unverändert bleiben.
