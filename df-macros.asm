@@ -49,40 +49,7 @@ lslz .macro
     rol \1
 .endm
 
-;fmb fill memory block
-;fills memory block from start address
-;to end address with imidiate value.
-;Input
-;\1 = Start address
-;\2 = end address
-;\3 = value
-;Output
-;Block from start address to end address
-;filled with value
-fmb .macro 
-    lda #>\1
-    sta r1
-    lda #<\1
-    sta r0
-    ldy #0
-FillByte
-    lda #\3
-    sta (r0), y
-    lda r0
-    clc
-    adc #1
-    sta r0
-    lda r1
-    adc #0
-    sta r1
-CheckEnd
-    lda r1
-    cmp #>\2
-    bne FillByte
-    lda r0
-    cmp #<\2
-    bne CheckEnd
-.endm
+
 
 cpb .macro
     ldy #0
@@ -95,12 +62,12 @@ cpb .macro
     lda #>\1
     sta r1
 
-CopyByte
+copyByte
     lda (r0), y
     sta (r2), y
     iny
     cpy #\3
-    bne CopyByte
+    bne copyByte
 .endm
 
 ;Macro wrapper for basic rom PrintNull
@@ -124,7 +91,7 @@ crlf .macro; Carriage Return Line Feed
     inx; Increment row by one
     ldy #0; Set cursor column to 0
     clc; Clear carry to indicate set
-    jsr KernalPlot; hit it!
+    jsr BasicPlot; hit it!
 .endm
 
 ;The ASM equivalent of basics input func
@@ -134,12 +101,12 @@ crlf .macro; Carriage Return Line Feed
 ;\1 = char storage address
 input .macro
     ldx #0
-GetNextChar
+getNextChar
     jsr KernalGetChr
-    beq GetNextChar; temp
+    beq getNextChar; temp
     cmp #$0D; Carriage return
     beq done; We are done here
     sta \1, x
-    jmp GetNextChar
+    jmp getNextChar
 done
 .endm

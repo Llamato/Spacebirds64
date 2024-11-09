@@ -15,15 +15,16 @@ ActionKernalSave = 1
 LoadToAdressInFile = 0
 LoadToAddressInAX = 1
 
-DataStart = 1024
-DataLength = 40 * 25
-DataEnd = DataStart + DataLength + 1
+diskBuffer = $C000
+diskBufferS = 512
+diskBufferEnd = diskBuffer + diskBufferS
 
 primery_iec_channel_address = 2
 device = 8
 seconday_address_read_to_xy = 0
 seconday_address_write = 1
 seconday_address_read_to_prg = 2
+
 
 ;--------------------------------------
 ;Marcos
@@ -92,33 +93,20 @@ LoadHighScores
     rts
 
 SaveHighScores
-    #poke r0, <DataStart
-    #poke r1, >DataStart
-    #poke r2, <DataEnd
-    #poke r3, >DataEnd
+    #poke r0, <diskBuffer
+    #poke r1, >diskBuffer
+    #poke r2, <diskBufferEnd
+    #poke r3, >diskBufferEnd
     #sfd 2, 8, FilenameStart, 11
     rts
 
-SaveError
-    sta 53280
-    jsr $BDCD
-    rts
+appendHighscoreToDiskBuffer
+    #ldi16 r0, scoreArea
+    #ldi16 r2, diskBuffer
     
-;--------------------------------------
-;Tests
-.ifne IncludeTests
-
-TestHighScoreSaving
-    #poke 53280, 1
-    jsr SaveHighScores
+    jsr memcpy
     rts
 
-TestHighScoreLoading
-    #poke 53280, 0
-    jsr LoadHighScores
-    rts
-.endif
-;---------------------------------------
 ;Data
 
 FilenamePrefixOverwrite
@@ -132,5 +120,11 @@ FilenameSuffix
 FilenameEnd
     .byte 0
 
-PlayerScore
-.word 0
+scoreArea
+    .text "00000"; temp
+
+yearArea
+    .text "2024"
+
+nameArea
+    .repeat 20, 32
