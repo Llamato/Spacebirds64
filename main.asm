@@ -8,7 +8,7 @@ IncludeTests = 0
 
 .include "zeropage-map.asm"
 .include "kernal-map.asm"
-.include "dataflow-macros.asm"
+.include "df-macros.asm"
 .include "math-macros.asm"
 
 jmp init
@@ -20,5 +20,5 @@ gameloop
 
 jmp gameloop
 
-.include "disk-subrotines.asm"
-.include "vic-subrotines.asm"
+.include "disksubs.asm"
+.include "vicsubs.asm"

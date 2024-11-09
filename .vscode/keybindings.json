@@ -1,0 +1,5 @@
+{
+    "key": "ctrl+Alt+d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "launch in vice"
+}
