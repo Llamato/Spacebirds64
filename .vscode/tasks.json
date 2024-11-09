@@ -32,6 +32,20 @@
                 "isDefault": false
             },
             "dependsOn":["pack program disk"]
+        },
+        {
+            "label": "convert to petscii",
+            "type": "shell",
+            "command": "petcat -text -w2 -o build/${fileBasename} ${fileBasename}",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "pack code disk",
+            "type": "shell",
+            "command": "python3 buildscripts/packasmdisk.py"
         }
     ]
 }
