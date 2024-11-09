@@ -1,4 +1,7 @@
 includeTests = 1
+includeTestSave = 0
+includeTestLoad = 1
+
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
 ;Load address for next BASIC line (2064)
@@ -34,30 +37,64 @@ showSaveHighScoreScreen
 ;Move cursor to (0, 0)
     jsr BasicCursorHome
     #poke 53272, 23; set charset to 2
+
+    ;Load scores from disk
+    jsr LoadHighScores
+    #ldi16 r0, diskBuffer
+    #ldi16 r2, 1768
+    ldy diskBufferEnd-2
+    jsr memcpy
+
     #print ThankYouForPlayingString
+
 ;Get name from user
     #print EnterNamePrompt
-    #input nameArea
+    #input nameArea   
     #crlf
 ;Get year from user
     #print EnterCurrentYearPrompt
     #input yearArea
     #crlf
+
 ;Get score from user
     #print EnterScorePrompt
     #input scoreArea
     #crlf
 
+    jsr $E56C
+
+;Debug!!!!
+    #print YouEnteredString
+    #crlf
+
+    #print ScoreString
+    #print scoreArea
+    #crlf
+
+    #print CurrentYearString
+    #print yearArea
+    #crlf
+
+    #print NameString
+    #print nameArea
+    #crlf
+    hold
+    jmp hold
+
 ;Save score to disk
-    jsr appendHighscoreToDiskBuffer
-    jsr SaveHighScores
+    ;jsr appendHighscoreToDiskBuffer
+    ;jsr SaveHighScores
 
-;Load scores from disk
+    ;Load scores from disk
+    ;jsr LoadHighScores
+    ;#ldi16 r0, diskBuffer
+    ;#ldi16 r2, 1768
+    ;ldy diskBufferEnd-2
+    ;jsr memcpy
+    ;rts; temp
 
-rts; temp
-
-.include "dataflowsubs.asm"
 .include "disksubs.asm"
+.include "dataflowsubs.asm"
 ;.include "vicsubs.asm" ;error in here
 
 ;Data
@@ -73,3 +110,15 @@ EnterScorePrompt
 .null "and your score for debugging? "
 ThankYouString
 .null "Thank you!"
+
+YouEnteredString
+.null "You entered"
+
+NameString
+.null "Name: "
+
+CurrentYearString
+.null "Current Year: "
+
+ScoreString
+.null "Score: "

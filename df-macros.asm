@@ -49,27 +49,6 @@ lslz .macro
     rol \1
 .endm
 
-
-
-cpb .macro
-    ldy #0
-    lda #<\2
-    sta r2
-    lda #>\2
-    sta r3
-    lda #<\1
-    sta r0
-    lda #>\1
-    sta r1
-
-copyByte
-    lda (r0), y
-    sta (r2), y
-    iny
-    cpy #\3
-    bne copyByte
-.endm
-
 ;Macro wrapper for basic rom PrintNull
 ;function by max integrated by Tina
 ;Input 
@@ -87,9 +66,10 @@ print .macro
 .endm
 
 crlf .macro; Carriage Return Line Feed
-    ldx $d6; Read current cursor row
-    inx; Increment row by one
-    ldy #0; Set cursor column to 0
+    sec; set carry to indicate read
+    jsr BasicPlot; read cursor position
+    ldy #0
+    inx
     clc; Clear carry to indicate set
     jsr BasicPlot; hit it!
 .endm
@@ -103,10 +83,10 @@ input .macro
     ldx #0
 getNextChar
     jsr KernalGetChr
-    beq getNextChar; temp
     cmp #$0D; Carriage return
     beq done; We are done here
     sta \1, x
+    inx
     jmp getNextChar
 done
 .endm

@@ -177,3 +177,12 @@ L2
 DEX
 BNE L1
 .endm
+
+add16 .macro
+    lda \1
+    adc \2
+    sta \1
+    lda \1 +1
+    adc \2 +1
+    sta \1 +1
+.endm

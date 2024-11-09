@@ -53,6 +53,7 @@ KernalChrout = $FFD2
 ;of pointer to start of data block
 ;X = low byte of end of block of data
 ;Y = high byte of end of block of data 
+;Carry set on Error
 KernalSave = $FFD8
 
 ;Load block of memory from io device
@@ -65,6 +66,7 @@ KernalSave = $FFD8
 ;memory
 ;Output
 ;X/Y = Address of last byte loaded
+;Carry set on Error
 KernalLoad = $FFD5
 
 ;Equivalent of basic open command

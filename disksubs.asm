@@ -16,8 +16,9 @@ LoadToAdressInFile = 0
 LoadToAddressInAX = 1
 
 diskBuffer = $C000
-diskBufferS = 512
+diskBufferS = 1024
 diskBufferEnd = diskBuffer + diskBufferS
+LastLoadAddress = diskBufferEnd -2
 
 primery_iec_channel_address = 2
 device = 8
@@ -35,7 +36,7 @@ seconday_address_read_to_prg = 2
 ;\2 = device number
 ;\3 = filename pointer
 ;\4 = filename_length (less then 40)
-;\5 = (0 prg file addr, else r0/r1 addr)
+;\5 = (0 = r0/r1 addr else prg file adr)
 ;Output
 ;carry set on error with A = error code
 lfd .macro
@@ -48,14 +49,8 @@ lfd .macro
     ldy #>\3
     jsr KernalSetnam
     lda #0
-    .ifeq \5
-        ldx #0
-        ldy #0
-    .endif
-    .ifne \5
-        ldx r0
-        ldy r1
-    .endif
+    ldx r0
+    ldy r1
     jsr KernalLoad
 .endm
 
@@ -76,8 +71,8 @@ sfd .macro
     ldy #seconday_address_write
     jsr KernalSetlfs
     lda #\4
-    ldx #<FilenameStart
-    ldy #>FilenameStart
+    ldx #<\3
+    ldy #>\3
     jsr KernalSetnam
     ldx r2
     ldy r3
@@ -89,7 +84,11 @@ sfd .macro
 ;Rotines
 
 LoadHighScores
-    #lfd 2, 8, FilenameStart, 11, 2, 0
+    #ldi16 r0, 1024
+    #lfd 2, 8, FilenameStart, 11, 0
+    bcs handleReadError
+    stx diskBufferEnd -2
+    sty diskBufferEnd -1
     rts
 
 SaveHighScores
@@ -97,13 +96,30 @@ SaveHighScores
     #poke r1, >diskBuffer
     #poke r2, <diskBufferEnd
     #poke r3, >diskBufferEnd
-    #sfd 2, 8, FilenameStart, 11
+    #sfd 2, 8, FilenamePrefixOverwrite, 14
+    bcs handleWriteError
+    rts
+
+handleReadError
+    sta 5320
+    jmp handleReadWriteError
+
+handleWriteError
+    sta 53281
+    jmp handleReadWriteError
+
+handleReadWriteError
+    ldx #0
+    stx diskBufferEnd-2
+    ldy #0
+    sty diskBufferEnd-1
     rts
 
 appendHighscoreToDiskBuffer
     #ldi16 r0, scoreArea
     #ldi16 r2, diskBuffer
-    
+    #add16 r2, diskBufferEnd-2
+    ldy #scoreArea-nameEnd
     jsr memcpy
     rts
 
@@ -122,9 +138,12 @@ FilenameEnd
 
 scoreArea
     .text "00000"; temp
-
+    .byte $00
 yearArea
     .text "2024"
-
+    .byte $00
 nameArea
     .repeat 20, 32
+    .byte $00
+nameEnd
+    .byte 0
