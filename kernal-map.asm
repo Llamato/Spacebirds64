@@ -3,7 +3,7 @@
 ;They are all extremely inefficant
 
 ;For more detailed kernal map see
-https://www.pagetable.com/c64ref/kernal/
+;https://www.pagetable.com/c64ref/kernal
 ;---------------------------------------
 
 ;Sets filename of file on disk to be 
