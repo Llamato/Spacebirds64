@@ -1,25 +1,64 @@
+;Effectively equivalent to basics
+;poke command. Even the syntax is much
+;the same.
+;Input
+;\1 = target address
+;\2 = value to be loded into address
+;Output
+;\2 value in \1 address
 poke .macro
     lda #\2
     sta \1
 .endm
 
+;ldi16 load imidiate 16 bit.
+;Meaning load a value present in memory
+;directly after the instuction.
+;As in the value supplied as an argument
+;Input
+;\1 = target address of lower byte
+;\2 = value to be loaded into \1
+;Output
+;\2 value \in 1
 ldi16 .macro 
-    lda \2
+    lda #<\2
     sta \1
     lda #>\2
-    sta #<\1
+    sta #\1 +1
 .endm
 
+;lsl logical shift left
+;shifts left without rolling over carry
+;Input A
+;Output A shifted left by 1
 lsl .macro
     clc
     rol
 .endm
 
+;lslz logical shift left zero page
+;Behaves exectly like lsl execpt it
+;shifts the value of a zeropage address
+;instead of the accumulator.
+;Input
+;\1 = address of value to be shifted
+;Output
+;value of \1 shifted right by 1
 lslz .macro
     clc
     rol \1
 .endm
 
+;fmb fill memory block
+;fills memory block from start address
+;to end address with imidiate value.
+;Input
+;\1 = Start address
+;\2 = end address
+;\3 = value
+;Output
+;Block from start address to end address
+;filled with value
 fmb .macro 
     lda #>\1
     sta r1

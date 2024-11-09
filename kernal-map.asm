@@ -2,35 +2,119 @@
 ;in the game loop.
 ;They are all extremely inefficant
 
-KernalPrintInt16 = $BDCD
+;For more detailed kernal map see
+https://www.pagetable.com/c64ref/kernal/
+;---------------------------------------
+
+;Sets filename of file on disk to be 
+;written to or read from.
+;Input
+;A = length of filename
+;X/Y = address of first char in
+;filename
 KernalSetnam = $FFBD
+
+;set logical file number, device number,
+;and secondary address.
+;A setup rotine used in conjunction with
+;setnam to prepere for IO operations
+;see disk-subrotines.asm for examples.
+;Input 
+;A = logical file number
+;X = device number
+;Y = secondary address
 KernalSetlfs = $FFBA
+
+;Configure I/O channel as input in prep
+;for open command.
+;Input
+;X = logical file number of channel
+;Output
+KernalChkin = $FFC6
+
+;Configure I/O channel as output in prep
+;for open command.
+;Input
+;X = logical file number of channel
+;Output
+KernalChkout = $FFC9
+
+;Output Character
+;sends a character (byte) to all active
+;output channels configured by
+;rotines mapped and described above.
+;Input
+;A = byte to be send
 KernalChrout = $FFD2
 
-;Gets or sets the cursor position
-;based upon carry flag.
-;if the carry flag is set
-;the current cursor position will be
-;stored in X/Y
-;if the carry flag is clear
-;the current cursor position will be
-;set to X/Y and A destoryed
-KernalPlot = $FFF0
-
+;Save block of memory to io device
+;Input
+;A = Zeropage address of low byte 
+;of pointer to start of data block
+;X = low byte of end of block of data
+;Y = high byte of end of block of data 
 KernalSave = $FFD8
+
+;Load block of memory from io device
+;Caution length of data to be read can
+;not be set. This rotine loads until the
+;data stream ends.
+;Input
+;A = (0 for load, 1 for verify)
+;X/Y = Target start address for loaded
+;memory
+;Output
+;X/Y = Address of last byte loaded
 KernalLoad = $FFD5
+
+;Equivalent of basic open command
+;maps a logical file number to a
+;device with a device number
+;Input None (SetLFS and SetNam required)
+;Output
+;A = Error code
+KernalOpen = $FFC0
+
+;Reads IO status word into A
+;hard to descripe here see online
+;resources for a nice table.
 KernalReadst = $FFB7
-KernalOpen = $FFC0; Open File
-KernalChkin = $FFC6; Set Input Channel
-KernalChkout = $FFC9; Set Output Channel
 
 ;Get Character from Input Channel
+;Reads one char (byte) from active
+;input channel as configured using
+;Open checkin, setnam and setlfs
+;Input None (implicit)
+;Output 
+;A = char read from active input channel
 KernalGetin = $FFE4
 
-KernalClrChn = $FFCC; Clear I/O Channels
-KernalClose = $FFC3; Close File
-KernalClall = $FFE7; Close All Files
-KernalCls = $E544; Clear Screen
+;Clear I/O Channels
+;Resets I/O configureation set by
+;Open checkin, setnam and setlfs
+;and the like back to default
+;The default being the screen as
+;active output channel and
+;the keyboard as active input channel.
+;Input None
+;Output None
+KernalClrChn = $FFCC
+
+;Close I/O Channel
+;Closes an I/0 Channel opend by open
+;dues removing it from the list of
+;active input channels or
+;from the list of active output channels
+;depending upon the type of channel
+;closed
+;Input None
+;Output None
+KernalClose = $FFC3
+
+;Close All I/O channels
+;Input None
+;Output None
+KernalClall = $FFE7; 
 
 ;Shows flashing cursor and lets the user
 ;enter up to 80 chars of text
@@ -43,5 +127,3 @@ KernalCls = $E544; Clear Screen
 ;End of Data is denoted by
 ;carriage return character code in A
 KernalGetChr = $FFCF
-
-KernalListen = $FFB1

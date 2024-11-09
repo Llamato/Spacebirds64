@@ -128,7 +128,7 @@ FilenamePrefix
 FilenameStart
     .text "high scores"
 FilenameSuffix
-    .text ".S.W"
+    .text ",s,w"
 FilenameEnd
     .byte 0
 
