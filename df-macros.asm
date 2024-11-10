@@ -24,7 +24,7 @@ ldi16 .macro
     lda #<\2
     sta \1
     lda #>\2
-    sta #\1 +1
+    sta \1 +1
 .endm
 
 ;lsl logical shift left
