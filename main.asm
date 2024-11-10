@@ -39,10 +39,12 @@ showSaveHighScoreScreen
     #poke 53272, 23; set charset to 2
 
     ;Load scores from disk
+    jsr clearDiskIoMemory
     jsr LoadHighScores
     #ldi16 r0, diskBuffer
     #ldi16 r2, 1768
-    ldy diskBufferEnd-2
+    lda #255
+    sta r4
     jsr memcpy
 
     #print ThankYouForPlayingString
@@ -61,8 +63,6 @@ showSaveHighScoreScreen
     #input scoreArea
     #crlf
 
-    jsr $E56C
-
 ;Debug!!!!
     #print YouEnteredString
     #crlf
@@ -78,20 +78,19 @@ showSaveHighScoreScreen
     #print NameString
     #print nameArea
     #crlf
-    hold
-    jmp hold
 
 ;Save score to disk
-    ;jsr appendHighscoreToDiskBuffer
-    ;jsr SaveHighScores
+    jsr appendHighscoreToDiskBuffer
+    jsr SaveHighScores
 
     ;Load scores from disk
-    ;jsr LoadHighScores
-    ;#ldi16 r0, diskBuffer
-    ;#ldi16 r2, 1768
-    ;ldy diskBufferEnd-2
-    ;jsr memcpy
-    ;rts; temp
+    jsr LoadHighScores
+    #ldi16 r0, diskBuffer
+    #ldi16 r2, $400
+    lda #$FF
+    sta r4
+    jsr memcpy
+    rts; temp
 
 .include "disksubs.asm"
 .include "dataflowsubs.asm"

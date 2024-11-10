@@ -128,6 +128,10 @@ handleReadWriteError
     sty LastLoadAddress +1
     rts
 
+clearDiskIoMemory
+    ;#fmb diskBuffer, nameEnd, 32
+    rts
+
 appendHighscoreToDiskBuffer
     #ldi16 r0, scoreArea
     #ldi16 r2, diskBuffer
