@@ -1,6 +1,4 @@
 includeTests = 1
-includeTestSave = 0
-includeTestLoad = 1
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -16,13 +14,17 @@ includeTestLoad = 1
 ;End of BASIC program markers
 .byte $00, $00, $00
 
-*=2064
+*=$810 ;2064
 
 .include "zeropage-map.asm"
 .include "kernal-map.asm"
 .include "basic-map.asm"
 .include "df-macros.asm"
 .include "math-macros.asm"
+
+.ifne includeTests
+    .include "disktests.asm"
+.endif
 
 jmp init
 
@@ -33,37 +35,55 @@ gameloop
 jmp gameloop
 
 showSaveHighScoreScreen
-    jsr BasicCls; Clear screen
-;Move cursor to (0, 0)
-    jsr BasicCursorHome
+    jsr BasicCls
+
+.ifne includeTests
+    #dumpDiskBufferToScreen
+.endif
+
     #poke 53272, 23; set charset to 2
 
     ;Load scores from disk
     jsr clearDiskIoMemory
     jsr LoadHighScores
-    #ldi16 r0, diskBuffer
-    #ldi16 r2, 1768
-    lda #255
-    sta r4
-    jsr memcpy
+.ifne includeTests
+    #dumpDiskBufferToScreen
+.endif
+    lda #0
+    cmp eorp
+    bne skipCleanupForSubsequent
+    cmp eorp +1
+    bne skipCleanupForSubsequent
 
+;Cleaning twice for the first score
+;written to disk helps erase garbage
+;handed to us by the failed load attempt
+    jsr clearDiskIoMemory
+
+    skipCleanupForSubsequent
+.ifne includeTests
+    #dumpDiskBufferToScreen
+.endif
     #print ThankYouForPlayingString
 
 ;Get name from user
     #print EnterNamePrompt
-    #input nameArea   
+    #nullinput nameArea
     #crlf
 ;Get year from user
     #print EnterCurrentYearPrompt
-    #input yearArea
+    #nullinput yearArea
     #crlf
 
 ;Get score from user
     #print EnterScorePrompt
-    #input scoreArea
+    #nullinput scoreArea
     #crlf
 
 ;Debug!!!!
+.ifne includeTests
+    #dumpDiskBufferToScreen
+.endif
     #print YouEnteredString
     #crlf
 
@@ -81,32 +101,56 @@ showSaveHighScoreScreen
 
 ;Save score to disk
     jsr appendHighscoreToDiskBuffer
+
+    #dumpDiskBufferToScreen
+
     jsr SaveHighScores
+
+    #dumpDiskBufferToScreen
 
     ;Load scores from disk
     jsr LoadHighScores
-    #ldi16 r0, diskBuffer
-    #ldi16 r2, $400
-    lda #$FF
-    sta r4
-    jsr memcpy
-    rts; temp
+.ifne includeTests
+    #dumpDiskBufferToScreen
+.endif
+;Debug!!!
+    #print iSavedString
+    #crlf
+
+    #print ScoreString
+    #print recListStart
+    #crlf
+    
+    #print CurrentYearString
+    #print recListStart+scoreLength
+    #crlf
+
+    #print NameString
+    #print recListStart+scoreLength+yearLength
+    #crlf
+
+    #dumpDiskBufferToScreen
+    rts
 
 .include "disksubs.asm"
 .include "dataflowsubs.asm"
-;.include "vicsubs.asm" ;error in here
+.include "vicsubs.asm" ;error in here
 
 ;Data
 ThankYouForPlayingString
 .text "Thank you for playing"
 .byte $0D; \r = line end 
 .byte $00
+
 EnterNamePrompt
 .null "Please enter your name? "
+
 EnterCurrentYearPrompt
 .null "and the current year? "
+
 EnterScorePrompt
 .null "and your score for debugging? "
+
 ThankYouString
 .null "Thank you!"
 
@@ -121,3 +165,6 @@ CurrentYearString
 
 ScoreString
 .null "Score: "
+
+iSavedString
+.null "I saved"

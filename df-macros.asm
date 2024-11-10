@@ -79,14 +79,82 @@ crlf .macro; Carriage Return Line Feed
 ;question mark.
 ;Input
 ;\1 = char storage address
+;Output
+;char storage address + input length =
+;Input string
+;X = length of input
 input .macro
     ldx #0
 getNextChar
     jsr KernalGetChr
     cmp #$0D; Carriage return
     beq done; We are done here
-    sta \1, x
+    sta \1, X
     inx
     jmp getNextChar
 done
+.endm
+
+;The ASM equivalent of basics input func
+;Including everything but the forced
+;question mark and a null terminator
+;instead.
+;Input
+;\1 = char storage address
+;Output
+;char storage address + input length =
+;Input string
+;X = length of input
+nullinput .macro
+    #input \1
+    lda #0
+    sta \1, x
+.endm
+
+;fmb fill memory block
+;fills memory block from start address
+;to end address with imidiate value.
+;Input
+;\1 = Start address
+;\2 = end address
+;\3 = value
+;Output
+;Block from start address to end address
+;filled with value
+
+fmb .macro 
+    #ldi16 r0, \1
+    #ldi16 r2, \2
+    ldy #0
+    fillByte
+        lda #\3
+        sta (r0), y
+        lda r0
+        clc
+        adc #1
+        sta r0
+        lda r1
+        adc #0
+        sta r1
+        cmp r3
+        bne fillByte
+        lda r0
+        cmp r2
+        bne fillByte
+.endm
+
+mov16 .macro
+    lda \2
+    sta \1
+    lda \2 +1
+    sta \1 +1
+.endm
+
+bne16 .macro
+    lda \1
+    cmp \2
+    bne \3
+    lda \1 +1
+    cmp \2 +1
+    bne \3
 .endm

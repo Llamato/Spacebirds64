@@ -22,23 +22,32 @@ seconday_address_write = 1
 seconday_address_read_to_prg = 2
 
 
+
 ;Memory Allocation
+;eorp = end of records pointer
+eorp = $C000
+
 ;Disk buffer for load in and out
 diskBuffer = $C000
-diskBufferEnd = $C200
-
-LastLoadAddress = scoreArea -2
-
+recListStart = diskBuffer+2
+diskBufferEnd = $CF00
 
 ;Staging Area
-scoreArea = yearArea - 5
+scoreArea = diskBufferEnd +1
 ;    .text "00000"; temp
-yearArea = nameArea - 4
+yearArea = scoreArea +6
 ;    .text "2024"
-nameArea = nameEnd - 20
+nameArea =  yearArea  +5
 ;    .repeat 20, 32
-nameEnd = $CFFF
+nameEnd = nameArea +20
 
+scoreLength = yearArea - scoreArea
+yearLength = nameArea - yearArea
+nameLength = nameEnd - nameArea
+recordLength = nameEnd - scoreArea
+
+;curRecPointer = currentRecordPointer
+curRecPointer = nameEnd
 
 ;--------------------------------------
 ;Marcos
@@ -97,51 +106,66 @@ sfd .macro
 ;Rotines
 
 LoadHighScores
-    #ldi16 r0, diskBuffer
-    #lfd 2, 8, FilenameStart, 11, 1
-    bcs handleReadError
-    stx LastLoadAddress
-    sty LastLoadAddress + 1
-    rts
+#ldi16 curRecPointer, recListStart
+#ldi16 r0, diskBuffer
+#lfd 2, 8, FilenameStart, 11, 1
+bcs handleReadError
+rts
 
 SaveHighScores
-    #poke r0, <diskBuffer
-    #poke r1, >diskBuffer
-    #poke r2, <diskBufferEnd
-    #poke r3, >diskBufferEnd
-    #sfd 2, 8, FilenamePrefixOverwrite, 14
-    bcs handleWriteError
-    rts
+#poke r0, <diskBuffer
+#poke r1, >diskBuffer
+#poke r2, <diskBufferEnd
+#poke r3, >diskBufferEnd
+#sfd 2, 8, FilenamePrefixOverwrite, 14
+bcs handleWriteError
+rts
 
 handleReadError
-    sta 5320
+.ifne includeTests
+    sta 53280
+.endif
     jmp handleReadWriteError
 
 handleWriteError
+.ifne includeTests
     sta 53281
+.endif
     jmp handleReadWriteError
 
 handleReadWriteError
-    ldx #0
-    stx LastLoadAddress
-    ldy #0
-    sty LastLoadAddress +1
+    ldx #<recListStart
+    stx eorp
+    ldy #>recListStart
+    sty eorp +1
     rts
 
 clearDiskIoMemory
-    ;#fmb diskBuffer, nameEnd, 32
+    #fmb $C000, $CFFF, 0
+    rts
+
+getNextRecord
+    #add16i curRecPointer, recordLength
+;Add checks for greater then eorp here
+;if so jump to eorr
+    rts
+
+;eorr = end of records reached
+;warp around back to recListStart
+eorr
+    #ldi16 curRecPointer, recListStart
     rts
 
 appendHighscoreToDiskBuffer
     #ldi16 r0, scoreArea
-    #ldi16 r2, diskBuffer
-    #add16 r2, LastLoadAddress
-    ldy #scoreArea-nameEnd
+    #mov16 r2, eorp
+    ldy #recordLength
+    sty r4
     jsr memcpy
+    #add16i eorp, recordLength
     rts
 
 ;Data
-
 FilenamePrefixOverwrite
     .byte $40
 FilenamePrefix

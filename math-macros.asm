@@ -180,9 +180,20 @@ BNE L1
 
 add16 .macro
     lda \1
+    clc
     adc \2
     sta \1
     lda \1 +1
     adc \2 +1
+    sta \1 +1
+.endm
+
+add16i .macro
+    lda \1
+    clc
+    adc #<\2
+    sta \1
+    lda \1 +1
+    adc #>\2
     sta \1 +1
 .endm
