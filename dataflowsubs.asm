@@ -5,13 +5,16 @@
 ;Input
 ;r0/r1 = source address pointer
 ;r2/r3 = destination address pointer
-;Y = size of data block
+;r4 = size of data block
 
-memcpy
-    lda (r0), y
-    sta (r2), y
-    dey
-    bne memcpy
-    lda (r0), y
-    sta (r2), y
+memcpy; Needs recode. While at it. Add 16 bit support please
+.block
+    ldy #0
+    copybyte
+        lda (r0),y
+        sta (r2),y
+        iny
+        cpy r4
+        bne copybyte
     rts
+.bend

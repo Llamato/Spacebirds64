@@ -15,16 +15,29 @@ ActionKernalSave = 1
 LoadToAdressInFile = 0
 LoadToAddressInAX = 1
 
-diskBuffer = $C000
-diskBufferS = 1024
-diskBufferEnd = diskBuffer + diskBufferS
-LastLoadAddress = diskBufferEnd -2
-
 primery_iec_channel_address = 2
 device = 8
 seconday_address_read_to_xy = 0
 seconday_address_write = 1
 seconday_address_read_to_prg = 2
+
+
+;Memory Allocation
+;Disk buffer for load in and out
+diskBuffer = $C000
+diskBufferEnd = $C200
+
+LastLoadAddress = scoreArea -2
+
+
+;Staging Area
+scoreArea = yearArea - 5
+;    .text "00000"; temp
+yearArea = nameArea - 4
+;    .text "2024"
+nameArea = nameEnd - 20
+;    .repeat 20, 32
+nameEnd = $CFFF
 
 
 ;--------------------------------------
@@ -84,11 +97,11 @@ sfd .macro
 ;Rotines
 
 LoadHighScores
-    #ldi16 r0, 1024
-    #lfd 2, 8, FilenameStart, 11, 0
+    #ldi16 r0, diskBuffer
+    #lfd 2, 8, FilenameStart, 11, 1
     bcs handleReadError
-    stx diskBufferEnd -2
-    sty diskBufferEnd -1
+    stx LastLoadAddress
+    sty LastLoadAddress + 1
     rts
 
 SaveHighScores
@@ -110,15 +123,15 @@ handleWriteError
 
 handleReadWriteError
     ldx #0
-    stx diskBufferEnd-2
+    stx LastLoadAddress
     ldy #0
-    sty diskBufferEnd-1
+    sty LastLoadAddress +1
     rts
 
 appendHighscoreToDiskBuffer
     #ldi16 r0, scoreArea
     #ldi16 r2, diskBuffer
-    #add16 r2, diskBufferEnd-2
+    #add16 r2, LastLoadAddress
     ldy #scoreArea-nameEnd
     jsr memcpy
     rts
@@ -134,16 +147,4 @@ FilenameStart
 FilenameSuffix
     .text ",s,w"
 FilenameEnd
-    .byte 0
-
-scoreArea
-    .text "00000"; temp
-    .byte $00
-yearArea
-    .text "2024"
-    .byte $00
-nameArea
-    .repeat 20, 32
-    .byte $00
-nameEnd
     .byte 0
