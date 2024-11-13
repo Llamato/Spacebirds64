@@ -46,8 +46,13 @@ yearLength = nameArea - yearArea
 nameLength = nameEnd - nameArea
 recordLength = nameEnd - scoreArea
 
+
+;This variable seems redundent to me.
+;Once the first completely working
+;version of the save and retiveal system
+;is done, I will try to optimize it away
 ;curRecPointer = currentRecordPointer
-curRecPointer = nameEnd
+curRecPointer = $CFFE
 
 ;--------------------------------------
 ;Marcos

@@ -1,4 +1,4 @@
-includeTests = 1
+includeTests = 0
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -41,14 +41,19 @@ showSaveHighScoreScreen
     #dumpDiskBufferToScreen
 .endif
 
+    #poke 53280, 0; set border color
+    #poke 53281, 0; set background color
+    #poke 646, 7; set basic text color
     #poke 53272, 23; set charset to 2
 
     ;Load scores from disk
     jsr clearDiskIoMemory
     jsr LoadHighScores
+
 .ifne includeTests
     #dumpDiskBufferToScreen
 .endif
+
     lda #0
     cmp eorp
     bne skipCleanupForSubsequent
@@ -61,15 +66,19 @@ showSaveHighScoreScreen
     jsr clearDiskIoMemory
 
     skipCleanupForSubsequent
+
 .ifne includeTests
     #dumpDiskBufferToScreen
+
 .endif
+
     #print ThankYouForPlayingString
 
 ;Get name from user
     #print EnterNamePrompt
     #nullinput nameArea
     #crlf
+
 ;Get year from user
     #print EnterCurrentYearPrompt
     #nullinput yearArea
@@ -80,61 +89,81 @@ showSaveHighScoreScreen
     #nullinput scoreArea
     #crlf
 
-;Debug!!!!
-.ifne includeTests
-    #dumpDiskBufferToScreen
-.endif
-    #print YouEnteredString
-    #crlf
-
-    #print ScoreString
-    #print scoreArea
-    #crlf
-
-    #print CurrentYearString
-    #print yearArea
-    #crlf
-
-    #print NameString
-    #print nameArea
-    #crlf
-
 ;Save score to disk
     jsr appendHighscoreToDiskBuffer
 
-    #dumpDiskBufferToScreen
+;Print high score table to screen
+.block ;print high scores table
+;(game) design parameters‹
+    tableHeaderColor = 4; Pink
+    tableEntryColor = 1; White
+    tableOwnEntryColor = 7; Yellow
+    jsr BasicCls; Clear screen
 
-    jsr SaveHighScores
+;print table header
+    #poke 646, tableHeaderColor
+    #printNoneNull ScoreString, 5
+    #tab
+    #printNoneNull YearString, 4
+    #tab
+    #printNoneNull NameString, 4
+    #crlf
 
-    #dumpDiskBufferToScreen
+;print table entries
+    #poke 646, 1; set text color black
 
-    ;Load scores from disk
-    jsr LoadHighScores
+printTableEntry
+;print Score
+    lda curRecPointer
+    ldy curRecPointer +1
+    jsr BasicPrintNull
+    #tab
+    #add16i curRecPointer, scoreLength 
+
+;print Year
+    lda curRecPointer
+    ldy curRecPointer +1
+    jsr BasicPrintNull
+    #tab
+    #add16i curRecPointer, yearLength
+;print Name
+    lda curRecPointer
+    ldy curRecPointer +1
+    jsr BasicPrintNull
+    #tab
+    #add16i curRecPointer, nameLength
+    #crlf
+
+;Check for next record
+;Optimized with Claude ai. Good stuff!
+    lda curRecPointer +1 ; Load high byte of eorp
+    cmp eorp +1 ; Compare with high byte of curRecPointer
+    bcc jumppad  ; If eorp > curRecPointer, continue to print
+    bne done     ; If eorp < curRecPointer, branch to done
+    lda curRecPointer   ; If high bytes equal, load low byte of eorp
+    cmp  eorp  ; Compare with low byte of curRecPointer
+    bcc jumppad  ; If eorp > curRecPointer, continue to print
+    beq done  ; If equal, continue to print
+    jmp done
+jumppad; needed because of long branch
+    jmp printTableEntry
+done
+.bend
+
 .ifne includeTests
     #dumpDiskBufferToScreen
 .endif
-;Debug!!!
-    #print iSavedString
-    #crlf
-
-    #print ScoreString
-    #print recListStart
-    #crlf
     
-    #print CurrentYearString
-    #print recListStart+scoreLength
-    #crlf
+    jsr SaveHighScores
 
-    #print NameString
-    #print recListStart+scoreLength+yearLength
-    #crlf
-
+.ifne includeTests
     #dumpDiskBufferToScreen
+.endif
     rts
 
 .include "disksubs.asm"
 .include "dataflowsubs.asm"
-.include "vicsubs.asm" ;error in here
+.include "vicsubs.asm"
 
 ;Data
 ThankYouForPlayingString
@@ -160,11 +189,18 @@ YouEnteredString
 NameString
 .null "Name: "
 
-CurrentYearString
-.null "Current Year: "
+YearString
+.null "Year: "
 
 ScoreString
 .null "Score: "
 
 iSavedString
 .null "I saved"
+
+;Note from tina for tina
+;Next problem to solve
+;How do we print the table header
+;Wihout including every needed string
+;twice?
+;is there a basic print none null func?

@@ -45,7 +45,7 @@ KernalChkout = $FFC9
 ;rotines mapped and described above.
 ;Input
 ;A = byte to be send
-KernalChrout = $FFD2
+kernalChrout = $FFD2
 
 ;Save block of memory to io device
 ;Input

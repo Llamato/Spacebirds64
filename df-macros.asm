@@ -49,6 +49,32 @@ lslz .macro
     rol \1
 .endm
 
+;getCur = getCursor
+;Retives current basic cursor position
+;stores column in y and row in x
+getCur .macro
+    sec; set carry to indicate read
+    jsr BasicPlot; read cursor position
+.endm
+
+;prints string to screen
+;Input
+;\1 = start address of string
+;\2 = length of string
+;Output
+;String on screeen,cursor at stringEnd+1
+printNoneNull .macro
+ldx #0
+printChar
+    lda \1, x
+    jsr kernalChrout
+    inx
+    cpx #\2
+    beq donePrinting
+    jmp printChar
+donePrinting
+.endm
+
 ;Macro wrapper for basic rom PrintNull
 ;function by max integrated by Tina
 ;Input 
@@ -57,7 +83,7 @@ lslz .macro
 ;string from \1
 ;without the null terminator
 ;beginning at location of basic cursor
-print .macro 
+print .macro ;Rename to printNull
     ;put low byte of address in a
     lda  #<\1
     ;put high byte of address in y
@@ -66,12 +92,19 @@ print .macro
 .endm
 
 crlf .macro; Carriage Return Line Feed
-    sec; set carry to indicate read
-    jsr BasicPlot; read cursor position
+    #getCur
     ldy #0
     inx
     clc; Clear carry to indicate set
     jsr BasicPlot; hit it!
+.endm
+
+tab .macro; Tab of IBM PC fame
+    lda #32
+    jsr kernalChrout
+    jsr kernalChrout
+    jsr kernalChrout
+    jsr kernalChrout
 .endm
 
 ;The ASM equivalent of basics input func
@@ -148,13 +181,4 @@ mov16 .macro
     sta \1
     lda \2 +1
     sta \1 +1
-.endm
-
-bne16 .macro
-    lda \1
-    cmp \2
-    bne \3
-    lda \1 +1
-    cmp \2 +1
-    bne \3
 .endm
