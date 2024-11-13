@@ -57,6 +57,16 @@ getCur .macro
     jsr BasicPlot; read cursor position
 .endm
 
+;setCur = setCursor
+;Sets basic cursor position
+;Input
+;Y = cursor column
+;X = cursor row
+setCur .macro
+    clc; clear carry to indicate set
+    jsr BasicPlot; srt cursor position
+.endm
+
 ;prints string to screen
 ;Input
 ;\1 = start address of string
@@ -111,7 +121,7 @@ tab .macro; Tab of IBM PC fame
 ;Including everything but the forced
 ;question mark.
 ;Input
-;\1 = char storage address
+;\1 = Char storage address
 ;Output
 ;char storage address + input length =
 ;Input string
@@ -149,12 +159,11 @@ nullinput .macro
 ;to end address with imidiate value.
 ;Input
 ;\1 = Start address
-;\2 = end address
-;\3 = value
+;\2 = End address
+;\3 = Value
 ;Output
 ;Block from start address to end address
 ;filled with value
-
 fmb .macro 
     #ldi16 r0, \1
     #ldi16 r2, \2
@@ -176,6 +185,10 @@ fmb .macro
         bne fillByte
 .endm
 
+;mov16 = move 16 bit with LSB frist
+;Input
+;\1 = destination address of low byte
+;\2 = source address of high byte.
 mov16 .macro
     lda \2
     sta \1

@@ -1,6 +1,9 @@
 ;---------------------------------------
 ;This file contains verious macros
-;implementing basic arithmetic ops
+;implementing basic arithmetic ops.
+
+;Note: 6502 byte order is always
+;lsb first, unless specified otherwise.
 
 ;Tina Guessbacher
 ;Claude.ai
@@ -8,6 +11,39 @@
 ;WS2024
 
 ;---------------------------------------
+
+;Add two 16 bit numbers in memory
+;Input
+;\1 = Source address of first number
+;\2 = Source address of second number
+;Output
+;Result of addition in \1 and \1+1
+add16 .macro
+    lda \1
+    clc
+    adc \2
+    sta \1
+    lda \1 +1
+    adc \2 +1
+    sta \1 +1
+.endm
+
+;Add a 16 bit imidiate to a 16 bit
+;number in memory.
+;Input
+;\1 = Source adddress of first number
+;\2 = Imidiate value to be added to \1
+;Output
+;Result of addition in \1 and \1 +1
+add16i .macro
+    lda \1
+    clc
+    adc #<\2
+    sta \1
+    lda \1 +1
+    adc #>\2
+    sta \1 +1
+.endm
 
 ;Standard implementation of S and A alg
 ;Input
@@ -106,7 +142,6 @@ ResHi = <\3
 ;by Bregalad
 ;Enter with A = Dividend, Y=Divisor
 ;Output with YX = (A/Y) << 8, A = remain
-
 sta Dvd	;Stores dividend
 sty Dvs	;Stores divisor
 lda #$00
@@ -176,24 +211,4 @@ INC NUM1; and record a 1 in the quotient
 L2      
 DEX
 BNE L1
-.endm
-
-add16 .macro
-    lda \1
-    clc
-    adc \2
-    sta \1
-    lda \1 +1
-    adc \2 +1
-    sta \1 +1
-.endm
-
-add16i .macro
-    lda \1
-    clc
-    adc #<\2
-    sta \1
-    lda \1 +1
-    adc #>\2
-    sta \1 +1
 .endm

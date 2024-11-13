@@ -8,6 +8,10 @@ BitmapStart = $6000
 BitmapSize = 8000
 BitmapEnd = BitmapStart + BitmapSize
 
+;Set VIC-II to high res mode
+;in accordance with procedure described
+;here 
+;c64-wiki.com/wiki/Graphics_Modes
 EnterHighResMode
 lda 53265
 ora #32

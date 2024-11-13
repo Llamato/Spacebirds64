@@ -1,4 +1,4 @@
-;copyBlock
+;memcpy = memory copy
 ;copies a block of data 
 ;(max 256 byte size) from one location
 ;in memory to another
@@ -6,8 +6,9 @@
 ;r0/r1 = source address pointer
 ;r2/r3 = destination address pointer
 ;r4 = size of data block
-
-memcpy; Needs recode. While at it. Add 16 bit support please
+;Needs recode.
+;While at it. Add 16 bit support please.
+memcpy
 .block
     ldy #0
     copybyte

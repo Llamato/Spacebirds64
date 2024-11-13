@@ -21,8 +21,6 @@ seconday_address_read_to_xy = 0
 seconday_address_write = 1
 seconday_address_read_to_prg = 2
 
-
-
 ;Memory Allocation
 ;eorp = end of records pointer
 eorp = $C000
@@ -161,6 +159,8 @@ eorr
     #ldi16 curRecPointer, recListStart
     rts
 
+;Appends high score in staging Area to
+;Disk Buffer
 appendHighscoreToDiskBuffer
     #ldi16 r0, scoreArea
     #mov16 r2, eorp

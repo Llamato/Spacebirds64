@@ -1,4 +1,4 @@
-includeTests = 0
+includeTests = 1
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -69,7 +69,6 @@ showSaveHighScoreScreen
 
 .ifne includeTests
     #dumpDiskBufferToScreen
-
 .endif
 
     #print ThankYouForPlayingString
@@ -98,6 +97,7 @@ showSaveHighScoreScreen
     tableHeaderColor = 4; Pink
     tableEntryColor = 1; White
     tableOwnEntryColor = 7; Yellow
+    tabstopWidth = 4
     jsr BasicCls; Clear screen
 
 ;print table header
@@ -197,10 +197,3 @@ ScoreString
 
 iSavedString
 .null "I saved"
-
-;Note from tina for tina
-;Next problem to solve
-;How do we print the table header
-;Wihout including every needed string
-;twice?
-;is there a basic print none null func?
