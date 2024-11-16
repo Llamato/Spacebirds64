@@ -54,7 +54,7 @@ lslz .macro
 ;stores column in y and row in x
 getCur .macro
     sec; set carry to indicate read
-    jsr BasicPlot; read cursor position
+    jsr basicPlot; read cursor position
 .endm
 
 ;setCur = setCursor
@@ -64,7 +64,7 @@ getCur .macro
 ;X = cursor row
 setCur .macro
     clc; clear carry to indicate set
-    jsr BasicPlot; srt cursor position
+    jsr basicPlot; srt cursor position
 .endm
 
 ;prints string to screen
@@ -73,7 +73,7 @@ setCur .macro
 ;\2 = length of string
 ;Output
 ;String on screeen,cursor at stringEnd+1
-printNoneNull .macro
+printnonenull .macro
 ldx #0
 printChar
     lda \1, x
@@ -98,7 +98,7 @@ print .macro ;Rename to printNull
     lda  #<\1
     ;put high byte of address in y
     ldy  #>\1
-    jsr BasicPrintNull
+    jsr basicprintnull
 .endm
 
 crlf .macro; Carriage Return Line Feed
@@ -106,7 +106,7 @@ crlf .macro; Carriage Return Line Feed
     ldy #0
     inx
     clc; Clear carry to indicate set
-    jsr BasicPlot; hit it!
+    jsr basicPlot; hit it!
 .endm
 
 tab .macro; Tab of IBM PC fame

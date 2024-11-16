@@ -11,9 +11,10 @@ if len(filenames) == 0:
     exit(1)
 
 syscmd("c1541 -format asmdisk,01 d64 build/asmdisk.d64")
+preprocess_path = "build/preprocess"
+
 for filename in filenames:
     if filename.endswith(".asm"):
-        #syscmd("python3 buildscripts/C64AsciiPetsciiConverter/src/python/asciitopetscii.py " + filename + " buildscripts/" + filename)
         syscmd(f'petcat -text -w2 -o build/{filename} {filename}')
         syscmd(f'c1541 -attach build/asmdisk.d64 -write build/{filename} {filename},s')
         if len(filename) > 16:

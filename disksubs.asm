@@ -8,49 +8,38 @@
 
 ;---------------------------------------
 ;Constants
-
-ActionKernalLoad = 0
-ActionKernalSave = 1
-
-LoadToAdressInFile = 0
-LoadToAddressInAX = 1
-
-primery_iec_channel_address = 2
 device = 8
-seconday_address_read_to_xy = 0
-seconday_address_write = 1
-seconday_address_read_to_prg = 2
 
 ;Memory Allocation
 ;eorp = end of records pointer
 eorp = $C000
 
 ;Disk buffer for load in and out
-diskBuffer = $C000
-recListStart = diskBuffer+2
-diskBufferEnd = $CF00
+diskbuffer = $C000
+recliststart = diskbuffer+2
+diskbufferend = $CF00
 
 ;Staging Area
-scoreArea = diskBufferEnd +1
+scorearea = diskbufferend +1
 ;    .text "00000"; temp
-yearArea = scoreArea +6
+yeararea = scorearea +6
 ;    .text "2024"
-nameArea =  yearArea  +5
+namearea =  yeararea  +5
 ;    .repeat 20, 32
-nameEnd = nameArea +20
+nameend = namearea +20
 
-scoreLength = yearArea - scoreArea
-yearLength = nameArea - yearArea
-nameLength = nameEnd - nameArea
-recordLength = nameEnd - scoreArea
+scorelength = yeararea - scorearea
+yearlength = namearea - yeararea
+namelength = nameend - namearea
+recordlength = nameend - scorearea
 
 
 ;This variable seems redundent to me.
 ;Once the first completely working
 ;version of the save and retiveal system
 ;is done, I will try to optimize it away
-;curRecPointer = currentRecordPointer
-curRecPointer = $CFFE
+;currrecptr = currentRecordPointer
+currrecptr = $CFFE
 
 ;--------------------------------------
 ;Marcos
@@ -68,22 +57,22 @@ lfd .macro
     lda #\1
     ldx #\2
     ldy #\5
-    jsr KernalSetlfs
+    jsr kernalsetlfs
     lda #\4
     ldx #<\3
     ldy #>\3
-    jsr KernalSetnam
+    jsr kernalsetnam
     lda #0
     ldx r0
     ldy r1
-    jsr KernalLoad
+    jsr kernalload
 .endm
 
 ;sfd SaveFileToDisk(/1,/2,/3,/4,/5)
 ;\1 = logical file number
 ;\2 = device number
 ;\3 = filename pointer
-;\4 = filename_length (less then 40)
+;\4 = filenamelength (less then 40)
 ;r0 = LB of DataStart
 ;r1 = HB of DataStart
 ;r2 = LB of DataEnd
@@ -93,91 +82,94 @@ lfd .macro
 sfd .macro
     lda #\1
     ldx #\2
-    ldy #seconday_address_write
-    jsr KernalSetlfs
+    ldy #1
+    jsr kernalsetlfs
     lda #\4
     ldx #<\3
     ldy #>\3
-    jsr KernalSetnam
+    jsr kernalsetnam
     ldx r2
     ldy r3
     lda #<r0
-    jsr KernalSave
+    jsr kernalsave
     rts
 .endm
 
 ;Rotines
 
-LoadHighScores
-#ldi16 curRecPointer, recListStart
-#ldi16 r0, diskBuffer
-#lfd 2, 8, FilenameStart, 11, 1
-bcs handleReadError
+loadhighscores
+#ldi16 currrecptr, recliststart
+#ldi16 r0, diskbuffer
+#lfd 2, 8, filenamestart, 11, 1
+bcs hreaderr
 rts
 
-SaveHighScores
-#poke r0, <diskBuffer
-#poke r1, >diskBuffer
-#poke r2, <diskBufferEnd
-#poke r3, >diskBufferEnd
-#sfd 2, 8, FilenamePrefixOverwrite, 14
-bcs handleWriteError
+savehighscores
+#poke r0, <diskbuffer
+#poke r1, >diskbuffer
+#poke r2, <diskbufferend
+#poke r3, >diskbufferend
+#sfd 2, 8, filenameprefow, 14
+bcs hwriteerr
 rts
 
-handleReadError
-.ifne includeTests
+hreaderr; handle read error
+.ifne includetests
     sta 53280
 .endif
-    jmp handleReadWriteError
+    jmp hreadwriteerr;
 
-handleWriteError
-.ifne includeTests
+hwriteerr; handle write error
+.ifne includetests
     sta 53281
 .endif
-    jmp handleReadWriteError
+    jmp hreadwriteerr
 
-handleReadWriteError
-    ldx #<recListStart
+hreadwriteerr; handle read write error
+    ldx #<recliststart
     stx eorp
-    ldy #>recListStart
+    ldy #>recliststart
     sty eorp +1
     rts
 
-clearDiskIoMemory
+clrdiskiomem
     #fmb $C000, $CFFF, 0
     rts
 
-getNextRecord
-    #add16i curRecPointer, recordLength
+getnextrecord
+    #add16i currrecptr, recordlength
 ;Add checks for greater then eorp here
 ;if so jump to eorr
     rts
 
 ;eorr = end of records reached
-;warp around back to recListStart
+;warp around back to recliststart
 eorr
-    #ldi16 curRecPointer, recListStart
+    #ldi16 currrecptr, recliststart
     rts
 
+;addhstodb = append high score to
+;disk buffer
 ;Appends high score in staging Area to
-;Disk Buffer
-appendHighscoreToDiskBuffer
-    #ldi16 r0, scoreArea
+;disk Buffer
+addhstodb
+    #ldi16 r0, scorearea
     #mov16 r2, eorp
-    ldy #recordLength
+    ldy #recordlength
     sty r4
     jsr memcpy
-    #add16i eorp, recordLength
+    #add16i eorp, recordlength
     rts
 
 ;Data
-FilenamePrefixOverwrite
+;filenameprefow=filenameprefixOverwrite
+filenameprefow
     .byte $40
-FilenamePrefix
+filenameprefix
     .text "0:"
-FilenameStart
+filenamestart
     .text "high scores"
-FilenameSuffix
+filenamesuffix
     .text ",s,w"
-FilenameEnd
+filenameend
     .byte 0

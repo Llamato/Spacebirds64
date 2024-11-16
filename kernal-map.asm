@@ -12,7 +12,7 @@
 ;A = length of filename
 ;X/Y = address of first char in
 ;filename
-KernalSetnam = $FFBD
+kernalsetnam = $FFBD
 
 ;set logical file number, device number,
 ;and secondary address.
@@ -23,7 +23,7 @@ KernalSetnam = $FFBD
 ;A = logical file number
 ;X = device number
 ;Y = secondary address
-KernalSetlfs = $FFBA
+kernalsetlfs = $FFBA
 
 ;Configure I/O channel as input in prep
 ;for open command.
@@ -54,7 +54,7 @@ kernalChrout = $FFD2
 ;X = low byte of end of block of data
 ;Y = high byte of end of block of data 
 ;Carry set on Error
-KernalSave = $FFD8
+kernalsave = $FFD8
 
 ;Load block of memory from io device
 ;Caution length of data to be read can
@@ -67,7 +67,7 @@ KernalSave = $FFD8
 ;Output
 ;X/Y = Address of last byte loaded
 ;Carry set on Error
-KernalLoad = $FFD5
+kernalload = $FFD5
 
 ;Equivalent of basic open command
 ;maps a logical file number to a

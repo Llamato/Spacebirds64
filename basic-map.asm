@@ -1,7 +1,7 @@
 ;Positions cursor at (0,0)
 ;Input none
 ;Output none
-BasicCursorHome = $E566
+basicCursorHome = $E566
 
 ;Gets or sets the cursor position
 ;based upon carry flag.
@@ -11,14 +11,14 @@ BasicCursorHome = $E566
 ;if the carry flag is clear
 ;the current cursor position will be
 ;set to X/Y and A destoryed
-BasicPlot = $FFF0
+basicPlot = $FFF0
 
 ;Prints null terminated string
 ;starting at cursor position
 ;shifting the cursor to the position of
 ;the current char up to end including
 ;the terminator
-BasicPrintNull = $AB1E
+basicprintnull = $AB1E
 
 ;Prints 16 bit number stored in X/Y
 ;to screen at cursor position
@@ -28,7 +28,7 @@ BasicPrintNull = $AB1E
 ;String of characters representing
 ;the 16 bit input value starting at
 ;cursor position
-BasicPrintInt16 = $BDCD
+basicPrintInt16 = $BDCD
 
 
 ;Clear Screen
@@ -38,4 +38,4 @@ BasicPrintInt16 = $BDCD
 ;Output
 ;Memory region defined as basic
 ;screen memory filled with #32
-BasicCls = $E544
+basiccls = $E544

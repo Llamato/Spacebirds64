@@ -21,7 +21,9 @@
                 "kind": "build",
                 "isDefault": false
             },
-            "dependsOn":["tmpx assemble"],
+            "dependsOn": [
+                "tmpx assemble"
+            ]
         },
         {
             "label": "launch in vice",
@@ -31,7 +33,9 @@
                 "kind": "build",
                 "isDefault": false
             },
-            "dependsOn":["pack program disk"]
+            "dependsOn": [
+                "pack program disk"
+            ]
         },
         {
             "label": "convert to petscii",
@@ -45,7 +49,8 @@
         {
             "label": "pack code disk",
             "type": "shell",
-            "command": "python3 buildscripts/packasmdisk.py"
+            "command": "python3 buildscripts/packasmdisk.py",
+            "problemMatcher": []
         }
     ]
 }

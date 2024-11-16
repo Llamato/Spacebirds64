@@ -1,18 +1,18 @@
 ;VIC bank 2 constants
-ScreenStart = $4400
-ScreenSize = 40 * 25
-ScreenEnd = ScreenStart + ScreenSize
+screenStart = $4400
+screenSize = 40 * 25
+screenEnd = screenStart + screenSize
 
 ;hires mode constants
-BitmapStart = $6000
-BitmapSize = 8000
-BitmapEnd = BitmapStart + BitmapSize
+bitmapStart = $6000
+bitmapSize = 8000
+bitmapEnd = bitmapStart + bitmapSize
 
 ;Set VIC-II to high res mode
 ;in accordance with procedure described
 ;here 
 ;c64-wiki.com/wiki/Graphics_Modes
-EnterHighResMode
+enterHighResMode
 lda 53265
 ora #32
 sta 53265
@@ -32,6 +32,6 @@ ora #2
 sta 56576
 
 ;clear color and pixels
-#fmb BitmapStart, BitmapEnd, $00
-#fmb ScreenStart, ScreenEnd, $F0
+#fmb bitmapStart, bitmapEnd, $00
+#fmb screenStart, screenEnd, $F0
 rts
