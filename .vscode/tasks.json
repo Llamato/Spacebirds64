@@ -47,10 +47,23 @@
             }
         },
         {
+            "label": "flatten TMPx includes",
+            "type": "shell",
+            "command": "python3 buildscripts/flattenasm.py ${fileBasename} build/flattend${fileBasenameNoExtension}.asm",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "pack code disk",
             "type": "shell",
-            "command": "python3 buildscripts/packasmdisk.py",
-            "problemMatcher": []
+            "command": "python3 buildscripts/packasmdisk.py main.asm",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
         }
     ]
 }
