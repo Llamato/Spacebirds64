@@ -9,7 +9,6 @@ filenames = os.listdir(".")
 if len(filenames) == 0:
     print("No asm files found. Aborting...", file=sys.stderr)
     exit(1)
-
 syscmd("c1541 -format asmdisk,01 d64 build/asmdisk.d64")
 preprocess_path = "build/preprocess"
 

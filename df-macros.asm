@@ -49,40 +49,22 @@ lslz .macro
     rol \1
 .endm
 
-;getCur = getCursor
+;getcur = getcursor
 ;Retives current basic cursor position
 ;stores column in y and row in x
-getCur .macro
-    sec; set carry to indicate read
-    jsr basicPlot; read cursor position
+getcur .macro
+    sec; clear carry means read
+    jsr basicplot; do the reading
 .endm
 
-;setCur = setCursor
+;setcur = setcursor
 ;Sets basic cursor position
 ;Input
 ;Y = cursor column
 ;X = cursor row
-setCur .macro
-    clc; clear carry to indicate set
-    jsr basicPlot; srt cursor position
-.endm
-
-;prints string to screen
-;Input
-;\1 = start address of string
-;\2 = length of string
-;Output
-;String on screeen,cursor at stringEnd+1
-printnonenull .macro
-ldx #0
-printChar
-    lda \1, x
-    jsr kernalChrout
-    inx
-    cpx #\2
-    beq donePrinting
-    jmp printChar
-donePrinting
+setcur .macro
+    clc; clear carry means set
+    jsr basicplot; set cursor pos
 .endm
 
 ;Macro wrapper for basic rom PrintNull
@@ -101,20 +83,21 @@ print .macro ;Rename to printNull
     jsr basicprintnull
 .endm
 
-crlf .macro; Carriage Return Line Feed
-    #getCur
+;Carriage Return Line Feed
+crlf .macro
+    #getcur
     ldy #0
     inx
-    clc; Clear carry to indicate set
-    jsr basicPlot; hit it!
+    clc; set means clear carry
+    jsr basicplot; hit it!
 .endm
 
 tab .macro; Tab of IBM PC fame
     lda #32
-    jsr kernalChrout
-    jsr kernalChrout
-    jsr kernalChrout
-    jsr kernalChrout
+    jsr kernalchrout
+    jsr kernalchrout
+    jsr kernalchrout
+    jsr kernalchrout
 .endm
 
 ;The ASM equivalent of basics input func
@@ -128,13 +111,13 @@ tab .macro; Tab of IBM PC fame
 ;X = length of input
 input .macro
     ldx #0
-getNextChar
-    jsr KernalGetChr
-    cmp #$0D; Carriage return
+getnextchar
+    jsr kernalgetchr
+    cmp #$0d; Carriage return
     beq done; We are done here
     sta \1, X
     inx
-    jmp getNextChar
+    jmp getnextchar
 done
 .endm
 
@@ -168,7 +151,7 @@ fmb .macro
     #ldi16 r0, \1
     #ldi16 r2, \2
     ldy #0
-    fillByte
+    fillbyte
         lda #\3
         sta (r0), y
         lda r0
@@ -179,10 +162,10 @@ fmb .macro
         adc #0
         sta r1
         cmp r3
-        bne fillByte
+        bne fillbyte
         lda r0
         cmp r2
-        bne fillByte
+        bne fillbyte
 .endm
 
 ;mov16 = move 16 bit with LSB frist
@@ -194,4 +177,22 @@ mov16 .macro
     sta \1
     lda \2 +1
     sta \1 +1
+.endm
+
+;prints string to screen
+;Input
+;\1 = start address of string
+;\2 = length of string
+;Output
+;String on screeen,cursor at stringEnd+1
+printlen .macro
+ldx #0
+printchar
+    lda \1, x
+    jsr kernalchrout
+    inx
+    cpx #\2
+    beq doneprinting
+    jmp printchar
+doneprinting
 .endm

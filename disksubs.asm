@@ -3,21 +3,19 @@
 ;Saving, loading,
 ;complaining about melfunctions
 ;you name it
-
-;Tina Guessbacher 2024
-
 ;---------------------------------------
+
 ;Constants
 device = 8
 
 ;Memory Allocation
 ;eorp = end of records pointer
-eorp = $C000
+eorp = $c000
 
 ;Disk buffer for load in and out
-diskbuffer = $C000
+diskbuffer = $c000
 recliststart = diskbuffer+2
-diskbufferend = $CF00
+diskbufferend = $cf00
 
 ;Staging Area
 scorearea = diskbufferend +1
@@ -39,7 +37,7 @@ recordlength = nameend - scorearea
 ;version of the save and retiveal system
 ;is done, I will try to optimize it away
 ;currrecptr = currentRecordPointer
-currrecptr = $CFFE
+currrecptr = $cffe
 
 ;--------------------------------------
 ;Marcos
@@ -49,7 +47,7 @@ currrecptr = $CFFE
 ;\1 = logical file number
 ;\2 = device number
 ;\3 = filename pointer
-;\4 = filename_length (less then 40)
+;\4 = filename-length (less then 40)
 ;\5 = (0 = r0/r1 addr else prg file adr)
 ;Output
 ;carry set on error with A = error code
@@ -133,14 +131,16 @@ hreadwriteerr; handle read write error
     rts
 
 clrdiskiomem
-    #fmb $C000, $CFFF, 0
+    #fmb $c000, $cfff, 0
     rts
 
+.ifne includetests
 getnextrecord
     #add16i currrecptr, recordlength
 ;Add checks for greater then eorp here
 ;if so jump to eorr
     rts
+.endif
 
 ;eorr = end of records reached
 ;warp around back to recliststart
@@ -171,5 +171,3 @@ filenamestart
     .text "high scores"
 filenamesuffix
     .text ",s,w"
-filenameend
-    .byte 0

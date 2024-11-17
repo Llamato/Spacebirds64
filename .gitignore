@@ -6,3 +6,4 @@ build/
 scrap/
 .VSCodeCounter/
 prgdisk/
+*.bin

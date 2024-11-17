@@ -17,10 +17,20 @@ includetests = 0
 *=$810 ;2064
 
 .include "zeropage-map.asm"
-.include "kernal-map.asm"
-.include "basic-map.asm"
+.include "rom-map.asm"
 .include "df-macros.asm"
-.include "math-macros.asm"
+
+add16i .macro
+    lda \1
+    clc
+    adc #<\2
+    sta \1
+    lda \1 +1
+    adc #>\2
+    sta \1 +1
+.endm
+
+;.include "math-macros.asm"
 
 .ifne includetests
     .include "disktests.asm"
@@ -100,19 +110,20 @@ sshss
 ;Print high score table to screen
 .block ;print high scores table
 ;(game) design parameters
-    tableheadcolor = 4; Pink
-    tableEntryColor = 1; White
-    tableOwnEntryColor = 7; Yellow
-    tabstopWidth = 4
+
+    theadcolor = 4; Pink
+    tentrycolor = 1; White
+    townentrycolor = 7; Yellow
+    tabstopwidth = 4
     jsr basiccls; Clear screen
 
 ;print table header
-    #poke 646, tableheadcolor
-    #printnonenull scorestring, 5
+    #poke 646, theadcolor
+    #printlen scorestring, 5
     #tab
-    #printnonenull yearstring, 4
+    #printlen yearstring, 4
     #tab
-    #printnonenull namestring, 4
+    #printlen namestring, 4
     #crlf
 
 ;print table entries
@@ -176,9 +187,7 @@ done
 .endif
     rts
 
-.include "disksubs.asm"
-.include "dataflowsubs.asm"
-.include "vicsubs.asm"
+;.include "vicsubs.asm"
 
 ;Data
 ;tyfps = thank you for playing string
@@ -201,12 +210,6 @@ esp
 .text "and your score "
 .null "for debugging? "
 
-thankyoustring
-.null "Thank you!"
-
-youenteredstr
-.null "You entered"
-
 namestring
 .null "Name: "
 
@@ -216,5 +219,6 @@ yearstring
 scorestring
 .null "Score: "
 
-isavedstr
-.null "I saved"
+.include "dataflowsubs.asm"
+.include "disksubs.asm"
+

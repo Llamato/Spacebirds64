@@ -1,17 +1,17 @@
 ;Completely Save
-r0 = $FB
-r1 = $FC
-r2 = $FD
-r3 = $FE
+r0 = $fb
+r1 = $fc
+r2 = $fd
+r3 = $fe
 
 ;Most likely save
-r4 = $F9
-r5 = $FA
-r6 = $F7
-r7 = $F8
+r4 = $f9
+r5 = $fa
+r6 = $f7
+r7 = $f8
 
 ;Less save
-r31 = $F6
+r31 = $f6
 r30 = r31 -1 
 r29 = r30 -1
 r28 = r29 -1
