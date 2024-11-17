@@ -188,6 +188,8 @@ done
     rts
 
 ;.include "vicsubs.asm"
+.include "dataflowsubs.asm"
+.include "disksubs.asm"
 
 ;Data
 ;tyfps = thank you for playing string
@@ -218,7 +220,4 @@ yearstring
 
 scorestring
 .null "Score: "
-
-.include "dataflowsubs.asm"
-.include "disksubs.asm"
 

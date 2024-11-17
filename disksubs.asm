@@ -171,3 +171,5 @@ filenamestart
     .text "high scores"
 filenamesuffix
     .text ",s,w"
+filenameend
+    .byte 0
