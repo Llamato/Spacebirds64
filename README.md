@@ -5,10 +5,13 @@ A flappy bird inspired obstacle avoidance game for the commodore c64 of 1982 dev
 
 # Coding Conventions
 
-**Caution: All labels must be lowercase only to maintain compatiblity with Turbo Macro pro version v1.2 by style.**
-**Caution: All labels must be less then 16 characters long to maintain compatiblity with Turbo Macro pro version v1.2 by style.**
-**Caution: psudo-op strings must not be longer then then 30 characters to maintain compatiblity with Turbo Macro pro version v1.2 by style.**
-**Caution: all hexadecimal digits must be lowercase to maintain compatiblity with Turbo Macro pro version v1.2 by style.***
+### Warung der Kompatiblität. 
+Um kompatiblität zum c64 nativen Turbo Macro Pro 1.2 von Style zu waren muss der Quellcode folgenden Format vorgaben entsprechen.
+
+- Alle Label dürfen ausschließlich aus Kleinbuchstaben bestehen.
+- Alle Label dürfen eine Länge von 15 Zeichen nicht überschreiten.
+- Alle Psudo-op Zeichenketten dürfen eine Länge von 30 Zeichen nicht überschreiten.
+- Alle Hexadezimal zahlen dürfen nur aus Ziffern und Kleinbuchstaben bestehen.
 
 ### Register-Sicherung in Subroutinen
 
