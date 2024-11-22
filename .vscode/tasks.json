@@ -38,9 +38,18 @@
             ]
         },
         {
-            "label": "convert to petscii",
+            "label": "convert to ascii to petscii",
             "type": "shell",
             "command": "petcat -text -w2 -o build/${fileBasename} ${fileBasename}",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "convert petscii to ascii",
+            "type": "shell",
+            "command": "petcat -text -o build/${fileBasename} ${fileBasename}",
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -58,12 +67,30 @@
         {
             "label": "pack code disk",
             "type": "shell",
-            "command": "python3 buildscripts/packasmdisk.py main.asm",
+            "command": "python3 buildscripts/packasmdisk.py main.asm build/pack build/pre",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+        },
+        {
+            "label": "unpack code disk",
+            "type": "shell",
+            "command": "python3 buildscripts/unpackasmdisk.py ${input:diskfile} build/unpack build/unpack/pre",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
                 "isDefault": false
             },
         }
+    ],
+    "inputs": [
+        {
+            "id": "diskfile",
+            "description": "disk file path",
+            "default": "build/pack/asmdisk.d64",
+            "type": "promptString"
+        },
     ]
 }

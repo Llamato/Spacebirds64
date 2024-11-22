@@ -33,14 +33,20 @@ def copy_code(src, dest, exclude=[]):
             dest_file.close()
 
 if __name__ == "__main__":
+    pack_path = "build"
+    preprocessor_path = os.path.join(pack_path, "pre")
     if len(sys.argv) > 1 and sys.argv[1].endswith(".asm"):
         input_filepath = sys.argv[1]
-        preprocessor_path = os.path.join("build", "pre")
+        if len(sys.argv) > 2:
+            pack_path = sys.argv[2]
+            preprocessor_path = os.path.join(pack_path, "pre")
+            if len(sys.argv) > 3:
+                preprocessor_path = sys.argv[3]
         copy_code(".", preprocessor_path)
         output_filepath = os.path.join(preprocessor_path, f'flat{input_filepath}')
         output_file = open(output_filepath, "w", newline='\n')
         output_file.write(flattenIncludes(input_filepath))
         output_file.close()
-        pack_code_disk(preprocessor_path, "build", "asmdisk.d64")
+        pack_code_disk(preprocessor_path, pack_path, "asmdisk.d64")
     else:
-        pack_code_disk(".", "build", "asmdisk.d64")
+        pack_code_disk(".", pack_path, "asmdisk.d64")
