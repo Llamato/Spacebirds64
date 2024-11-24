@@ -94,14 +94,17 @@ sfd .macro
 .endm
 
 ;Rotines
-
+;Loads high scores from disk.
+;No external parameters needed.
 loadhighscores
 #ldi16 currrecptr, recliststart
 #ldi16 r0, diskbuffer
-#lfd 2, 8, filenamestart, 11, 1
+#lfd 2, 8, hsfilename, 11, 1
 bcs hreaderr
 rts
 
+;Saves high scores to disk.
+;No external parameters needed.
 savehighscores
 #poke r0, <diskbuffer
 #poke r1, >diskbuffer
@@ -134,20 +137,6 @@ clrdiskiomem
     #fmb $c000, $cfff, 0
     rts
 
-.ifne includetests
-getnextrecord
-    #add16i currrecptr, recordlength
-;Add checks for greater then eorp here
-;if so jump to eorr
-    rts
-.endif
-
-;eorr = end of records reached
-;warp around back to recliststart
-eorr
-    #ldi16 currrecptr, recliststart
-    rts
-
 ;addhstodb = append high score to
 ;disk buffer
 ;Appends high score in staging Area to
@@ -161,15 +150,23 @@ addhstodb
     #add16i eorp, recordlength
     rts
 
+;Loads character generator rom from disk
+;Input
+;r0 = Lowbyte of target address.
+;r1 = Highbyte of target address
+loadchargen
+    #add16i r0, 2
+    #lfd 2, 8, fontfn, 7, 0
+    rts
+
 ;Data
 ;filenameprefow=filenameprefixOverwrite
 filenameprefow
     .byte $40
-filenameprefix
-    .text "0:"
-filenamestart
+hsfilename
     .text "high scores"
-filenamesuffix
-    .text ",s,w"
-filenameend
-    .byte 0
+
+;Fonts by Patrick Mollohan
+;https://github.com/Llamato/c64-fonts
+fontfn
+    .text "chargen"

@@ -14,7 +14,7 @@ includetests = 0
 ;End of BASIC program markers
     .byte $00, $00, $00
 
-*=$810 ;2064
+*=2064
 
 .include "zeropage-map.asm"
 .include "rom-map.asm"
@@ -59,9 +59,14 @@ sshss
 ;set basic text color
 #poke 646, 7
 ;set charset to 2
-#poke 53272, 23
+jsr encharset2
 
-    ;load scores from disk
+;load custom font
+    #ldi16 r0, txtcharsetstart
+    jsr loadchargen
+    jsr encharram
+
+;load scores from disk
     jsr clrdiskiomem
     jsr loadhighscores
 
@@ -185,9 +190,11 @@ done
 .ifne includetests
     #ddbts
 .endif
+
+
     rts
 
-;.include "vicsubs.asm"
+.include "vicsubs.asm"
 .include "dataflowsubs.asm"
 .include "disksubs.asm"
 
@@ -220,4 +227,3 @@ yearstring
 
 scorestring
 .null "Score: "
-

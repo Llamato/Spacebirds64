@@ -16,7 +16,7 @@
         {
             "label": "pack program disk",
             "type": "shell",
-            "command": "c1541 -format ${workspaceFolderBasename},0 d64 build/${workspaceFolderBasename}.d64 -attach build/${workspaceFolderBasename}.d64 -write build/${fileBasenameNoExtension}.prg ${fileBasenameNoExtension}",
+            "command": "python3 buildscripts/packprgdisk.py ${workspaceFolderBasename}",
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -28,7 +28,7 @@
         {
             "label": "launch in vice",
             "type": "shell",
-            "command": "x64sc build/${workspaceFolderBasename}.d64",
+            "command": "x64sc build/prgdisk.d64",
             "group": {
                 "kind": "build",
                 "isDefault": false
