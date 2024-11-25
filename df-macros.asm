@@ -11,6 +11,19 @@ poke .macro
     sta \1
 .endm
 
+;Effectively equivalent to basics
+;poke command. Even the syntax is much
+;the same.
+;Input
+;\1 = address to monitor
+;\2 = value to wait for
+wait .macro
+    waitmore
+    lda \1
+    cmp #\2
+    bne waitmore
+.endm
+
 ;ldi16 load imidiate 16 bit.
 ;Meaning load a value present in memory
 ;directly after the instuction.

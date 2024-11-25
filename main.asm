@@ -113,7 +113,8 @@ jsr encharset2
     jsr addhstodb
 
 ;Print high score table to screen
-.block ;print high scores table
+.block 
+;print high scores table
 ;(game) design parameters
 
     theadcolor = 4; Pink
@@ -191,7 +192,57 @@ done
     #ddbts
 .endif
 
+;Wait for user to press any key
+;or fire button
+;before continueing.
+.block
+    #poke 198,0
+waitsomemore
+;Char in keyboard buffer?
+;Aka. Keyboard key pressed?
+    lda 198
+    bne continue
 
+;Joystick1 fire button pressed?
+    lda 56321
+    and #16
+    beq continue
+
+;Joystick2 fire button pressed?
+    lda 56320
+    and #16
+    beq continue
+
+;Attari Paddle1 fireX pressed?
+    lda 56321
+    and #4
+    beq continue
+
+;Attari Paddle1 fireY pressed?
+    lda 56321
+    and #8
+    beq continue
+
+;Attari Paddle2 fireX pressed?
+    lda 56320
+    and #4
+    beq continue
+
+;Attari Paddle2 fireY pressed?
+    lda 56320
+    and #8
+    beq continue
+
+;Nothing pressed
+    jmp waitsomemore 
+continue
+    #poke 198,0
+.bend
+
+displayqrcode
+    jsr encharrom
+    jsr encharset1
+    jmp loadqrcode
     rts
 
 .include "vicsubs.asm"
@@ -202,7 +253,7 @@ done
 ;tyfps = thank you for playing string
 tyfps
 .text "Thank you for playing"
-; line end
+;line end
 .byte $0d
 .byte $00
 

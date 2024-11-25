@@ -110,7 +110,7 @@ savehighscores
 #poke r1, >diskbuffer
 #poke r2, <diskbufferend
 #poke r3, >diskbufferend
-#sfd 2, 8, filenameprefow, 14
+#sfd 2, 8, filenameprefow, 13
 bcs hwriteerr
 rts
 
@@ -159,10 +159,28 @@ loadchargen
     #lfd 2, 8, fontfn, 7, 0
     rts
 
+;Loads and displays qr code
+;Warning: ireversable actionrun
+;Overwrites programm
+loadqrcode
+.block
+destaddr = $c000
+    #ldi16 r0, startddr
+    #ldi16 r2, destaddr
+    #poke r4, endaddr-startddr+1
+    jsr memcpy
+    jmp destaddr
+startddr = *
+    #lfd 2, 8, qrcodefn, 6, 1
+    jmp 2061
+endaddr = *
+.bend
+
 ;Data
 ;filenameprefow=filenameprefixOverwrite
 filenameprefow
     .byte $40
+    .text ":"
 hsfilename
     .text "high scores"
 
@@ -170,3 +188,10 @@ hsfilename
 ;https://github.com/Llamato/c64-fonts
 fontfn
     .text "chargen"
+
+;QR code created with
+;https://qrcode-generator.de
+;And converted with
+;https://digartroks.be/img2c64mc
+qrcodefn
+    .text "qrcode"

@@ -5,7 +5,7 @@ txtcharsetstart = $2000
 
 
 ;Sets up custom charset space and points
-;all basic pointers to to use new space.
+;all pointers to to use new space.
 encharram
 lda 53272
 and #243
@@ -13,18 +13,26 @@ ora #$08
 sta 53272
 rts
 
+;points all pointers to character rom.
 encharrom
 lda 53272
-and #243
+and #2
+ora #21
 sta 53272
 rts
 
+;Enables first charset
+;Uppercase and graphics characters
+;in the default character rom.
 encharset1
 lda 53272
-and #$FF-$02
+and #$ff-2
 sta 53272
 rts
 
+;Enables second charset
+;Uppercase and lowercase latters
+;in the default character rom.
 encharset2
 lda 53272
 ora #$02
