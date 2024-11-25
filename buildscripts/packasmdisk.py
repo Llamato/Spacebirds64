@@ -1,11 +1,14 @@
 import os
 import sys
 import pathlib
+import subprocess
 from flattenasm import flattenIncludes
 
 def syscmd(cmd):
     print(cmd)
-    os.system(cmd)
+    argv = cmd.split()
+    result = subprocess.run(argv, stdout=subprocess.PIPE)
+    return result.stdout.decode("utf-8")
 
 def pack_code_disk(code_path, pack_path, img_name):
     filenames = os.listdir(code_path)
