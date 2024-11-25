@@ -75,8 +75,9 @@ Ist das erledigt, sollten wir einige neue vsbuild Aufgaben widerfinden. die es u
 
 ## Transfer von Turbo macro pro zu TMPx.
 
-Für alle diese die ihre Sehle an Style verkauft haben und nur deswegen, denn das ist gewiss die einzig sinnige Erklärung, freude am programmieren mit Turbo Macro Pro haben aber dennoch auf vorzüge einer modernen Versionsverwaltung nicht verzichten wollen (Möglicherweise weil sie von mir dazu verdonnert, äh, ich meine gebeten wurden, dieses Github Repo zu verwenden).
+Für alle diese die ihre Seele an Style verkauft haben und nur deswegen, denn das ist gewiss die einzig sinnige Erklärung, Freude am programmieren mit Turbo Macro Pro haben aber dennoch auf Vorzüge einer modernen Versionsverwaltung nicht verzichten wollen (Möglicherweise weil sie von mir dazu verdonnert, äh, ich meine gebeten wurden, dieses Github Repo zu verwenden).
 
-Zur übertragung findet ihr also unter dem im Repo enthaltenden VScode Task, "unpack asm disk". Um diesen verwenden zu können müssen wir nur styles TMPview installieren und zur PATH Umgebungsvariable hinzufügen. Das erledigt, können wir den "unpack asm disk" Task benutzen. Wie gefodert noch angeben wo sich das d64 Image welches es zu entpacken gilt befindet und fertig.
+Zur Übertragung findet ihr also unter dem im Repo enthaltenden VScode Task, "unpack asm disk". Um diesen verwenden zu können müssen wir nur styles TMPview installieren und zur PATH-Umgebungsvariable hinzufügen. Das erledigt, können wir den "unpack asm disk" Task benutzen. Wie gefordert noch angeben wo sich das d64 Image welches es zu entpacken gilt befindet und fertig.
 
-Jetzt ist der Inhalt des d64 Images im Ordner build/unpack zufinden.
+Jetzt ist der Inhalt des d64 Images im Ordner build/unpack zu finden.
+
