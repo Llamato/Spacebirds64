@@ -4,6 +4,16 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "clean",
+            "type": "shell",
+            "command": "python3 buildscripts/clear.py",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "tmpx assemble",
             "type": "shell",
             "command": "tmpx -i ${relativeFile} -o build/${fileBasenameNoExtension}.prg",
@@ -73,6 +83,9 @@
                 "kind": "build",
                 "isDefault": false
             },
+            "dependsOn": [
+                "clean"
+            ]
         },
         {
             "label": "unpack code disk",
