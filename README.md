@@ -72,12 +72,3 @@ Daher müssen wir die wichtigsten druch vs64 für andere Assembler bereitgestell
 Sobald diese sich in der Lokalen Kopie des Repos befinden müssen wir nur noch petcat und c1541 (beide befinden sich im VICE Hauptverzeichniss) zur PATH Umgebungsvariable hinzufügen.
 
 Ist das erledigt, sollten wir einige neue vsbuild Aufgaben widerfinden. die es uns erlauben mit tmpx ein Compilat zu erstellen (tmpx assemble), unser Programm in VICE zu testen (launch in vice) oder eine code disk zu packen (pack asm / code disk). Die Code disk entählt dann alle Sourcecode Datein von Ascii nach Petscii convertiert. Und zwar so das Turbo Macro Pro sie als SEQ Datein einlesen kann.
-
-## Transfer von Turbo macro pro zu TMPx.
-
-Für alle diese die ihre Seele an Style verkauft haben und nur deswegen, denn das ist gewiss die einzig sinnige Erklärung, Freude am programmieren mit Turbo Macro Pro haben aber dennoch auf Vorzüge einer modernen Versionsverwaltung nicht verzichten wollen (Möglicherweise weil sie von mir dazu verdonnert, äh, ich meine gebeten wurden, dieses Github Repo zu verwenden).
-
-Zur Übertragung findet ihr also unter dem im Repo enthaltenden VScode Task, "unpack asm disk". Um diesen verwenden zu können müssen wir nur styles TMPview installieren und zur PATH-Umgebungsvariable hinzufügen. Das erledigt, können wir den "unpack asm disk" Task benutzen. Wie gefordert noch angeben wo sich das d64 Image welches es zu entpacken gilt befindet und fertig.
-
-Jetzt ist der Inhalt des d64 Images im Ordner build/unpack zu finden.
-
