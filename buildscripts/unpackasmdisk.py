@@ -1,7 +1,7 @@
 import sys
 import os
 import re
-from packasmdisk import syscmd
+from helpers import syscmd
 
 def unpack_file(disk_img_path, src_filename, dest_path=None):
     if dest_path == None:

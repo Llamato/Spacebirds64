@@ -88,6 +88,19 @@
             ]
         },
         {
+            "label": "pack code disk with assets",
+            "type": "shell",
+            "command": "python3 buildscripts/packasmdisk.py main.asm build/pack build/pre ./assets",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn": [
+                "clean"
+            ]
+        },
+        {
             "label": "unpack code disk",
             "type": "shell",
             "command": "python3 buildscripts/unpackasmdisk.py ${input:diskfile} build/unpack build/unpack/pre",

@@ -1,27 +1,25 @@
 import os
 import sys
 import pathlib
-import subprocess
+from helpers import syscmd
 from flattenasm import flattenIncludes
+from packprgdisk import pack_assets
 
-def syscmd(cmd):
-    print(cmd)
-    argv = cmd.split()
-    result = subprocess.run(argv, stdout=subprocess.PIPE)
-    return result.stdout.decode("utf-8")
-
-def pack_code_disk(code_path, pack_path, img_name):
+def pack_code_disk(code_path, pack_path, img_name, assets_path=None):
+    img_path  = os.path.join(pack_path, img_name)
     filenames = os.listdir(code_path)
     if len(filenames) == 0:
         print("No asm files found. Aborting...", file=sys.stderr)
         exit(1)
-    syscmd("c1541 -format asmdisk,01 d64 " + os.path.join(pack_path, img_name))
+    syscmd("c1541 -format asmdisk,01 d64 " + img_path)
     for filename in filenames:
         if filename.endswith(".asm"):
             syscmd(f'petcat -text -w2 -o {os.path.join(pack_path, filename)} {os.path.join(code_path, filename)}')
-            syscmd(f'c1541 -attach {os.path.join(pack_path, img_name)} -write {os.path.join(pack_path, filename)} {filename},s')
+            syscmd(f'c1541 -attach {img_path} -write {os.path.join(pack_path, filename)} {filename},s')
             if len(filename) > 16:
                 print("Warning: file name too long", file=sys.stderr)
+    if assets_path != None:
+        pack_assets(assets_path, img_path)
 
 def copy_code(src, dest, exclude=[]):
     if not os.path.exists(dest):
@@ -45,6 +43,7 @@ if __name__ == "__main__":
     preprocessor_path = os.path.join(pack_path, "pre")
     if not os.path.exists(preprocessor_path):
         os.makedirs(preprocessor_path)
+    assets_path = None
     if len(sys.argv) > 1 and sys.argv[1].endswith(".asm"):
         input_filepath = sys.argv[1]
         if not os.path.exists(input_filepath):
@@ -58,12 +57,14 @@ if __name__ == "__main__":
                 preprocessor_path = sys.argv[3]
                 if not os.path.exists(preprocessor_path):
                     os.makedirs(preprocessor_path)
+                if len(sys.argv) > 4:
+                    assets_path = sys.argv[4]
         copy_code(".", preprocessor_path)
         output_filepath = os.path.join(preprocessor_path, f'flat{input_filepath}')
         output_file = open(output_filepath, "w", newline='\n')
         output_file.write(flattenIncludes(input_filepath))
         output_file.close()
-        pack_code_disk(preprocessor_path, pack_path, "asmdisk.d64")
+        pack_code_disk(preprocessor_path, pack_path, "asmdisk.d64", assets_path=assets_path)
     else:
-        pack_code_disk(".", pack_path, "asmdisk.d64")
+        pack_code_disk(".", pack_path, "asmdisk.d64", assets_path=assets_path)
     
