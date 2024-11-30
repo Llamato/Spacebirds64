@@ -9,14 +9,6 @@ class cbmfile:
         self.name = name
         self.type = type
 
-def unpack_file(disk_img_path, src_file : cbmfile, dest_path=None):
-    if dest_path == None:
-        dest_path = src_file
-    if src_file.type == "seq":
-        syscmd(f'c1541 -attach {disk_img_path} -read {src_file.name},s {dest_path}')
-    else:
-        syscmd(f'c1541 -attach {disk_img_path} -read {src_file.name} {dest_path}')
-
 def list_disk(img_path):
     files = []
     disk_dir = syscmd(f'c1541 -attach {img_path} -list')
@@ -39,6 +31,17 @@ def list_disk(img_path):
         filetype = dir_entry[2]
         files.append(cbmfile(filesize, filename, filetype))
     return files
+
+def unpack_file(disk_img_path, src_file, dest_path=None):
+    if dest_path == None:
+        dest_path = src_file
+    if src_file is cbmfile and src_file.type == "seq":
+        syscmd(f'c1541 -attach {disk_img_path} -read {src_file.name},s {dest_path}')
+    elif src_file is cbmfile:
+        syscmd(f'c1541 -attach {disk_img_path} -read {src_file.name} {dest_path}')
+    elif src_file is str:
+        files_on_disk = list_disk(disk_img_path)
+        
 
 def unpack_disk(disk_img_path, dest_path=None):
     if dest_path == None:
@@ -72,12 +75,12 @@ if __name__ == "__main__":
                 tmp_to_ascii(src_file, dest_file)
         else:
             print("Error: Wrong number of arguments for file extraction", file=sys.stderr)
-    #elif len(sys.argv) == 5:
-        #img_path = sys.argv[1]
-        #unpack_filename = sys.argv[2]
-        #unpack_destination_filename = sys.argv[3]
-        #conversion_destination_filename = sys.argv[4]
-        #unpack_file(img_path, unpack_filename, unpack_destination_filename)
-        #petscii_to_ascii(unpack_destination_filename, conversion_destination_filename)
+    elif len(sys.argv) == 5:
+        img_path = sys.argv[1]
+        unpack_filename = sys.argv[2]
+        unpack_destination_filename = sys.argv[3]
+        conversion_destination_filename = sys.argv[4]
+        unpack_file(img_path, unpack_filename, unpack_destination_filename)
+        petscii_to_ascii(unpack_destination_filename, conversion_destination_filename)
     else:
         print("Error: Wrong number of arguments", file=sys.stderr)
