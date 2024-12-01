@@ -36,13 +36,37 @@ add16i .macro
     .include "disktests.asm"
 .endif
 
-jmp init
-
-init
+    jmp sss
 
 gameloop
-    jmp sshss
-jmp gameloop
+    jmp gameloop
+
+;sss = show start screen
+sss
+    jsr encharram
+
+;set border color
+    #poke 53280, 0
+
+;set background color
+    #poke 53281, 0
+
+;set text color for all chars
+;on screen;
+    lda #7
+    jsr recolorscreen
+
+;load start screen content
+    #ldi16 r0, txtscreenstart
+    lda #$53; S in ascii
+    jsr loadtextscreen
+
+;load custom font
+    #ldi16 r0, txtcharsetstart
+    lda #$53; S in ascii
+    jsr loadchargen
+
+jsr waitforinput
 
 ;sshss = show save high score screen
 sshss
@@ -54,17 +78,21 @@ sshss
 
 ;set border color
 #poke 53280, 0
+
 ;set background color
 #poke 53281, 0
+
 ;set basic text color
 #poke 646, 7
+
 ;set charset to 2
 jsr encharset2
 
 ;load custom font
     #ldi16 r0, txtcharsetstart
+    lda #$45; E in ascii
     jsr loadchargen
-    jsr encharram
+    ;jsr encharram
 
 ;load scores from disk
     jsr clrdiskiomem
@@ -192,9 +220,18 @@ done
     #ddbts
 .endif
 
+jsr waitforinput
+
+displayqrcode
+    jsr encharrom
+    jsr encharset1
+    jmp loadqrcode
+    rts
+
 ;Wait for user to press any key
 ;or fire button
 ;before continueing.
+waitforinput
 .block
     #poke 198,0
 waitsomemore
@@ -237,13 +274,8 @@ waitsomemore
     jmp waitsomemore 
 continue
     #poke 198,0
-.bend
-
-displayqrcode
-    jsr encharrom
-    jsr encharset1
-    jmp loadqrcode
     rts
+.bend
 
 .include "vicsubs.asm"
 .include "dataflowsubs.asm"

@@ -106,13 +106,13 @@ rts
 ;Saves high scores to disk.
 ;No external parameters needed.
 savehighscores
-#poke r0, <diskbuffer
-#poke r1, >diskbuffer
-#poke r2, <diskbufferend
-#poke r3, >diskbufferend
-#sfd 2, 8, filenameprefow, 13
-bcs hwriteerr
-rts
+    #poke r0, <diskbuffer
+    #poke r1, >diskbuffer
+    #poke r2, <diskbufferend
+    #poke r3, >diskbufferend
+    #sfd 2, 8, filenameprefow, 13
+    bcs hwriteerr
+    rts
 
 hreaderr; handle read error
 .ifne includetests
@@ -152,11 +152,28 @@ addhstodb
 
 ;Loads character generator rom from disk
 ;Input
+;a = chargen id (last char of file name)
 ;r0 = Lowbyte of target address.
 ;r1 = Highbyte of target address
 loadchargen
+    sta fontfn+7
     #add16i r0, 2
-    #lfd 2, 8, fontfn, 7, 0
+    #lfd 2, 8, fontfn, 8, 0
+    rts
+
+;Loads (40*25=1000) bytes
+;directly onto the text screen
+;a = screen id (last char of file name)
+loadtextscreen
+    sta screenfn+6
+    ;What is up with those +2
+    ;offsets needed for
+    ;correct load address?
+    ;Must be that c1541 interprets
+    ;the first two bytes as prg load 
+    ;address. I will get to it!
+    #ldi16 r0, txtscreenstart
+    #lfd 2, 8, screenfn, 7, 0
     rts
 
 ;Loads and displays qr code
@@ -187,7 +204,10 @@ hsfilename
 ;Fonts by Patrick Mollohan
 ;https://github.com/Llamato/c64-fonts
 fontfn
-    .text "chargen"
+    .text "chargen0"
+
+screenfn
+    .text "screen0"
 
 ;QR code created with
 ;https://qrcode-generator.de

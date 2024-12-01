@@ -2,7 +2,27 @@
 txtscreenstart = $0400
 txtscreensize = 40 * 25
 txtcharsetstart = $2000
+colorramstart = $d800
+colorramend = $dbe7
+colorramsize = 512
 
+;Fills color ram 
+;with value in A
+;Input
+;A = colorcode
+recolorscreen
+.block
+    ldx #0
+
+colorfillloop
+    sta $d800,x; first page
+    sta $d900,x; second page
+    sta $da00,x; third page
+    sta $db00,x; fourth page
+    inx
+    bne colorfillloop
+    rts
+.bend
 
 ;Sets up custom charset space and points
 ;all pointers to to use new space.
