@@ -12,11 +12,6 @@ device = 8
 ;eorp = end of records pointer
 eorp = $c000
 
-;Disk buffer for load in and out
-diskbuffer = $c000
-recliststart = diskbuffer+2
-diskbufferend = $cf00
-
 ;Staging Area
 scorearea = diskbufferend +1
 ;    .text "00000"; temp
@@ -161,6 +156,16 @@ loadchargen
     #lfd 2, 8, fontfn, 8, 0
     rts
 
+;Loads sprite from disk
+;Input
+;a = sprite id (last char of file name)
+;r0 = Lowbyte of target address
+;r1 = Highbyte of target address
+loadsprite
+    sta spritefn+6
+    #lfd 2, 8, spritefn, 7, 0
+    rts
+
 ;Loads (40*25=1000) bytes
 ;directly onto the text screen
 ;a = screen id (last char of file name)
@@ -174,6 +179,11 @@ loadtextscreen
     ;address. I will get to it!
     #ldi16 r0, txtscreenstart
     #lfd 2, 8, screenfn, 7, 0
+    rts
+
+;Loads sid file from disk
+loadsid
+    #lfd 2, 8, sidfn, 3, 1
     rts
 
 ;Loads and displays qr code
@@ -208,6 +218,12 @@ fontfn
 
 screenfn
     .text "screen0"
+
+spritefn
+    .text "sprite0"
+
+sidfn
+    .text "sid"
 
 ;QR code created with
 ;https://qrcode-generator.de

@@ -1,10 +1,4 @@
 ;Text mode constants
-txtscreenstart = $0400
-txtscreensize = 40 * 25
-txtcharsetstart = $2000
-colorramstart = $d800
-colorramend = $dbe7
-colorramsize = 512
 
 ;Fills color ram 
 ;with value in A
@@ -58,15 +52,6 @@ lda 53272
 ora #$02
 sta 53272
 rts
-
-;Hires mode constants
-screenstart = $4400
-screensize = 40 * 25
-screenend = screenstart + screensize
-charsetstart = $2c00
-bitmapstart = $6000
-bitmapsize = 8000
-bitmapend = bitmapstart + bitmapsize
 
 ;Set VIC-II to high res mode
 ;in accordance with procedure described

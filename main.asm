@@ -18,6 +18,7 @@ enablechargen = 0
 
 .include "zeropage-map.asm"
 .include "rom-map.asm"
+.include "rammap.asm"
 .include "df-macros.asm"
 
 add16i .macro
@@ -55,17 +56,22 @@ sss
     jsr recolorscreen
 
 ;load start screen content
-    #ldi16 r0, txtscreenstart
+    #ldi16 r0, txtscreenstart 
     lda #$53; S in ascii
     jsr loadtextscreen
-
+    ;#ldi16 r0, sprite0addr
 ;load custom font
+.ifeq enablechargen
+    ;Copy over chars from character rom to ram
+.endif
 ;.Ifne enablechargen
     jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$53; S in ascii
     jsr loadchargen
 ;.endif
+jsr loadsid
+jsr pssm
 jsr waitforinput
 
 ;sshss = show save high score screen
@@ -77,16 +83,17 @@ sshss
 .endif
 
 ;set border color
-#poke 53280, 0
+    #poke 53280, 0
 
 ;set background color
-#poke 53281, 0
+    #poke 53281, 0
 
 ;set basic text color
-#poke 646, 7
+    #poke 646, 7
 
 ;set charset to 2
-jsr encharset2
+    sei
+    jsr encharset2
 
 .ifeq enablechargen
 jsr encharrom
@@ -125,6 +132,7 @@ jsr encharrom
     #ddbts
 .endif
 
+    cli
     #print tyfps
 
 ;Get name from user
@@ -228,6 +236,7 @@ done
 jsr waitforinput
 
 displayqrcode
+    jsr basiccls
     jsr encharrom
     jsr encharset1
     jmp loadqrcode
@@ -284,6 +293,7 @@ continue
 
 .include "vicsubs.asm"
 .include "dataflowsubs.asm"
+.include "playsid.asm"
 .include "disksubs.asm"
 
 ;Data
