@@ -73,6 +73,7 @@ sss
 jsr loadsid
 jsr pssm
 jsr waitforinput
+jsr disablesnd
 
 ;sshss = show save high score screen
 sshss
@@ -139,6 +140,7 @@ jsr encharrom
     #print enternameprompt
     #nullinput namearea
     #crlf
+    jsr enablesnd
 
 ;Get year from user
     #print ecyp
@@ -149,6 +151,7 @@ jsr encharrom
     #print esp
     #nullinput scorearea
     #crlf
+    jsr disablesnd
 
 ;Save score to disk
     jsr addhstodb

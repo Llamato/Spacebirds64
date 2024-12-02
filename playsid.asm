@@ -26,6 +26,8 @@ pssm
 
 ;---------- init Music -----------------
 
+         #poke sndenabled, 1
+
          lda #0
          tax
          tay
@@ -33,20 +35,51 @@ pssm
 
          cli
          rts
+
+;---------- Sound Interrupt -----------------         
 srirq
          ; set bit 0 in ISR to ack irq
          inc $d019
 
-         ;actual code goes here
 .ifne includetests
          inc $d020
 .endif
 
+        lda sndenabled
+        beq skip
+
+
          ; play music
          jsr sidstart + 6
+
+
 .ifne includetests
          dec $d020
 .endif
          ; Restores A,X,Y register and
          ; CPU flags before returning
-         jmp $ea31
+skip         jmp $ea31
+sndenabled .byte $0  ;boolean for sound toggle
+
+
+
+disablesnd 
+        #poke sndenabled, 0
+        #poke $d404, 0     ; deactivate Voice1
+        #poke $d40b, 0     ; deactivate Voice2
+        #poke $d412, 0     ; deactivate Voice3
+        rts
+
+enablesnd
+        #poke sndenabled, 1
+
+        ; reinitialize sound
+        lda #0
+        tax
+        tay
+        jsr sidstart
+
+        rts
+
+
+
