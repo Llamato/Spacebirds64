@@ -35,12 +35,10 @@ def list_disk(img_path):
 def unpack_file(disk_img_path, src_file, dest_path=None):
     if dest_path == None:
         dest_path = src_file
-    if src_file is cbmfile and src_file.type == "seq":
+    if src_file.type == "seq":
         syscmd(f'c1541 -attach {disk_img_path} -read {src_file.name},s {dest_path}')
-    elif src_file is cbmfile:
+    else:
         syscmd(f'c1541 -attach {disk_img_path} -read {src_file.name} {dest_path}')
-    elif src_file is str:
-        files_on_disk = list_disk(disk_img_path)
         
 
 def unpack_disk(disk_img_path, dest_path=None):
@@ -80,7 +78,10 @@ if __name__ == "__main__":
         unpack_filename = sys.argv[2]
         unpack_destination_filename = sys.argv[3]
         conversion_destination_filename = sys.argv[4]
-        unpack_file(img_path, unpack_filename, unpack_destination_filename)
+        for file in list_disk(img_path):
+            if file.name == unpack_filename:
+                unpack_file(img_path, unpack_filename, unpack_destination_filename)
+                break
         petscii_to_ascii(unpack_destination_filename, conversion_destination_filename)
     else:
         print("Error: Wrong number of arguments", file=sys.stderr)
