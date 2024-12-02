@@ -1,5 +1,5 @@
 includetests = 0
-
+enablechargen = 0
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
 ;Load address for next BASIC line (2064)
@@ -43,8 +43,6 @@ gameloop
 
 ;sss = show start screen
 sss
-    jsr encharram
-
 ;set border color
     #poke 53280, 0
 
@@ -62,10 +60,12 @@ sss
     jsr loadtextscreen
 
 ;load custom font
+;.Ifne enablechargen
+    jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$53; S in ascii
     jsr loadchargen
-
+;.endif
 jsr waitforinput
 
 ;sshss = show save high score screen
@@ -88,11 +88,16 @@ sshss
 ;set charset to 2
 jsr encharset2
 
+.ifeq enablechargen
+jsr encharrom
+.endif
 ;load custom font
+.ifne enablechargen
     #ldi16 r0, txtcharsetstart
     lda #$45; E in ascii
     jsr loadchargen
     ;jsr encharram
+.endif
 
 ;load scores from disk
     jsr clrdiskiomem
