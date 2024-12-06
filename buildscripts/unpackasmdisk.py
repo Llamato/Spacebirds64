@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import shutil
 from helpers import syscmd
 
 class cbmfile:
@@ -37,9 +38,10 @@ def unpack_file(disk_img_path, src_file, dest_path=None):
         dest_path = src_file
     if src_file.type == "seq":
         syscmd(f'c1541 -attach {disk_img_path} -read {src_file.name},s {dest_path}')
-    else:
+    elif src_file.type == "prg":
         syscmd(f'c1541 -attach {disk_img_path} -read {src_file.name} {dest_path}')
-        
+    else:
+        print(f"Warning filetype of {src_file.filename} not supported", file=sys.stderr)
 
 def unpack_disk(disk_img_path, dest_path=None):
     if dest_path == None:
@@ -47,11 +49,20 @@ def unpack_disk(disk_img_path, dest_path=None):
     for file in list_disk(disk_img_path):
         unpack_file(disk_img_path, file, os.path.join(dest_path, file.name))
 
+def writeout_ascii(ascii, output_file):
+    output_stream = open(output_file, "w")
+    output_stream.write(ascii)
+    output_stream.close()
+
 def petscii_to_ascii(petscii_file, ascii_file):
     syscmd(f'petcat -text -o {ascii_file} {petscii_file}')
 
 def tmp_to_ascii(tmp_file, ascii_file):
-    syscmd(f'tmpview -i {tmp_file} -o {ascii_file}')
+    ascii  =  syscmd(f'tmpview -i {tmp_file}')
+    if ascii != "Source file could not be parsed.\n":
+        writeout_ascii(ascii, ascii_file)
+    else:
+        shutil.copyfile(tmp_file, ascii_file)
 
 if __name__ == "__main__":
     if len(sys.argv) == 4:
@@ -71,8 +82,6 @@ if __name__ == "__main__":
                 petscii_to_ascii(src_file, dest_file)
             elif file.type == "prg":
                 tmp_to_ascii(src_file, dest_file)
-        else:
-            print("Error: Wrong number of arguments for file extraction", file=sys.stderr)
     elif len(sys.argv) == 5:
         img_path = sys.argv[1]
         unpack_filename = sys.argv[2]
