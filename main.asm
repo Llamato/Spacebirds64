@@ -1,5 +1,7 @@
 includetests = 0
 enablechargen = 0
+enablesound = 1
+
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
 ;Load address for next BASIC line (2064)
@@ -62,7 +64,7 @@ sss
     ;#ldi16 r0, sprite0addr
 ;load custom font
 .ifeq enablechargen
-    ;Copy over chars from character rom to ram
+;Copy chars from character rom to ram 
 .endif
 ;.Ifne enablechargen
     jsr encharram
@@ -70,10 +72,11 @@ sss
     lda #$53; S in ascii
     jsr loadchargen
 ;.endif
-jsr loadsid
-jsr pssm
-jsr waitforinput
-jsr disablesnd
+.ifne enablesound
+    jsr loadsid
+    jsr playsound
+.endif
+    jsr waitforinput
 
 ;sshss = show save high score screen
 sshss
@@ -140,7 +143,6 @@ jsr encharrom
     #print enternameprompt
     #nullinput namearea
     #crlf
-    jsr enablesnd
 
 ;Get year from user
     #print ecyp
@@ -151,7 +153,6 @@ jsr encharrom
     #print esp
     #nullinput scorearea
     #crlf
-    jsr disablesnd
 
 ;Save score to disk
     jsr addhstodb

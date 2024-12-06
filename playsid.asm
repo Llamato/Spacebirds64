@@ -1,5 +1,4 @@
-;pssm = playstartscreenmusic
-pssm
+playsound
          sei
 
          lda #$7f     ;turn off cia
@@ -36,7 +35,7 @@ pssm
          cli
          rts
 
-;---------- Sound Interrupt -----------------         
+;---------- Sound Interrupt ------------
 srirq
          ; set bit 0 in ISR to ack irq
          inc $d019
@@ -63,7 +62,7 @@ sndenabled .byte $0  ;boolean for sound toggle
 
 
 
-disablesnd 
+disablesound
         #poke sndenabled, 0
         #poke $d404, 0     ; deactivate Voice1
         #poke $d40b, 0     ; deactivate Voice2
@@ -81,5 +80,7 @@ enablesnd
 
         rts
 
-
-
+disablerasterirq
+        lda #$00   ; disable raster
+         sta $d01a  ; interrupt
+         rts
