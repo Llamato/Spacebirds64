@@ -26,13 +26,12 @@
         {
             "label": "pack program disk",
             "type": "shell",
-            "command": "python3 buildscripts/packprgdisk.py ${workspaceFolderBasename}",
+            "command": "python3 buildscripts/packprgdisk.py ${workspaceFolderBasename} build/${fileBasenameNoExtension}.prg",
             "group": {
                 "kind": "build",
                 "isDefault": false
             },
             "dependsOn": [
-                "clean",
                 "tmpx assemble"
             ]
         },
