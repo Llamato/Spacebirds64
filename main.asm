@@ -1,5 +1,5 @@
 includetests = 0
-enablechargen = 0
+enablechargen = 1
 enablesound = 1
 
 *=2049
@@ -63,15 +63,13 @@ sss
     jsr loadtextscreen
     ;#ldi16 r0, sprite0addr
 ;load custom font
-.ifeq enablechargen
-;Copy chars from character rom to ram 
-.endif
-;.Ifne enablechargen
+.ifne enablechargen
     jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$53; S in ascii
     jsr loadchargen
-;.endif
+endif
+    jsr enablesprite0
 .ifne enablesound
     jsr loadsid
     jsr playsound
@@ -200,7 +198,7 @@ printtableentry
     lda currrecptr
     ldy currrecptr +1
     jsr basicprintnull
-    #tab
+;    #tab
     #add16i currrecptr, namelength
     #crlf
 
@@ -230,7 +228,7 @@ done
 .ifne includetests
     #ddbts
 .endif
-    
+
     jsr savehighscores
 
 .ifne includetests
@@ -299,6 +297,7 @@ continue
 .include "dataflowsubs.asm"
 .include "playsid.asm"
 .include "disksubs.asm"
+.include "sprite0.asm"
 
 ;Data
 ;tyfps = thank you for playing string

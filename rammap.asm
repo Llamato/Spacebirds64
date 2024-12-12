@@ -1,7 +1,7 @@
 ;Text graphics
 txtscreenstart = $0400
 txtscreensize = 40 * 25
-txtcharsetstart = $2000
+txtcharsetstart = $2800
 charsetend = $3000
 
 colorramstart = $d800

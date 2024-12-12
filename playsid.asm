@@ -77,7 +77,7 @@ enablesnd
         tax
         tay
         jsr sidstart
-
+        
         rts
 
 disablerasterirq

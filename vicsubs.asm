@@ -23,7 +23,7 @@ colorfillloop
 encharram
 lda 53272
 and #243
-ora #$08
+ora #$A
 sta 53272
 rts
 
@@ -74,7 +74,7 @@ sta 56576
 ;Tell VIC-II where bitmap and
 ;screen space are.
 lda 53272
-ora #8
+ora #$A
 sta 53272
 
 ;Clear color and pixels
