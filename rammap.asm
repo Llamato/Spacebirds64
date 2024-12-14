@@ -2,7 +2,22 @@
 txtscreenstart = $0400
 txtscreensize = 40 * 25
 txtcharsetstart = $2800
-charsetend = $3000
+spriteptr0 = txtscreenstart+$03f8
+spriteptr1 = txtscreenstart+$03f9 
+spriteptr2 = txtscreenstart+$03fa
+spriteptr3 = txtscreenstart+$03fb
+spriteptr4 = txtscreenstart+$03fc
+spriteptr5 = txtscreenstart+$03fd
+spriteptr6 = txtscreenstart+$03fe
+spriteptr7 = txtscreenstart+$03ff
+
+;primmulticolloc = primeray multiclor 
+;location
+primmulticolloc = $d025
+
+;secmulticolloc = secondary multicolor
+;location
+secmulticolloc = $d026
 
 colorramstart = $d800
 colorramend = $dbe7
@@ -12,7 +27,10 @@ colorramsize = 512
 screenstart = $4400
 screensize = 40 * 25
 screenend = screenstart + screensize
-charsetstart = $2c00
+
+;sccharsetstart = start screen
+;charset start
+charsetstart = $2800
 bitmapstart = $6000
 bitmapsize = 8000
 bitmapend = bitmapstart + bitmapsize

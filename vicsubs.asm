@@ -1,5 +1,3 @@
-;Text mode constants
-
 ;Fills color ram 
 ;with value in A
 ;Input
@@ -51,6 +49,18 @@ encharset2
 lda 53272
 ora #$02
 sta 53272
+rts
+
+;Set player sprite position
+;Input
+;A = y position
+;Output
+;Sprite at position
+;Note
+;Please referactor this away and
+;combine with input gathering.
+setplayerpos
+sta $d001 ;y Sprite0
 rts
 
 ;Set VIC-II to high res mode

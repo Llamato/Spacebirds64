@@ -1,12 +1,5 @@
+
 enablesprite0
-        ; jsr $e544
-
-         lda #55
-         sta $d000 ;x Sprite0
-
-         lda #125
-         sta $d001 ;y Sprite0
-
          lda #$0f
          sta $d027 ;color Sprite0
 
@@ -17,7 +10,7 @@ enablesprite0
          sta $d026 ;multicol2
 
          lda #$80
-         sta $07f8;Pointer Sprite0
+         sta $07f8 ;Pointer Sprite0
 
          lda #%00000001
          sta $d01c ;bin multicol
@@ -29,9 +22,9 @@ enablesprite0
          sta $d017 ;bin double height
 
          lda #%00000001
-         sta $d01d;bin double width
-         rts
-        
+         sta $d01d ;bin double width
+        rts
+
               *= $2000
 spritenull
          .byte $0a,$f0,$00,$02,$00,$00

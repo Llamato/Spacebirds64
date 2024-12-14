@@ -1,6 +1,6 @@
 includetests = 0
-enablechargen = 1
-enablesound = 1
+includechargen = 1
+includesound = 1
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -21,7 +21,8 @@ enablesound = 1
 .include "zeropage-map.asm"
 .include "rom-map.asm"
 .include "rammap.asm"
-.include "df-macros.asm"
+.include "dfmacros.asm"
+.include "vicmacros.asm"
 
 add16i .macro
     lda \1
@@ -61,20 +62,43 @@ sss
     #ldi16 r0, txtscreenstart 
     lda #$53; S in ascii
     jsr loadtextscreen
-    ;#ldi16 r0, sprite0addr
 ;load custom font
-.ifne enablechargen
     jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$53; S in ascii
     jsr loadchargen
-endif
-    jsr enablesprite0
-.ifne enablesound
+
+;sprite stuff
+sprite0addr = $2000
+    #setspritepos 0, 55, 125
+    #enablesprite 0
+    #setspritecolor 0, $0f
+
+;enable double height for all sprites
+    #poke $d017, $ff
+
+;enable double width for all sprites
+    #poke $d01d, $ff
+
+;Enable multicolor for all sprites
+    #poke 53276, 255
+
+;Set sprite 0 pointer to $2000
+    #poke $07f8, $80
+
+;Set multicolor colors
+    #poke $d025, $06
+    #poke $d026, $02
+    #ldi16 r0, sprite0addr
+    lda #48
+    jsr loadsprite
+.ifne includesound
     jsr loadsid
     jsr playsound
 .endif
+
     jsr waitforinput
+    #disablesprite 0
 
 ;sshss = show save high score screen
 sshss
@@ -92,25 +116,42 @@ sshss
 
 ;set basic text color
     #poke 646, 7
-
-;set charset to 2
-    sei
-    jsr encharset2
-
-.ifeq enablechargen
-jsr encharrom
+    
+;Replacing this and corresponding cli
+;with disablerasterirq and disablesound
+;breaks end screen.
+.ifeq includechargen
+    jsr encharrom
 .endif
+
+.ifne includesound
+    jsr disablesound
+.endif
+
 ;load custom font
-.ifne enablechargen
+.ifne includechargen
+    jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$45; E in ascii
     jsr loadchargen
-    ;jsr encharram
+.endif
+
+;set charset to 2
+.ifeq includechargen
+    jsr encharset2
+.endif
+
+.ifne includesound
+    jsr disablesound
 .endif
 
 ;load scores from disk
     jsr clrdiskiomem
     jsr loadhighscores
+
+.ifne includesound
+    jsr enablesound
+.endif
 
 .ifne includetests
     #ddbts
@@ -134,7 +175,6 @@ jsr encharrom
     #ddbts
 .endif
 
-    cli
     #print tyfps
 
 ;Get name from user
@@ -159,7 +199,6 @@ jsr encharrom
 .block 
 ;print high scores table
 ;(game) design parameters
-
     theadcolor = 4; Pink
     tentrycolor = 1; White
     townentrycolor = 7; Yellow
@@ -198,7 +237,7 @@ printtableentry
     lda currrecptr
     ldy currrecptr +1
     jsr basicprintnull
-;    #tab
+    ;#tab
     #add16i currrecptr, namelength
     #crlf
 
@@ -229,7 +268,15 @@ done
     #ddbts
 .endif
 
+.ifne includesound
+    jsr disablesound
+.endif
+    
     jsr savehighscores
+    
+.ifne includesound
+    jsr enablesound
+.endif
 
 .ifne includetests
     #ddbts
@@ -249,7 +296,7 @@ displayqrcode
 ;before continueing.
 waitforinput
 .block
-    #poke 198,0
+    #poke 198, 0
 waitsomemore
 ;Char in keyboard buffer?
 ;Aka. Keyboard key pressed?
@@ -289,7 +336,7 @@ waitsomemore
 ;Nothing pressed
     jmp waitsomemore 
 continue
-    #poke 198,0
+    #poke 198, 0
     rts
 .bend
 
@@ -297,7 +344,7 @@ continue
 .include "dataflowsubs.asm"
 .include "playsid.asm"
 .include "disksubs.asm"
-.include "sprite0.asm"
+;.include "sprite0.asm"
 
 ;Data
 ;tyfps = thank you for playing string

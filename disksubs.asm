@@ -192,7 +192,7 @@ loadsid
 loadqrcode
 .block
 destaddr = $c000
-.ifne enablesound
+.ifne includesound
     jsr disablesound
     jsr disablerasterirq
 .endif

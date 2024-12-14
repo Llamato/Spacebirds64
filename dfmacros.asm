@@ -209,3 +209,39 @@ printchar
     jmp printchar
 doneprinting
 .endm
+
+;Number to sequence
+;Converts a binary number in to a
+;binary sequence so for example
+;11 (3) becomes 100 (4)
+; up to 8 becomes 128
+;Input
+;\1 = Number to convert
+;Output
+; A = Binary sequence representing /1
+bintobinseq .macro 
+    .ifeq \1
+        lda #1
+    .endif
+    .ifeq \1 - 1
+        lda #2
+    .endif
+    .ifeq \1 - 2
+        lda #4
+    .endif
+    .ifeq \1 - 3
+        lda #8
+    .endif
+    .ifeq \1 - 4
+        lda #16
+    .endif
+    .ifeq \1 -5
+        lda #32
+    .endif
+    .ifeq \1 - 6
+        lda #64
+    .endif
+    .ifeq \1 -7
+        lda #128
+    .endif
+.endm

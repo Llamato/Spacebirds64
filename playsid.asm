@@ -60,27 +60,29 @@ srirq
 skip         jmp $ea31
 sndenabled .byte $0  ;boolean for sound toggle
 
-
-
 disablesound
+        sei
         #poke sndenabled, 0
         #poke $d404, 0     ; deactivate Voice1
         #poke $d40b, 0     ; deactivate Voice2
         #poke $d412, 0     ; deactivate Voice3
+        cli
         rts
 
-enablesnd
+enablesound
+        sei
         #poke sndenabled, 1
-
         ; reinitialize sound
         lda #0
         tax
         tay
         jsr sidstart
-        
+        cli
         rts
 
 disablerasterirq
+        sei
         lda #$00   ; disable raster
-         sta $d01a  ; interrupt
-         rts
+        sta $d01a  ; interrupt
+        cli
+        rts
