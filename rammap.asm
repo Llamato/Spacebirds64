@@ -10,6 +10,8 @@ spriteptr4 = txtscreenstart+$03fc
 spriteptr5 = txtscreenstart+$03fd
 spriteptr6 = txtscreenstart+$03fe
 spriteptr7 = txtscreenstart+$03ff
+sprite0addr = $2000
+sprite1addr = $2040
 
 ;primmulticolloc = primeray multiclor 
 ;location

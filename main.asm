@@ -47,44 +47,48 @@ gameloop
 
 ;sss = show start screen
 sss
-;set border color
+;Set border color
     #poke 53280, 0
 
-;set background color
+;Set background color
     #poke 53281, 0
 
-;set text color for all chars
+;Set text color for all chars
 ;on screen;
-    lda #7
+    lda #7; Yellow
     jsr recolorscreen
 
-;load start screen content
+;Load start screen content
     #ldi16 r0, txtscreenstart 
     lda #$53; S in ascii
     jsr loadtextscreen
-;load custom font
+
+;Load custom font
     jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$53; S in ascii
     jsr loadchargen
 
-;sprite stuff
-sprite0addr = $2000
-    #setspritepos 0, 55, 125
-    #enablesprite 0
-    #setspritecolor 0, $0f
-
-;enable double height for all sprites
+;Enable double height for all sprites
     #poke $d017, $ff
 
-;enable double width for all sprites
+;Enable double width for all sprites
     #poke $d01d, $ff
 
 ;Enable multicolor for all sprites
     #poke 53276, 255
 
-;Set sprite 0 pointer to $2000
+;Setup sprite 0 for address $2000
     #poke $07f8, $80
+    #setspritecolor 0, $0f
+    #setspritepos 0, 55, 125
+    #enablesprite 0
+
+;Setup sprite 1 for address $2040
+    #poke $07f9, $81
+    #setspritecolor 1, 1
+    #setspritepos 1, 265, 125
+    #enablesprite 1
 
 ;Set multicolor colors
     #poke $d025, $06
@@ -92,13 +96,16 @@ sprite0addr = $2000
     #ldi16 r0, sprite0addr
     lda #48
     jsr loadsprite
+    #ldi16 r0, sprite1addr
+    lda #49
+    jsr loadsprite
 .ifne includesound
     jsr loadsid
     jsr playsound
 .endif
 
     jsr waitforinput
-    #disablesprite 0
+    #poke $d015, 0; Disable all sprites
 
 ;sshss = show save high score screen
 sshss
@@ -108,13 +115,13 @@ sshss
     #ddbts
 .endif
 
-;set border color
+;Set border color
     #poke 53280, 0
 
-;set background color
+;Set background color
     #poke 53281, 0
 
-;set basic text color
+;Set basic text color
     #poke 646, 7
     
 ;Replacing this and corresponding cli
@@ -128,7 +135,7 @@ sshss
     jsr disablesound
 .endif
 
-;load custom font
+;Load custom font
 .ifne includechargen
     jsr encharram
     #ldi16 r0, txtcharsetstart
@@ -136,7 +143,7 @@ sshss
     jsr loadchargen
 .endif
 
-;set charset to 2
+;Set charset to 2
 .ifeq includechargen
     jsr encharset2
 .endif
@@ -145,7 +152,7 @@ sshss
     jsr disablesound
 .endif
 
-;load scores from disk
+;Load scores from disk
     jsr clrdiskiomem
     jsr loadhighscores
 
@@ -197,7 +204,7 @@ sshss
 
 ;Print high score table to screen
 .block 
-;print high scores table
+;Print high scores table
 ;(game) design parameters
     theadcolor = 4; Pink
     tentrycolor = 1; White
@@ -205,39 +212,38 @@ sshss
     tabstopwidth = 4
     jsr basiccls; Clear screen
 
-;print table header
+;Print table header
     #poke 646, theadcolor
     #printlen scorestring, 5
     #tab
     #printlen yearstring, 4
-    #tab
+    #tab 
     #printlen namestring, 4
     #crlf
 
-;print table entries
+;Print table entries
 ;set text color black
     #poke 646, 1
 
 printtableentry
-;print Score
+;Print Score
     lda currrecptr
     ldy currrecptr +1
     jsr basicprintnull
     #tab
     #add16i currrecptr, scorelength 
 
-;print Year
+;Print Year
     lda currrecptr
     ldy currrecptr +1
     jsr basicprintnull
     #tab
     #add16i currrecptr, yearlength
     
-;print Name
+;Print Name
     lda currrecptr
     ldy currrecptr +1
     jsr basicprintnull
-    ;#tab
     #add16i currrecptr, namelength
     #crlf
 
@@ -259,7 +265,7 @@ printtableentry
     ;If equal, continue
     beq done
     jmp done
-jumppad; needed because of long branch
+jumppad; Needed because of long branch
     jmp printtableentry
 done
 .bend
