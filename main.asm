@@ -40,11 +40,6 @@ add16i .macro
     .include "disktests.asm"
 .endif
 
-    jmp sss
-
-gameloop
-    jmp gameloop
-
 ;sss = show start screen
 sss
 ;Set border color
@@ -104,13 +99,36 @@ sss
     jsr playsound
 .endif
 
-    jsr waitforinput
-    
-    ; Disable all sprites
-    #poke $d015, 0
+    gameloop
+.block
+inputloop
+         lda #$ff
+         cmp $d012
+         bne inputloop
+
+up       
+        lda 56320
+         and #1
+         bne down
+         dec $d001
+down     
+        lda 56320
+         and #2
+         bne jumppad
+         inc $d001
+jumppad
+        lda 198
+        bne sshss
+        #poke 198, 0
+        jmp gameloop
+.bend
 
 ;sshss = show save high score screen
 sshss
+
+; Disable all sprites
+    #poke $d015, 0
+    
     jsr basiccls
 
 .ifne includetests
@@ -308,36 +326,6 @@ waitsomemore
 ;Aka. Keyboard key pressed?
     lda 198
     bne continue
-
-;Joystick1 fire button pressed?
-    lda 56321
-    and #16
-    beq continue
-
-;Joystick2 fire button pressed?
-    lda 56320
-    and #16
-    beq continue
-
-;Attari Paddle1 fireX pressed?
-    lda 56321
-    and #4
-    beq continue
-
-;Attari Paddle1 fireY pressed?
-    lda 56321
-    and #8
-    beq continue
-
-;Attari Paddle2 fireX pressed?
-    lda 56320
-    and #4
-    beq continue
-
-;Attari Paddle2 fireY pressed?
-    lda 56320
-    and #8
-    beq continue
 
 ;Nothing pressed
     jmp waitsomemore 
