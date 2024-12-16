@@ -194,7 +194,7 @@ loadqrcode
 destaddr = $c000
 .ifne includesound
     jsr disablesound
-    jsr disablerasterirq
+    jsr disrasterirq
 .endif
     #ldi16 r0, startddr
     #ldi16 r2, destaddr

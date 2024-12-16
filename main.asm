@@ -105,7 +105,9 @@ sss
 .endif
 
     jsr waitforinput
-    #poke $d015, 0; Disable all sprites
+    
+    ; Disable all sprites
+    #poke $d015, 0
 
 ;sshss = show save high score screen
 sshss
@@ -124,9 +126,7 @@ sshss
 ;Set basic text color
     #poke 646, 7
     
-;Replacing this and corresponding cli
-;with disablerasterirq and disablesound
-;breaks end screen.
+
 .ifeq includechargen
     jsr encharrom
 .endif

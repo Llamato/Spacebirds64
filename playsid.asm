@@ -63,9 +63,9 @@ sndenabled .byte $0  ;boolean for sound toggle
 disablesound
         sei
         #poke sndenabled, 0
-        #poke $d404, 0     ; deactivate Voice1
-        #poke $d40b, 0     ; deactivate Voice2
-        #poke $d412, 0     ; deactivate Voice3
+        #poke $d404, 0; deactivate Voice1
+        #poke $d40b, 0; deactivate Voice2
+        #poke $d412, 0; deactivate Voice3
         cli
         rts
 
@@ -80,7 +80,7 @@ enablesound
         cli
         rts
 
-disablerasterirq
+disrasterirq
         sei
         lda #$00   ; disable raster
         sta $d01a  ; interrupt
