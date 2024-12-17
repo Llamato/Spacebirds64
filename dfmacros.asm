@@ -80,6 +80,42 @@ setcur .macro
     jsr basicplot; set cursor pos
 .endm
 
+;movecur = move cursor (Relative)
+;moves the cursor up for negativ \1
+;and down for positive \1 aswell as
+;left for negative \2
+;and right for positive \2
+;relative to its position before invoke.
+;Input
+;\1 = horizontal shift in num of chars
+;\2 = vertical shift in num of chars
+;Output
+;Shifted cursor
+movcur .macro
+    sec
+    jsr basicplot
+    txa
+    clc
+.ifpl \1
+    adc #\1
+.endif
+.ifmi \2
+    sbc #\1
+.endif
+    tax
+    tya
+    clc
+.ifpl \2
+    adc #\2
+.endif
+.ifmi \2
+    sbc #\2
+.endif
+    tay
+    clc
+    jsr basicplot
+.endm
+
 ;Macro wrapper for basic rom PrintNull
 ;function by max integrated by Tina
 ;Input 
