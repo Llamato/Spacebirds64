@@ -203,6 +203,10 @@ sshss
 
 ;Get name from user
     #print enternameprompt
+;If ldx is removed it breaks the name
+;promt. Does anybody have any idea
+;why that is?
+    ldx #0    
     #nullinput namearea
     #crlf
 

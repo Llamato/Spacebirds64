@@ -48,7 +48,12 @@ currrecptr = $cffe
 ;carry set on error with A = error code
 lfd .macro
     lda #\1
+.ifne \2
     ldx #\2
+.endif
+.ifeq \2
+    ldx $ba; last used drive id
+.endif
     ldy #\5
     jsr kernalsetlfs
     lda #\4
@@ -74,7 +79,12 @@ lfd .macro
 ;carry set on error with A = error code
 sfd .macro
     lda #\1
+.ifne \2
     ldx #\2
+.endif
+.ifeq \2
+    ldx $ba; last used drive id
+.endif
     ldy #1
     jsr kernalsetlfs
     lda #\4
@@ -94,7 +104,7 @@ sfd .macro
 loadhighscores
 #ldi16 currrecptr, recliststart
 #ldi16 r0, diskbuffer
-#lfd 2, 8, hsfilename, 11, 1
+#lfd 2, 0, hsfilename, 11, 1
 bcs hreaderr
 rts
 
@@ -105,7 +115,7 @@ savehighscores
     #poke r1, >diskbuffer
     #poke r2, <diskbufferend
     #poke r3, >diskbufferend
-    #sfd 2, 8, filenameprefow, 13
+    #sfd 2, 0, filenameprefow, 13
     bcs hwriteerr
     rts
 
@@ -153,7 +163,7 @@ addhstodb
 loadchargen
     sta fontfn+7
     #add16i r0, 2
-    #lfd 2, 8, fontfn, 8, 0
+    #lfd 2, 0, fontfn, 8, 0
     rts
 
 ;Loads sprite from disk
@@ -163,7 +173,7 @@ loadchargen
 ;r1 = Highbyte of target address
 loadsprite
     sta spritefn+6
-    #lfd 2, 8, spritefn, 7, 0
+    #lfd 2, 0, spritefn, 7, 0
     rts
 
 ;Loads (40*25=1000) bytes
@@ -178,12 +188,12 @@ loadtextscreen
     ;the first two bytes as prg load 
     ;address. I will get to it!
     #ldi16 r0, txtscreenstart
-    #lfd 2, 8, screenfn, 7, 0
+    #lfd 2, 0, screenfn, 7, 0
     rts
 
 ;Loads sid file from disk
 loadsid
-    #lfd 2, 8, sidfn, 3, 1
+    #lfd 2, 0, sidfn, 3, 1
     rts
 
 ;Loads and displays qr code
@@ -202,7 +212,7 @@ destaddr = $c000
     jsr memcpy
     jmp destaddr
 startddr = *
-    #lfd 2, 8, qrcodefn, 6, 1
+    #lfd 2, 0, qrcodefn, 6, 1
     jmp 2061
 endaddr = *
 .bend
