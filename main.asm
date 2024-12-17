@@ -125,7 +125,6 @@ jumppad
 
 ;sshss = show save high score screen
 sshss
-
 ; Disable all sprites
     #poke $d015, 0
     
