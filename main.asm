@@ -203,7 +203,7 @@ sshss
 
 ;Get name from user
     #print enternameprompt
-;    #movcur 1, 0 
+    jsr kernalgetchr
     #nullinput namearea
     #crlf
 
@@ -350,7 +350,7 @@ tyfps
 
 enternameprompt
 .text "Please "
-.null "enter your name? "
+.null "enter your name?"
 
 ;ecyp = enter current year prompt
 ecyp
