@@ -1,6 +1,6 @@
 includetests = 0
 includechargen = 1
-includesound = 1
+includesound = 0
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -354,6 +354,7 @@ continue
 .include "vicsubs.asm"
 .include "dataflowsubs.asm"
 .include "playsid.asm"
+.include "delay.asm"
 .include "disksubs.asm"
 
 ;Data
