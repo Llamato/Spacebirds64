@@ -99,29 +99,46 @@ sss
     jsr playsound
 .endif
 
-    gameloop
-.block
-inputloop
-         lda #$ff
-         cmp $d012
-         bne inputloop
+gameloop
+;Check for raster line to
+;determine if enemies should
+;move
+lda $d012
+cmp #$ff
+beq moveloop
+jmp jumppad
 
-up       
-        lda 56320
-         and #1
-         bne down
-         dec $d001
-down     
-        lda 56320
-         and #2
-         bne jumppad
-         inc $d001
-jumppad
-        lda 198
-        bne sshss
-        #poke 198, 0
-        jmp gameloop
+;move enemies one to the left
+moveloop
+.block
+    #movespriteleft 1
+    #movespriteleft 2
+    #movespriteleft 3
+    #movespriteleft 4
+    #movespriteleft 5
+    #movespriteleft 6
+    #movespriteleft 7
 .bend
+inputloop
+.block
+    up       
+    lda 56320
+    and #1
+    bne down
+    dec $d001
+
+    down     
+    lda 56320
+    and #2
+    bne jumppad
+    inc $d001
+.bend
+
+jumppad
+lda 198
+bne sshss
+#poke 198, 0
+jmp gameloop
 
 ;sshss = show save high score screen
 sshss
@@ -192,7 +209,7 @@ sshss
 ;handed to us by the failed load attempt
     jsr clrdiskiomem
 
-    ;scfs = skip cleanup for subsequent
+;scfs = skip cleanup for subsequent
     scfs
 
 .ifne includetests
@@ -338,7 +355,6 @@ continue
 .include "dataflowsubs.asm"
 .include "playsid.asm"
 .include "disksubs.asm"
-;.include "sprite0.asm"
 
 ;Data
 ;tyfps = thank you for playing string

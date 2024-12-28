@@ -1,3 +1,19 @@
+;Get sprite position
+;Input
+;\1 = sprite number
+;Output
+;X = Low byte of sprite x pos
+;Y = sprite y pos
+;A = high byte of sprite x pos
+getspritepos .macro
+    xposl = \1 * 2 + $d000
+    ypos = xposl +1
+    ldx xposl
+    ldy ypos
+    #bintobinseq \1
+    and 53264
+.endm
+
 ;Set sprite position
 ;Input
 ;\1 = sprite number
@@ -56,4 +72,42 @@ setspritecolor .macro
     coloraddr = \1 + $d027
     lda #\2
     sta coloraddr
+.endm
+
+;Move sprite number \1 left
+;Input
+;\1 = sprite number
+;Output
+;Sprite one more pixel to left
+;Bug in here
+;Sprite flickering on
+;transition
+movespriteleft .macro
+    xposl = \1 * 2 + $d000
+    ypos = xposl +1
+    lda xposl
+    sec
+    sbc #1
+    sta xposl
+    bcs done
+    lda #255
+    sta xposl
+    #bintobinseq \1
+    eor 53264
+    sta 53264
+done
+.endm
+
+movespriteright .macro
+    xposl = \1 * 2 + $d000
+    ypos = xposl +1
+    lda xposl
+    clc
+    adc #1
+    sta xposl
+    bcc done
+    #bintobinseq \1
+    eor 53264
+    sta 53264
+done
 .endm
