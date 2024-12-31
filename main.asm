@@ -1,5 +1,5 @@
 includetests = 0
-includechargen = 1
+includechargen = 0
 includesound = 0
 
 *=2049
@@ -59,10 +59,22 @@ sss
     jsr loadtextscreen
 
 ;Load custom font
+.ifne includechargen
     jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$53; S in ascii
     jsr loadchargen
+.endif
+
+;Temporary solution because I could not
+;get copying over of default chars
+;from rom to ram to work.
+.ifeq includechargen
+    jsr encharram
+    #ldi16 r0, txtcharsetstart
+    lda #$44
+    jsr loadchargen
+.endif
 
 ;Enable double height for all sprites
     #poke $d017, $ff
@@ -354,7 +366,6 @@ continue
 .include "vicsubs.asm"
 .include "dataflowsubs.asm"
 .include "playsid.asm"
-.include "delay.asm"
 .include "disksubs.asm"
 
 ;Data

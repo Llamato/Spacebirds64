@@ -32,6 +32,7 @@ screenend = screenstart + screensize
 
 ;sccharsetstart = start screen
 ;charset start
+charromstart = 53248
 charsetstart = $2800
 bitmapstart = $6000
 bitmapsize = 8000
