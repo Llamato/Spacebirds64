@@ -54,9 +54,17 @@ sss
     jsr recolorscreen
 
 ;Load start screen content
+.ifne includechargen
     #ldi16 r0, txtscreenstart 
     lda #$53; S in ascii
     jsr loadtextscreen
+.endif
+
+.ifeq includechargen
+    #ldi16 r0, txtcharsetstart
+    lda #$44
+    jsr loadtextscreen
+.endif
 
 ;Load custom font
 .ifne includechargen
@@ -72,7 +80,7 @@ sss
 .ifeq includechargen
     jsr encharram
     #ldi16 r0, txtcharsetstart
-    lda #$44
+    lda #$44; D in ascii
     jsr loadchargen
 .endif
 
@@ -131,15 +139,16 @@ moveloop
     #movespriteleft 6
     #movespriteleft 7
 .bend
+
 inputloop
 .block
-    up       
+    up
     lda 56320
     and #1
     bne down
     dec $d001
 
-    down     
+    down
     lda 56320
     and #2
     bne jumppad
