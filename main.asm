@@ -34,6 +34,16 @@ add16i .macro
     sta \1 +1
 .endm
 
+add16 .macro
+    lda \1
+    clc
+    adc <\2
+    sta \1
+    lda \1 +1
+    adc >\2
+    sta \1 +1
+.endm
+
 sub16i .macro
     lda \1
     sec
@@ -127,7 +137,9 @@ sss
 
 ;Add stars to background
     lda #69
+    sta r0
     ldx #10
+    stx r1
     jsr placestars
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
@@ -411,31 +423,50 @@ continue
 placestars
 .block
 setup
-    phx
-    phy
-    pha
-    ldy #0
-    #ldi16 r0, 1024
+    #ldi16 r2, 1024
+    ldx #0
 placestar
+    lda #255
+    sec
+    sbc r0
     clc
-    adc r0
+    adc r2
+    sta r2
+    lda #0
+    sta r3
+    ora r0
     sta r0
-    lda r1
-    adc #1
-    sta r1
-    cmp #<2024
-    bcc next 
-    cmp #>2024
-    bcc next
-    #sub16i r0, 1024
+clamp
+    lda r3
+    cmp #>2025
+    bcc bgte
+    lda r3
+    cmp #>1024
+    bcc bgin
+    jmp blt
+bgte
+    beq bgt
+    lda r2
+    cmp #<2025
+    bcc bgt
+    lda r2
+    cmp #<1024
+    bcc bgin
+    jmp blt
+bgt
+    #sub16i r2, 2024
+    #add16i r2, 1024
+    jmp bgin
+blt
+    #add16i r2, 1024
+bgin
+    lda #78
+    ldy #0
+    sta (r2), y
 next
-    lda #77
-    sta (r0),y
-    dex
+    inx
+    cpx r1
     bne placestar
-    pla
-    ply
-    plx
     rts
 .bend
 
