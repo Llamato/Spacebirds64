@@ -34,16 +34,6 @@ add16i .macro
     sta \1 +1
 .endm
 
-sub16i .macro
-    lda \1
-    sec
-    sbc #<\2
-    sta \1
-    lda \1 +1
-    sbc #>\2
-    sta \1 +1
-.endm
-
 ;.include "math-macros.asm"
 
 .ifne includetests
@@ -124,22 +114,6 @@ sss
     #ldi16 r0, sprite1addr
     lda #49
     jsr loadsprite
-
-;Add stars to background
-    lda #69
-    ldx #10
-    jsr placestars
-;For some reason enemy movement breaks
-;at the low byte, high byte boundry
-;if the registeres are not cleared like
-;done here. if anybody got any idea on
-;why that might be please let me know.
-;stranger still if any of those is not
-;cleared then the whole programm
-;crashes
-    lda #0
-    ldx #0
-    ldy #0
 .ifne includesound
     jsr loadsid
     jsr playsound
@@ -395,47 +369,6 @@ waitsomemore
     jmp waitsomemore 
 continue
     #poke 198, 0
-    rts
-.bend
-
-;Bug in here!!!
-;Place background stars
-;procedually with seed and density
-;with the density given in
-;stars per screen page (40x25 chars).
-;Input
-;r0 = seed
-;r1 = star density
-;Output
-;Stars on screen
-placestars
-.block
-setup
-    phx
-    phy
-    pha
-    ldy #0
-    #ldi16 r0, 1024
-placestar
-    clc
-    adc r0
-    sta r0
-    lda r1
-    adc #1
-    sta r1
-    cmp #<2024
-    bcc next 
-    cmp #>2024
-    bcc next
-    #sub16i r0, 1024
-next
-    lda #77
-    sta (r0),y
-    dex
-    bne placestar
-    pla
-    ply
-    plx
     rts
 .bend
 
