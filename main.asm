@@ -54,8 +54,69 @@ sub16i .macro
     sta \1 +1
 .endm
 
+;Bug in here
 div16 .macro
+;$59 used for hi-byte
+    divisor = \1
 
+;$fc used for hi-byte
+    dividend = \2
+
+;$fe used for hi-byte
+    remainder = \3
+
+;save memory by reusing
+;divident to store the result
+    result = dividend
+
+divide
+;preset remainder to 0
+    lda #0
+	sta remainder
+	sta remainder+1
+
+;repeat for each bit: ...
+	ldx #16
+
+divloop	
+;dividend lb & hb*2
+; msb -> Carry
+    asl dividend
+	rol dividend+1
+
+;remainder
+;lb & hb * 2 + msb from carry
+	rol remainder
+	rol remainder+1
+	lda remainder
+	sec
+
+;substract divisor to see if it fits in
+	sbc divisor
+
+;lb result -> Y
+;for we may need it later
+	tay
+	lda remainder+1
+	sbc divisor+1
+
+;if carry=0 then
+;divisor didn't fit in yet
+	bcc skip
+
+;else save substraction result 
+;as new remainder
+	sta remainder+1
+	sty remainder
+
+;and INCrement result
+;cause divisor fit in 1 times
+	inc result
+
+skip	
+    dex
+	bne divloop	
+	rts
 .endm
 
 ;.include "math-macros.asm"
@@ -140,11 +201,11 @@ sss
     jsr loadsprite
 
 ;Add stars to background
-    ;lda #69
-    ;sta r1
-    ;ldx #10
-    ;stx r0
-    ;∫jsr placestars
+    lda #69
+    sta r1
+    ldx #10
+    stx r0
+    jsr placestars
 
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
@@ -208,7 +269,7 @@ jmp gameloop
 
 ;sshss = show save high score screen
 sshss
-; Disable all sprites
+;Disable all sprites
     #poke $d015, 0
     
     jsr basiccls
@@ -417,13 +478,12 @@ continue
     rts
 .bend
 
-;Bug in here!!!
 ;Place background stars
 ;procedually with seed and density
 ;with the density given in
 ;stars per screen page (40x25 chars).
 ;Input
-;r0 = star density
+;r0 = star density (amount of stars)
 ;r1 = seed
 ;Output
 ;Stars on screen
@@ -434,10 +494,11 @@ setup
     lda r1
     pha
     #poke r1, 0
-    #div16 r2, r0, r31
-    #mov16 r4, r2
+    #mov16 r4, r0
+    #div16 r2, r4, r6
     #ldi16 r2, 1024
     pla
+    sta r1
     ldx #0
     ldy #0
 placestar
@@ -452,12 +513,14 @@ checklow
     beq checklowlb
     bcc outlow
     bcs notlow
+
 checklowlb
     lda r2
     cmp #<1024
     beq eqlow
     bcc outlow
     bcs notlow
+
 notlow
 checkhigh
     lda r3
@@ -465,29 +528,36 @@ checkhigh
     beq checkhighlb
     bcc in
     bcs outhigh
+
 checkhighlb
     lda r2
     cmp #<2024
     beq eqhigh
     bcc in
     bcs outhigh
+
 in
     lda #78
     sta (r2),y
     jmp next
+
 outhigh
     #sub16i r2, 1000
     jmp clamp
+
 eqhigh
     jmp in; temp
+
 outlow
     #add16i r2, 1000
     jmp clamp
+
 eqlow
     jmp in; temp
+
 next
     inx
-    cpx r1
+    cpx r4+1
     bne placestar
     rts
 .bend
