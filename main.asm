@@ -54,6 +54,10 @@ sub16i .macro
     sta \1 +1
 .endm
 
+div16 .macro
+
+.endm
+
 ;.include "math-macros.asm"
 
 .ifne includetests
@@ -136,11 +140,12 @@ sss
     jsr loadsprite
 
 ;Add stars to background
-    lda #69
-    sta r0
-    ldx #10
-    stx r1
-    jsr placestars
+    ;lda #69
+    ;sta r1
+    ;ldx #10
+    ;stx r0
+    ;∫jsr placestars
+
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
 ;if the registeres are not cleared like
@@ -163,6 +168,8 @@ gameloop
 ;move
 lda $d012
 cmp #$ff
+beq moveloop
+cmp #$aa
 beq moveloop
 jmp jumppad
 
@@ -416,53 +423,66 @@ continue
 ;with the density given in
 ;stars per screen page (40x25 chars).
 ;Input
-;r0 = seed
-;r1 = star density
+;r0 = star density
+;r1 = seed
 ;Output
 ;Stars on screen
 placestars
 .block
 setup
     #ldi16 r2, 1024
+    lda r1
+    pha
+    #poke r1, 0
+    #div16 r2, r0, r31
+    #mov16 r4, r2
+    #ldi16 r2, 1024
+    pla
     ldx #0
+    ldy #0
 placestar
-    lda #255
-    sec
-    sbc r0
-    clc
-    adc r2
-    sta r2
-    lda #0
-    sta r3
-    ora r0
-    sta r0
+    ;Algo to be designed.
+    ;Tina is sick.
 clamp
-    lda r3
-    cmp #>2025
-    bcc bgte
+checklow
     lda r3
     cmp #>1024
-    bcc bgin
-    jmp blt
-bgte
-    beq bgt
-    lda r2
-    cmp #<2025
-    bcc bgt
+    beq checklowlb
+    bcc outlow
+    bcs notlow
+checklowlb
     lda r2
     cmp #<1024
-    bcc bgin
-    jmp blt
-bgt
-    #sub16i r2, 2024
-    #add16i r2, 1024
-    jmp bgin
-blt
-    #add16i r2, 1024
-bgin
+    beq eqlow
+    bcc outlow
+    bcs notlow
+notlow
+checkhigh
+    lda r3
+    cmp #>2024
+    beq checkhighlb
+    bcc in
+    bcs outhigh
+checkhighlb
+    lda r2
+    cmp #<2024
+    beq eqhigh
+    bcc in
+    bcs outhigh
+in
     lda #78
-    ldy #0
-    sta (r2), y
+    sta (r2),y
+    jmp next
+outhigh
+    #sub16i r2, 1000
+    jmp clamp
+eqhigh
+    jmp in; temp
+outlow
+    #add16i r2, 1000
+    jmp clamp
+eqlow
+    jmp in; temp
 next
     inx
     cpx r1
@@ -474,6 +494,7 @@ next
 .include "dataflowsubs.asm"
 .include "playsid.asm"
 .include "disksubs.asm"
+;.include "mathsubs.asm"
 
 ;Data
 ;tyfps = thank you for playing string
