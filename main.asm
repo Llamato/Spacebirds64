@@ -34,6 +34,30 @@ add16i .macro
     sta \1 +1
 .endm
 
+add16 .macro
+    lda \1
+    clc
+    adc <\2
+    sta \1
+    lda \1 +1
+    adc >\2
+    sta \1 +1
+.endm
+
+sub16i .macro
+    lda \1
+    sec
+    sbc #<\2
+    sta \1
+    lda \1 +1
+    sbc #>\2
+    sta \1 +1
+.endm
+
+div16 .macro
+
+.endm
+
 ;.include "math-macros.asm"
 
 .ifne includetests
@@ -114,6 +138,25 @@ sss
     #ldi16 r0, sprite1addr
     lda #49
     jsr loadsprite
+
+;Add stars to background
+    ;lda #69
+    ;sta r1
+    ;ldx #10
+    ;stx r0
+    ;∫jsr placestars
+
+;For some reason enemy movement breaks
+;at the low byte, high byte boundry
+;if the registeres are not cleared like
+;done here. if anybody got any idea on
+;why that might be please let me know.
+;stranger still if any of those is not
+;cleared then the whole programm
+;crashes
+    lda #0
+    ldx #0
+    ldy #0
 .ifne includesound
     jsr loadsid
     jsr playsound
@@ -125,6 +168,8 @@ gameloop
 ;move
 lda $d012
 cmp #$ff
+beq moveloop
+cmp #$aa
 beq moveloop
 jmp jumppad
 
@@ -372,10 +417,86 @@ continue
     rts
 .bend
 
+;Bug in here!!!
+;Place background stars
+;procedually with seed and density
+;with the density given in
+;stars per screen page (40x25 chars).
+;Input
+;r0 = star density
+;r1 = seed
+;Output
+;Stars on screen
+placestars
+.block
+setup
+    #ldi16 r2, 1024
+    lda r1
+    pha
+    #poke r1, 0
+    #div16 r2, r0, r31
+    #mov16 r4, r2
+    #ldi16 r2, 1024
+    pla
+    ldx #0
+    ldy #0
+placestar
+
+;Algo to be designed.
+;Tina is sick.
+
+clamp
+checklow
+    lda r3
+    cmp #>1024
+    beq checklowlb
+    bcc outlow
+    bcs notlow
+checklowlb
+    lda r2
+    cmp #<1024
+    beq eqlow
+    bcc outlow
+    bcs notlow
+notlow
+checkhigh
+    lda r3
+    cmp #>2024
+    beq checkhighlb
+    bcc in
+    bcs outhigh
+checkhighlb
+    lda r2
+    cmp #<2024
+    beq eqhigh
+    bcc in
+    bcs outhigh
+in
+    lda #78
+    sta (r2),y
+    jmp next
+outhigh
+    #sub16i r2, 1000
+    jmp clamp
+eqhigh
+    jmp in; temp
+outlow
+    #add16i r2, 1000
+    jmp clamp
+eqlow
+    jmp in; temp
+next
+    inx
+    cpx r1
+    bne placestar
+    rts
+.bend
+
 .include "vicsubs.asm"
 .include "dataflowsubs.asm"
 .include "playsid.asm"
 .include "disksubs.asm"
+;.include "mathsubs.asm"
 
 ;Data
 ;tyfps = thank you for playing string
