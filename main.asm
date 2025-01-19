@@ -56,13 +56,8 @@ sub16i .macro
 
 ;Bug in here
 div16 .macro
-;$59 used for hi-byte
     divisor = \1
-
-;$fc used for hi-byte
     dividend = \2
-
-;$fe used for hi-byte
     remainder = \3
 
 ;save memory by reusing
@@ -202,9 +197,7 @@ sss
 
 ;Add stars to background
     lda #69
-    sta r1
     ldx #10
-    stx r0
     jsr placestars
 
 ;For some reason enemy movement breaks
@@ -483,32 +476,33 @@ continue
 ;with the density given in
 ;stars per screen page (40x25 chars).
 ;Input
-;r0 = star density (amount of stars)
-;r1 = seed
+;A = star density (amount of stars)
+;X = seed
 ;Output
 ;Stars on screen
 placestars
 .block
 setup
-    #ldi16 r2, 1024
-    lda r1
     pha
-    #poke r1, 0
-    #mov16 r4, r0
-    #div16 r2, r4, r6
     #ldi16 r2, 1024
+    #poke r1, 0
     pla
+    sta r0
+    pha
+    lda #0
     sta r1
+    #ldi16 r2, 1024
+    phx
+    ;#div16 r2, r0, r4
     ldx #0
     ldy #0
 placestar
 
-;Algo to be designed.
-;Tina is sick.
+    #add16 r2, r0
 
 clamp
 checklow
-    lda r3
+    lda r2
     cmp #>1024
     beq checklowlb
     bcc outlow
@@ -559,6 +553,8 @@ next
     inx
     cpx r4+1
     bne placestar
+    plx
+    pla
     rts
 .bend
 
