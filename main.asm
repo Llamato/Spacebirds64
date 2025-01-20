@@ -157,6 +157,14 @@ sss
     jsr playsound
 .endif
 
+
+
+
+
+jsr initfuel
+
+
+
 gameloop
 ;Check for raster line to
 ;determine if enemies should
@@ -200,6 +208,11 @@ jsr check_collision
 lda 198
 bne sshss
 #poke 198, 0
+
+;To reduce fuel call
+;jsr reducefuel
+
+
 jmp gameloop
 
 
@@ -524,6 +537,7 @@ next
 .include "dataflowsubs.asm"
 .include "playsid.asm"
 .include "disksubs.asm"
+.include "fuelbar.asm"
 ;.include "mathsubs.asm"
 
 ;Data
