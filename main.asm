@@ -204,7 +204,7 @@ inputloop
 .bend
 
 jumppad
-jsr check_collision
+jsr checkcollision
 lda 198
 bne sshss
 #poke 198, 0
@@ -216,23 +216,31 @@ bne sshss
 jmp gameloop
 
 
-check_collision
-    lda $d01e            ; Load sprite-sprite collision register
-    and #%00000001       ; Check bit 0 (collision sprite 0)
-    beq NoCollision      ; if no collision, skip to NoCollision
+checkcollision
+; Load sprite-sprite collision register
+    lda $d01e
+; Check bit 0 (collision sprite 0)            
+    and #%00000001
+; if no collision, skip to nocollision
+    beq nocollision      
 
-    ; Collision detected: Change color of sprite 0
+; Collision detected: Change 
+; color of sprite 0
     lda #$02
-    sta $d027            ; set color for sprite 0
-    jmp Continue         ; continue
+; set color for sprite 0
+    sta $d027
+; continue
+    jmp continue
 
-NoCollision
-    ; No collision detected: Reset to the original color
+nocollision
+; No collision detected: Reset
+; to the original color
     lda #$01
-    sta $d027            ; color sprite 0
+; color sprite 0
+    sta $d027
 
-Continue
-    ; Continue with the game
+continue
+; continue with the game
     rts
 
 

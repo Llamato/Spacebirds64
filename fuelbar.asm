@@ -4,7 +4,8 @@
 ;---------------------------------------
 initfuel
 .block
-#poke fuel, 64 ;set fuel to max (64)
+;set fuel to max (64)
+#poke fuel, 64
 ldx #0
 loop
     ; draw full characters
@@ -13,10 +14,11 @@ loop
 
     ; set the color
     lda #$02
-    sta $D800 + 911, x
+    sta $d800 + 911, x
 
     inx
-    cpx #8 ;fuel bar is 8 characters wide
+    ;fuel bar is 8 characters wide
+    cpx #8
     bne loop
 
     ; draw border on the right side
@@ -25,7 +27,7 @@ loop
 
     ; set color of the border
     lda #$01
-    sta $D800 + 919
+    sta $d800 + 919
 
     rts
 .bend
@@ -41,8 +43,8 @@ reducefuel
     beq outoffuel
     dec fuel
 
-    ;divide by 8 to know how many
-    ;full characters we have to draw
+;divide by 8 to know how many
+;full characters we have to draw
     lda fuel
     lsr
     lsr
@@ -57,25 +59,26 @@ drawfullfuel
     beq finishdrawing
     dex 
 
-    ; draw full characters
+;draw full characters
     lda #92
     sta $0400 + 911, x
 
     ; set the color
     lda #$05
-    sta $D800 + 911, x
+    sta $d800 + 911, x
 
     jmp drawfullfuel
 finishdrawing
 
 
-
-tya ; transfer the division result to x
+;transfer the division result to x
+tya
 tax
 drawemptyfuel
     cpx #8
     beq finishdrawempty
-    lda #23  ; draw space -> empty fuel
+;draw space -> empty fuel
+    lda #23  
     sta $0400 + 911, x
 
     inx
@@ -83,18 +86,19 @@ drawemptyfuel
 
 finishdrawempty
 
-; get remainder {x AND (y-1)}
+;get remainder {x AND (y-1)}
 lda fuel
 and #$07
 beq end ;zero was already drawn
 
-; draw the last character
-adc #83 ; add offset to get the right character
+;draw the last character
+;add offset to get the right character
+adc #83
 sta $0400 + 911, y
 
-; set the color
+;set the color
 lda #$07
-sta $D800 + 911, y
+sta $d800 + 911, y
 
 
 end
@@ -107,5 +111,5 @@ outoffuel
     rts
 .bend
 
-
-fuel .byte  64;set fuel to max (64)
+;set fuel to max (64)
+fuel .byte  64
