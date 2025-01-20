@@ -80,7 +80,7 @@ dvs = \2
 res = >\3
 reshi = <\3
 
-;16 bit subtraction algorithm originally
+;16 bit devision algorithm originally
 ;by Neil Parker
 ;developed for the apple ii in 2005
 ;https://llx.com/Neil/a2/mult.html

@@ -54,6 +54,7 @@ sub16i .macro
     sta \1 +1
 .endm
 
+
 ;.include "math-macros.asm"
 
 .ifne includetests
@@ -137,10 +138,9 @@ sss
 
 ;Add stars to background
     lda #69
-    sta r0
     ldx #10
-    stx r1
     jsr placestars
+
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
 ;if the registeres are not cleared like
@@ -172,6 +172,8 @@ gameloop
 lda $d012
 cmp #$ff
 beq moveloop
+cmp #$aa
+beq moveloop
 jmp jumppad
 
 ;move enemies one to the left
@@ -202,19 +204,42 @@ inputloop
 .bend
 
 jumppad
+jsr check_collision
 lda 198
 bne sshss
 #poke 198, 0
 
-jsr waitforinput
-jsr reducefuel
+;To reduce fuel call
+;jsr reducefuel
 
 
 jmp gameloop
 
+
+check_collision
+    lda $d01e            ; Load sprite-sprite collision register
+    and #%00000001       ; Check bit 0 (collision sprite 0)
+    beq NoCollision      ; if no collision, skip to NoCollision
+
+    ; Collision detected: Change color of sprite 0
+    lda #$02
+    sta $d027            ; set color for sprite 0
+    jmp Continue         ; continue
+
+NoCollision
+    ; No collision detected: Reset to the original color
+    lda #$01
+    sta $d027            ; color sprite 0
+
+Continue
+    ; Continue with the game
+    rts
+
+
+
 ;sshss = show save high score screen
 sshss
-; Disable all sprites
+;Disable all sprites
     #poke $d015, 0
     
     jsr basiccls
@@ -423,63 +448,88 @@ continue
     rts
 .bend
 
-;Bug in here!!!
 ;Place background stars
 ;procedually with seed and density
 ;with the density given in
 ;stars per screen page (40x25 chars).
 ;Input
-;r0 = seed
-;r1 = star density
+;A = star density (amount of stars)
+;X = seed
 ;Output
 ;Stars on screen
 placestars
 .block
 setup
+    pha
     #ldi16 r2, 1024
-    ldx #0
-placestar
-    lda #255
-    sec
-    sbc r0
-    clc
-    adc r2
-    sta r2
-    lda #0
-    sta r3
-    ora r0
+    #poke r1, 0
+    pla
     sta r0
+    pha
+    lda #0
+    sta r1
+    #ldi16 r2, 1024
+    phx
+    ;#div16 r2, r0, r4, r6
+    ldx #0
+    ldy #0
+placestar
+
+    #add16 r2, r0
+
 clamp
-    lda r3
-    cmp #>2025
-    bcc bgte
-    lda r3
-    cmp #>1024
-    bcc bgin
-    jmp blt
-bgte
-    beq bgt
+checklow
     lda r2
-    cmp #<2025
-    bcc bgt
+    cmp #>1024
+    beq checklowlb
+    bcc outlow
+    bcs notlow
+
+checklowlb
     lda r2
     cmp #<1024
-    bcc bgin
-    jmp blt
-bgt
-    #sub16i r2, 2024
-    #add16i r2, 1024
-    jmp bgin
-blt
-    #add16i r2, 1024
-bgin
+    beq eqlow
+    bcc outlow
+    bcs notlow
+
+notlow
+checkhigh
+    lda r3
+    cmp #>2024
+    beq checkhighlb
+    bcc in
+    bcs outhigh
+
+checkhighlb
+    lda r2
+    cmp #<2024
+    beq eqhigh
+    bcc in
+    bcs outhigh
+
+in
     lda #78
-    ldy #0
-    sta (r2), y
+    sta (r2),y
+    jmp next
+
+outhigh
+    #sub16i r2, 1000
+
+eqhigh
+    jmp in; temp
+
+outlow
+    #add16i r2, 1000
+
+eqlow
+    jmp in; temp
+
 next
     inx
-    cpx r1
+    cpx r4+1
     bne placestar
+    plx
+    pla
     rts
 .bend
 
@@ -488,6 +538,7 @@ next
 .include "playsid.asm"
 .include "disksubs.asm"
 .include "fuelbar.asm"
+;.include "mathsubs.asm"
 
 ;Data
 ;tyfps = thank you for playing string

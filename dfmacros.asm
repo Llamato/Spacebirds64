@@ -80,24 +80,6 @@ setcur .macro
     jsr basicplot; set cursor pos
 .endm
 
-;movecur = move cursor (Relative)
-;moves the cursor up for negativ \1
-;and down for positive \1 aswell as
-;left for negative \2
-;and right for positive \2
-;relative to its position before invoke.
-;Input
-;\1 = horizontal shift in num of chars
-;\2 = vertical shift in num of chars
-;Output
-;Shifted cursor
-movcur .macro; Bug in here
-    lda #\1
-    sta 211
-    lda #\2
-    sta 214
-.endm
-
 ;Macro wrapper for basic rom PrintNull
 ;function by max integrated by Tina
 ;Input 
