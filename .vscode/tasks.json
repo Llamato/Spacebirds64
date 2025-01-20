@@ -6,7 +6,7 @@
         {
             "label": "clean",
             "type": "shell",
-            "command": "python buildscripts/clear.py",
+            "command": "python3 buildscripts/clear.py",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -26,7 +26,7 @@
         {
             "label": "pack program disk",
             "type": "shell",
-            "command": "python buildscripts/packprgdisk.py ${workspaceFolderBasename} build/${fileBasenameNoExtension}.prg",
+            "command": "python3 buildscripts/packprgdisk.py ${workspaceFolderBasename} build/${fileBasenameNoExtension}.prg",
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -71,7 +71,7 @@
         {
             "label": "flatten TMPx includes",
             "type": "shell",
-            "command": "python buildscripts/flattenasm.py ${fileBasename} build/flattend${fileBasenameNoExtension}.asm",
+            "command": "python3 buildscripts/flattenasm.py ${fileBasename} build/flattend${fileBasenameNoExtension}.asm",
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -80,7 +80,7 @@
         {
             "label": "pack code disk",
             "type": "shell",
-            "command": "python buildscripts/packasmdisk.py main.asm build/pack build/pre",
+            "command": "python3 buildscripts/packasmdisk.py main.asm build/pack build/pre",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -93,7 +93,7 @@
         {
             "label": "pack code disk with assets",
             "type": "shell",
-            "command": "python buildscripts/packasmdisk.py main.asm build/pack build/pre ./assets",
+            "command": "python3 buildscripts/packasmdisk.py main.asm build/pack build/pre ./assets",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -106,7 +106,7 @@
         {
             "label": "unpack code disk",
             "type": "shell",
-            "command": "python buildscripts/unpackasmdisk.py ${input:diskfile} build/unpack build/unpack/pre",
+            "command": "python3 buildscripts/unpackasmdisk.py ${input:diskfile} build/unpack build/unpack/pre",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
