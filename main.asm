@@ -54,79 +54,6 @@ sub16i .macro
     sta \1 +1
 .endm
 
-; 16-bit division macro for Turbo Assembler
-; Input:  Dividend in \1 (low byte) and \1+1 (high byte)
-;         Divisor in \2 (low byte) and \2+1 (high byte)
-;         Result locations \3 (quotient) and \4 (remainder)
-div16   .MACRO
-        ; Save registers we'll be using
-        PHA             ; Save accumulator
-        TXA
-        PHA             ; Save X register
-        
-        ; Clear quotient and remainder locations
-        LDA #0
-        STA \3          ; Clear quotient low byte
-        STA \3+1        ; Clear quotient high byte
-        STA \4          ; Clear remainder low byte
-        STA \4+1        ; Clear remainder high byte
-        
-        ; Check for division by zero
-        LDA \2          ; Load divisor low byte
-        ORA \2+1        ; OR with high byte
-        BEQ DIV_ERROR ; Branch if divisor is zero
-        
-        ; Initialize bit counter
-        LDX #16         ; 16 bits to process
-        
-DIV_LOOP
-        ; Shift dividend left
-        ASL \1
-        ROL \1+1
-        ROL \4
-        ROL \4+1
-        
-        ; Try to subtract divisor from remainder
-        SEC             ; Set carry for subtraction
-        LDA \4
-        SBC \2
-        TAY             ; Store temp result in Y
-        LDA \4+1
-        SBC \2+1
-        BCC DIV_SKIP  ; Branch if subtraction would be negative
-        
-        ; Subtraction worked, save result and set quotient bit
-        STY \4
-        STA \4+1
-        INC \3          ; Set least significant bit of quotient
-        
-DIV_SKIP
-        ; Shift quotient left
-        ASL \3
-        ROL \3+1
-        
-        DEX             ; Decrement bit counter
-        BNE DIV_LOOP  ; Continue if more bits to process
-        
-        ; Final quotient shift to correct last iteration
-        LSR \3+1
-        ROR \3
-        JMP DIV_END
-
-DIV_ERROR
-        ; Handle division by zero
-        LDA #$FF        ; Load error value
-        STA \3          ; Set quotient to $FFFF
-        STA \3+1
-        STA \4          ; Set remainder to $FFFF
-        STA \4+1
-
-DIV_END
-        ; Restore registers
-        PLA
-        TAX             ; Restore X register
-        PLA             ; Restore accumulator
-.ENDM
 
 ;.include "math-macros.asm"
 
@@ -507,7 +434,7 @@ setup
     sta r1
     #ldi16 r2, 1024
     phx
-    #div16 r2, r0, r4, r6
+    ;#div16 r2, r0, r4, r6
     ldx #0
     ldy #0
 placestar
@@ -551,14 +478,12 @@ in
 
 outhigh
     #sub16i r2, 1000
-    jmp clamp
 
 eqhigh
     jmp in; temp
 
 outlow
     #add16i r2, 1000
-    jmp clamp
 
 eqlow
     jmp in; temp

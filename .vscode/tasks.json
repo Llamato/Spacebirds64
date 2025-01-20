@@ -39,6 +39,9 @@
             "label": "launch in vice",
             "type": "shell",
             "command": "x64sc build/prgdisk.d64",
+            "runOptions": {
+                "instanceLimit": 16
+            },
             "group": {
                 "kind": "build",
                 "isDefault": false
