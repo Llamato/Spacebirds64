@@ -126,6 +126,12 @@ sss
     #setspritepos 1, 265, 125
     #enablesprite 1
 
+;Setup sprite 2 for address $2080
+    #poke $07fa, $82
+    #setspritecolor 2, 1
+    #setspritepos 2, 100, 125
+    #enablesprite 2
+
 ;Set multicolor colors
     #poke $d025, $06
     #poke $d026, $02
@@ -135,11 +141,14 @@ sss
     #ldi16 r0, sprite1addr
     lda #49
     jsr loadsprite
+    #ldi16 r0, sprite2addr
+    lda #50
+    jsr loadsprite
 
 ;Add stars to background
-    lda #69
-    ldx #10
-    jsr placestars
+    ;lda #69
+    ;ldx #10
+    ;jsr placestars
 
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
@@ -157,13 +166,7 @@ sss
     jsr playsound
 .endif
 
-
-
-
-
 jsr initfuel
-
-
 
 gameloop
 ;Check for raster line to
@@ -455,7 +458,10 @@ continue
     #poke 198, 0
     rts
 .bend
-
+;---------------------------------------
+;Complex Bug in here
+;Breaks upon sprite2 load
+;Might require full recode
 ;Place background stars
 ;procedually with seed and density
 ;with the density given in
@@ -540,6 +546,7 @@ next
     pla
     rts
 .bend
+;------------------------------
 
 .include "vicsubs.asm"
 .include "dataflowsubs.asm"
