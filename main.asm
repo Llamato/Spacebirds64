@@ -198,12 +198,14 @@ inputloop
     and #1
     bne down
     dec $d001
+    jsr reducefuel
 
     down
     lda 56320
     and #2
     bne jumppad
     inc $d001
+    jsr reducefuel
 .bend
 
 jumppad

@@ -77,6 +77,15 @@ drawbottomborder
 ;---------------------------------------
 reducefuel
 .block
+    inc fuelscaler
+    lda fuelscaler
+    ; scale consumption down to 1/8
+    and #$010
+    beq end ; do nothing
+    ; reset scaler
+    lda #$00
+    sta fuelscaler
+
     lda fuel
     beq outoffuel
     dec fuel
@@ -135,7 +144,7 @@ adc #83
 sta $0400 + 911, y
 
 ;set the color
-lda #$07
+lda #$05
 sta $d800 + 911, y
 
 
@@ -146,8 +155,13 @@ outoffuel
     ; game over
     ;jmp gameover
 
+    ; for debugging
+    lda #64
+    sta fuel
+
     rts
 .bend
 
 ;set fuel to max (64)
 fuel .byte  64
+fuelscaler .byte 0
