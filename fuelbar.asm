@@ -10,11 +10,11 @@ ldx #0
 loop
     ; draw full characters
     lda #92
-    sta $0400 + 911, x
+    sta $0400 + 951, x
 
     ; set the color
     lda #$02
-    sta $d800 + 911, x
+    sta $d800 + 951, x
 
     inx
     ;fuel bar is 8 characters wide
@@ -23,30 +23,30 @@ loop
 
     ; draw border on the right side
     lda #84
-    sta $0400 + 919
+    sta $0400 + 959
 
     ; set color of right border
     lda #$01
-    sta $d800 + 919
+    sta $d800 + 959
 
     ;drawleftborder
     lda #93
-    sta $0400 + 910
+    sta $0400 + 950
 
     ; set color of left border
     lda #$01
-    sta $d800 + 910
+    sta $d800 + 950
 
 
     ldx #0
 drawtopborder
     ; draw top border
     lda #94
-    sta $0400 + 871, x
+    sta $0400 + 911, x
 
     ; set color of top border
     lda #$01
-    sta $d800 + 871, x
+    sta $d800 + 911, x
 
     inx
     cpx #8
@@ -57,11 +57,11 @@ drawtopborder
 drawbottomborder
     ; draw bottom border
     lda #96
-    sta $0400 + 951, x
+    sta $0400 + 991, x
 
     ; set color of bottom border
     lda #$01
-    sta $d800 + 951, x
+    sta $d800 + 991, x
 
     inx
     cpx #8
@@ -158,11 +158,11 @@ drawfullfuel
 
     ;draw full characters
     lda #92
-    sta $0400 + 911, x
+    sta $0400 + 951, x
 
     ; set the color
     lda #$05
-    sta $d800 + 911, x
+    sta $d800 + 951, x
 
     jmp drawfullfuel
 finishdrawing
@@ -176,7 +176,7 @@ drawemptyfuel
     beq finishdrawempty
 ;draw space -> empty fuel
     lda #23  
-    sta $0400 + 911, x
+    sta $0400 + 951, x
 
     inx
     jmp drawemptyfuel
@@ -191,11 +191,11 @@ beq end ;zero was already drawn
 ;draw the last character
 ;add offset to get the right character
 adc #83
-sta $0400 + 911, y
+sta $0400 + 951, y
 
 ;set the color
 lda #$05
-sta $d800 + 911, y
+sta $d800 + 951, y
 
 end
     rts
