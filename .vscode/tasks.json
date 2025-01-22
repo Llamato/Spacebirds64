@@ -16,7 +16,7 @@
         {
             "label": "tmpx assemble",
             "type": "shell",
-            "command": "tmpx -i ${relativeFile} -o build/${fileBasenameNoExtension}.prg",
+            "command": "python3 buildscripts/assemble.py main.asm build/main.prg",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -26,7 +26,7 @@
         {
             "label": "pack program disk",
             "type": "shell",
-            "command": "python3 buildscripts/packprgdisk.py ${workspaceFolderBasename} build/${fileBasenameNoExtension}.prg",
+            "command": "python3 buildscripts/packprgdisk.py ${workspaceFolderBasename}",
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -71,7 +71,7 @@
         {
             "label": "flatten TMPx includes",
             "type": "shell",
-            "command": "python3 buildscripts/flattenasm.py ${fileBasename} build/flattend${fileBasenameNoExtension}.asm",
+            "command": "python3 buildscripts/flattenasm.py ${fileBasename}",
             "group": {
                 "kind": "build",
                 "isDefault": false

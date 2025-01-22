@@ -1,4 +1,5 @@
 import subprocess
+import os
 def syscmd(cmd):
     print(cmd)
     argv = cmd.split()
@@ -10,3 +11,8 @@ def syscmd(cmd):
             return ''
          else:
              raise e
+def createBuildDir():
+     try:
+        os.mkdir("build")
+     except FileExistsError as e:
+          pass
