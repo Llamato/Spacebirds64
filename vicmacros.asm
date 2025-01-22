@@ -49,6 +49,18 @@ enablesprite .macro
     sta $d015
 .endm
 
+enspritedheight .macro
+    #bintobinseq \1
+    ora $d017
+    sta $d017
+.endm
+
+enspritedwidth .macro
+    #bintobinseq \1
+    ora $d01d
+    sta $d01d
+.endm
+
 ;Removes sprite \1 from screen
 ;Input
 ;\1 = sprite id
@@ -60,6 +72,20 @@ disablesprite .macro
     eor #$ff
     and $d015
     sta $d015
+.endm
+
+disspritedheight .macro
+    #bintobinseq \1
+    eor #$ff
+    and $d017
+    sta $d017
+.endm
+
+disspritedwidth .macro
+    #bintobinseq \1
+    eor #$ff
+    and $d01d
+    sta $d01d
 .endm
 
 ;Sets the individual sprite color
