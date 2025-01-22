@@ -13,7 +13,7 @@ loop
     sta $0400 + 951, x
 
     ; set the color
-    lda #$02
+    lda #$05
     sta $d800 + 951, x
 
     inx
@@ -140,6 +140,7 @@ maxfuel
 ;---------------------------------------
 updatefuelbar
 .block
+jsr setfuelcolor
 ;divide by 8 to know how many
 ;full characters we have to draw
     lda fuel
@@ -161,7 +162,7 @@ drawfullfuel
     sta $0400 + 951, x
 
     ; set the color
-    lda #$05
+    lda fuelcolor
     sta $d800 + 951, x
 
     jmp drawfullfuel
@@ -194,11 +195,36 @@ adc #83
 sta $0400 + 951, y
 
 ;set the color
-lda #$05
+lda fuelcolor
 sta $d800 + 951, y
 
 end
     rts
+.bend
+
+
+;---------- set fuel color -------------
+; sets the color of the fuel bar
+;---------------------------------------
+setfuelcolor
+.block
+lda fuel
+cmp #16
+bcc setlowcolor
+cmp #32
+bcc setmidcolor
+lda #$05 ; green
+sta fuelcolor
+rts
+setlowcolor
+lda #$02 ; red
+sta fuelcolor
+rts
+setmidcolor
+lda #$07 ; yellow
+sta fuelcolor
+rts
+
 .bend
 
 
@@ -207,3 +233,4 @@ end
 ;---------------------------------------
 fuel .byte  64
 fuelscaler .byte 0
+fuelcolor .byte 5
