@@ -1,4 +1,4 @@
-;---------- init fuel bar --------------
+;---------- init fuel ------------------
 ; sets  fuel to max 
 ; and draws the fuel bar
 ;---------------------------------------
@@ -90,6 +90,56 @@ reducefuel
     beq outoffuel
     dec fuel
 
+    jsr updatefuelbar
+
+end
+    rts
+
+outoffuel
+    ; game over
+    ;jmp gameover
+
+    ; -- for debugging remove 
+    ; -- if we have gameOver
+    jsr addfuel
+    ; -- end debugging
+
+    rts
+.bend
+
+
+;---------- add fuel -------------------
+; adds 16 to fuel and updates the  bar
+;---------------------------------------
+addfuel
+.block
+    lda fuel
+    adc #16 
+    tax
+    ; if fuel is greater than max
+    ; set fuel to max
+    and #64
+    bne maxfuel
+    txa
+    sta fuel
+    jsr updatefuelbar
+    rts
+maxfuel
+    lda #64
+    sta fuel
+    jsr updatefuelbar
+    rts
+
+.bend
+
+
+
+;---------- update fuel bar ------------
+; draws the fuel bar according to the
+; current fuel value
+;---------------------------------------
+updatefuelbar
+.block
 ;divide by 8 to know how many
 ;full characters we have to draw
     lda fuel
@@ -106,7 +156,7 @@ drawfullfuel
     beq finishdrawing
     dex 
 
-;draw full characters
+    ;draw full characters
     lda #92
     sta $0400 + 911, x
 
@@ -147,21 +197,13 @@ sta $0400 + 911, y
 lda #$05
 sta $d800 + 911, y
 
-
 end
-    rts
-
-outoffuel
-    ; game over
-    ;jmp gameover
-
-    ; for debugging
-    lda #64
-    sta fuel
-
     rts
 .bend
 
-;set fuel to max (64)
+
+;---------- fuel bar data --------------
+; max fuel is 64
+;---------------------------------------
 fuel .byte  64
 fuelscaler .byte 0
