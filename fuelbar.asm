@@ -25,9 +25,47 @@ loop
     lda #84
     sta $0400 + 919
 
-    ; set color of the border
+    ; set color of right border
     lda #$01
     sta $d800 + 919
+
+    ;drawleftborder
+    lda #93
+    sta $0400 + 910
+
+    ; set color of left border
+    lda #$01
+    sta $d800 + 910
+
+
+    ldx #0
+drawtopborder
+    ; draw top border
+    lda #94
+    sta $0400 + 871, x
+
+    ; set color of top border
+    lda #$01
+    sta $d800 + 871, x
+
+    inx
+    cpx #8
+    bne drawtopborder
+
+
+    ldx #0
+drawbottomborder
+    ; draw bottom border
+    lda #96
+    sta $0400 + 951, x
+
+    ; set color of bottom border
+    lda #$01
+    sta $d800 + 951, x
+
+    inx
+    cpx #8
+    bne drawbottomborder
 
     rts
 .bend
@@ -39,6 +77,15 @@ loop
 ;---------------------------------------
 reducefuel
 .block
+    inc fuelscaler
+    lda fuelscaler
+    ; scale consumption down to 1/8
+    and #$010
+    beq end ; do nothing
+    ; reset scaler
+    lda #$00
+    sta fuelscaler
+
     lda fuel
     beq outoffuel
     dec fuel
@@ -97,7 +144,7 @@ adc #83
 sta $0400 + 911, y
 
 ;set the color
-lda #$07
+lda #$05
 sta $d800 + 911, y
 
 
@@ -108,8 +155,13 @@ outoffuel
     ; game over
     ;jmp gameover
 
+    ; for debugging
+    lda #64
+    sta fuel
+
     rts
 .bend
 
 ;set fuel to max (64)
 fuel .byte  64
+fuelscaler .byte 0
