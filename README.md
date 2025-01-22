@@ -67,7 +67,7 @@ Hört hört! Die Rettung naht.
 Als erstes stellen wir sicher, dass unser 6502 code, als solcher erkannt wird. Dazu können wir die 6502-ASM Syntax Erweiterung aus dem Addon Store beziehen.
 Alternativ kann auch die umfassende vs64 Erweiterung bezogen werden. Die kommt auch direkt mit einer Anleitung zur Installation des VICE Comodore 8 bit Computer Emulators. Weshalb der notwendige Schritt der VICE Installation hier nicht weiter behandelt wird. Leider ist Tmpx nicht unter den druch vs64 nativ unterstüzten Assemblern. 
 
-Daher müssen wir die wichtigsten druch vs64 für andere Assembler bereitgestellten Funktionen nun selbst für TMPx nachbilden. Dazu sind bereits Buildscripts so wie eine vscode compatible tasks.json bereitgestellt. 
+Daher müssen wir die wichtigsten druch vs64 für andere Assembler bereitgestellten Funktionen nun selbst für TMPx nachbilden. Dazu sind bereits Buildscripts so wie eine vscode compatible tasks.json bereitgestellt. Zur Ausführung dieser wird Python 3 benötigt. Weiterhin muss python3 oder das Verzeichniss in dem die python3 Datei befindent, zu PATH hinzugefügt werden. Sollte keine python3 Datei sondern nur eine python im Python Paket eurer Wahl verfügbar sein, dann erstellt einfach eine Kopie dieser Datei und bennent sie in python3 bzw python3.exe um.
 
 Sobald diese sich in der Lokalen Kopie des Repos befinden müssen wir nur noch petcat und c1541 (beide befinden sich im VICE Hauptverzeichniss) zur PATH Umgebungsvariable hinzufügen.
 

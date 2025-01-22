@@ -106,10 +106,12 @@ sss
 .endif
 
 ;Enable double height for all sprites
-    #poke $d017, $ff
+;except 2
+    #poke $d017, $ff-4
 
 ;Enable double width for all sprites
-    #poke $d01d, $ff
+;except 2
+    #poke $d01d, $ff-4
 
 ;Enable multicolor for all sprites
     #poke 53276, 255
@@ -135,6 +137,8 @@ sss
 ;Set multicolor colors
     #poke $d025, $06
     #poke $d026, $02
+
+;Load sprites
     #ldi16 r0, sprite0addr
     lda #48
     jsr loadsprite
