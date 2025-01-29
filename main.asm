@@ -105,13 +105,13 @@ sss
     jsr loadchargen
 .endif
 
-;Enable double height for all sprites
-;except 2
-    #poke $d017, $ff-4
+;Set double height for enemy sprites (0-3)
+;and single height for fuel sprites (4-7)
+    #poke $d017, %00001111
 
-;Enable double width for all sprites
-;except 2
-    #poke $d01d, $ff-4
+;Set double height for enemy sprites (0-3)
+;and single height for fuel sprites (4-7)
+    #poke $d01d, $00001111
 
 ;Enable multicolor for all sprites
     #poke 53276, 255
@@ -221,36 +221,8 @@ bne sshss
 ;To reduce fuel call
 ;jsr reducefuel
 
-
+;loop around!
 jmp gameloop
-
-
-checkcollision
-; Load sprite-sprite collision register
-    lda $d01e
-; Check bit 0 (collision sprite 0)            
-    and #%00000001
-; if no collision, skip to nocollision
-    beq nocollision      
-
-; Collision detected: Change 
-; color of sprite 0
-    lda #$02
-; set color for sprite 0
-    sta $d027
-; continue
-    jmp continue
-
-nocollision
-; No collision detected: Reset
-; to the original color
-    lda #$01
-; color sprite 0
-    sta $d027
-
-continue
-; continue with the game
-    rts
 
 
 
@@ -446,6 +418,37 @@ displayqrcode
     jmp loadqrcode
     rts
 
+;Please put game mechanic
+;subrotines here.
+
+checkcollision
+.block
+; Load sprite-sprite collision register
+    lda $d01e
+; Check bit 0 (collision sprite 0)            
+    and #%00000001
+; if no collision, skip to nocollision
+    beq nocollision      
+
+;Collision detected
+;Did we colide with fuel or an enemy?
+;We need a way to distinglish between
+;the two. Should we do this dynamically
+;or statically? mhhh....
+;I am just gonna do this statically for
+;now. Then ask the team later.
+;Please remove comment upon merge.
+
+    jmp continue
+
+nocollision
+;do nothing
+
+continue
+; continue with the game
+    rts
+.bend
+
 ;Wait for user to press any key
 ;or fire button
 ;before continueing.
@@ -467,7 +470,8 @@ continue
 ;---------------------------------------
 ;Complex Bug in here
 ;Breaks upon sprite2 load
-;Might require full recode
+;Might require full recode...
+
 ;Place background stars
 ;procedually with seed and density
 ;with the density given in
