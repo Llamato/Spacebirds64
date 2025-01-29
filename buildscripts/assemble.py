@@ -13,4 +13,3 @@ if __name__ == '__main__':
     elif len(sys.argv) > 1:
         relativeFile = sys.argv[1]
     print(helpers.syscmd(f'tmpx -i {relativeFile} -o {fileBasenameNoExtention}.prg'))
-    print(sys.argv)
