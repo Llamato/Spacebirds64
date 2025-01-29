@@ -1,3 +1,7 @@
+;Programm flow
+stackstart = $100
+stackend = $1ff
+
 ;Text graphics
 txtscreenstart = $0400
 txtscreensize = 40 * 25

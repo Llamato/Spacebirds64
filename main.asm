@@ -107,11 +107,11 @@ sss
 
 ;Set double height for enemy sprites (0-3)
 ;and single height for fuel sprites (4-7)
-    #poke $d017, %00001111
+    #poke $d017, $0f
 
 ;Set double height for enemy sprites (0-3)
 ;and single height for fuel sprites (4-7)
-    #poke $d01d, $00001111
+    #poke $d01d, $0f
 
 ;Enable multicolor for all sprites
     #poke 53276, 255
@@ -128,11 +128,23 @@ sss
     #setspritepos 1, 265, 125
     #enablesprite 1
 
-;Setup sprite 2 for address $2080
-    #poke $07fa, $82
+;Setup sprite 2 for address $2040
+    #poke $07fa, $81
     #setspritecolor 2, 1
-    #setspritepos 2, 100, 125
-    #enablesprite 2
+    #setspritepos 2, 265, 1
+    ;#enablesprite 2
+
+;Setup sprite 3 for address $2040
+    #poke $07fb, $82
+    #setspritecolor 3, 1
+    #setspritepos 3, 265, 145
+    ;#enablesprite 3
+
+;Setup sprite 4 for address $2080
+    #poke $07fc, $83
+    #setspritecolor 4, 1
+    #setspritepos 4, 100, 165
+    #enablesprite 4
 
 ;Set multicolor colors
     #poke $d025, $06
@@ -145,7 +157,7 @@ sss
     #ldi16 r0, sprite1addr
     lda #49
     jsr loadsprite
-    #ldi16 r0, sprite2addr
+    #ldi16 r0, sprite4addr
     lda #50
     jsr loadsprite
 
@@ -187,12 +199,12 @@ jmp jumppad
 moveloop
 .block
     #movespriteleft 1
-    #movespriteleft 2
-    #movespriteleft 3
+    ;#movespriteleft 2
+    ;#movespriteleft 3
     #movespriteleft 4
-    #movespriteleft 5
-    #movespriteleft 6
-    #movespriteleft 7
+    ;#movespriteleft 5
+    ;#movespriteleft 6
+    ;#movespriteleft 7
 .bend
 
 inputloop
@@ -214,9 +226,6 @@ inputloop
 
 jumppad
 jsr checkcollision
-lda 198
-bne sshss
-#poke 198, 0
 
 ;To reduce fuel call
 ;jsr reducefuel
@@ -225,7 +234,8 @@ bne sshss
 jmp gameloop
 
 
-
+gameover
+#fmb stackstart, stackend, $00
 ;sshss = show save high score screen
 sshss
 ;Disable all sprites
@@ -306,7 +316,6 @@ sshss
 
 ;Get name from user
     #print enternameprompt
-    jsr kernalgetchr
     #nullinput namearea
     #crlf
 
@@ -423,29 +432,25 @@ displayqrcode
 
 checkcollision
 .block
-; Load sprite-sprite collision register
+;check for collision with enemy
     lda $d01e
-; Check bit 0 (collision sprite 0)            
-    and #%00000001
-; if no collision, skip to nocollision
-    beq nocollision      
+    and #$0e
+    bne enemycollision
 
-;Collision detected
-;Did we colide with fuel or an enemy?
-;We need a way to distinglish between
-;the two. Should we do this dynamically
-;or statically? mhhh....
-;I am just gonna do this statically for
-;now. Then ask the team later.
-;Please remove comment upon merge.
+;check for collision with fuel
+    lda $d01e
+    and #$f0
+    bne fuelcollision
+    jmp nocollision
 
-    jmp continue
+enemycollision
+    jmp gameover
+
+fuelcollision
+    ;set fuel bar here
+    jmp nocollision
 
 nocollision
-;do nothing
-
-continue
-; continue with the game
     rts
 .bend
 
@@ -575,7 +580,7 @@ tyfps
 
 enternameprompt
 .text "Please "
-.null "enter your name?"
+.null "enter your name? "
 
 ;ecyp = enter current year prompt
 ecyp
