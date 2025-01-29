@@ -96,12 +96,13 @@ end
     rts
 
 outoffuel
-    ; game over
-    ;jmp gameover
+    jmp gameover
 
     ; -- for debugging remove 
     ; -- if we have gameOver
-    jsr addfuel
+    .ifne includetests
+        jsr addfuel
+    .endif
     ; -- end debugging
 
     rts

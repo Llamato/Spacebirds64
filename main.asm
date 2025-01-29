@@ -546,7 +546,7 @@ in
 
 outhigh
     #sub16i r2, 1000
-
+    jmp clamp
 eqhigh
     jmp in; temp
 
