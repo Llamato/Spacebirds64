@@ -129,19 +129,19 @@ sss
     #enablesprite 1
 
 ;Setup sprite 2 for address $2040
-    #poke $07fa, $81
+    #poke $07fa, $82
     #setspritecolor 2, 1
     #setspritepos 2, 265, 1
     ;#enablesprite 2
 
-;Setup sprite 3 for address $2040
-    #poke $07fb, $82
+;Setup sprite 3 for address $2080
+    #poke $07fb, $83
     #setspritecolor 3, 1
     #setspritepos 3, 265, 145
     ;#enablesprite 3
 
-;Setup sprite 4 for address $2080
-    #poke $07fc, $83
+;Setup sprite 4 for address $2040
+    #poke $07fc, $82
     #setspritecolor 4, 1
     #setspritepos 4, 100, 165
     #enablesprite 4
@@ -157,7 +157,7 @@ sss
     #ldi16 r0, sprite1addr
     lda #49
     jsr loadsprite
-    #ldi16 r0, sprite4addr
+    #ldi16 r0, sprite2addr
     lda #50
     jsr loadsprite
 
@@ -199,12 +199,12 @@ jmp jumppad
 moveloop
 .block
     #movespriteleft 1
-    ;#movespriteleft 2
-    ;#movespriteleft 3
+    #movespriteleft 2
+    #movespriteleft 3
     #movespriteleft 4
-    ;#movespriteleft 5
-    ;#movespriteleft 6
-    ;#movespriteleft 7
+    #movespriteleft 5
+    #movespriteleft 6
+    #movespriteleft 7
 .bend
 
 inputloop
@@ -448,6 +448,9 @@ enemycollision
 
 fuelcollision
     ;set fuel bar here
+    .ifne includetests
+        #poke 1024,1
+    .endif
     jmp nocollision
 
 nocollision
