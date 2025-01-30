@@ -1,4 +1,4 @@
-includetests = 0
+includetests = 1
 includechargen = 0
 includesound = 0
 
@@ -225,7 +225,32 @@ inputloop
 .bend
 
 jumppad
-jsr checkcollision
+
+checkcollision
+.block
+;check for collision with enemy
+    lda $d01e
+    and #$0e
+    bne enemycollision
+
+;check for collision with fuel
+    lda $d01e
+    and #$f0
+    bne fuelcollision
+    jmp nocollision
+
+enemycollision
+    jmp gameover
+
+fuelcollision
+    ;set fuel bar here
+    .ifne includetests
+        #poke 1024,1
+    .endif
+    jmp nocollision
+
+nocollision
+.bend
 
 ;To reduce fuel call
 ;jsr reducefuel
@@ -235,7 +260,9 @@ jmp gameloop
 
 
 gameover
+;Clear stack
 #fmb stackstart, stackend, $00
+
 ;sshss = show save high score screen
 sshss
 ;Disable all sprites
@@ -430,33 +457,6 @@ displayqrcode
 ;Please put game mechanic
 ;subrotines here.
 
-checkcollision
-.block
-;check for collision with enemy
-    lda $d01e
-    and #$0e
-    bne enemycollision
-
-;check for collision with fuel
-    lda $d01e
-    and #$f0
-    bne fuelcollision
-    jmp nocollision
-
-enemycollision
-    jmp gameover
-
-fuelcollision
-    ;set fuel bar here
-    .ifne includetests
-        #poke 1024,1
-    .endif
-    jmp nocollision
-
-nocollision
-    rts
-.bend
-
 ;Wait for user to press any key
 ;or fire button
 ;before continueing.
@@ -475,6 +475,7 @@ continue
     #poke 198, 0
     rts
 .bend
+
 ;---------------------------------------
 ;Complex Bug in here
 ;Breaks upon sprite2 load
