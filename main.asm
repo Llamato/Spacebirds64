@@ -146,6 +146,24 @@ sss
     #setspritepos 4, 100, 165
     #enablesprite 4
 
+;Setup sprite 3 for address $20c0
+    #poke $07fb, $81
+    #setspritecolor 3, 1
+    #setspritepos 3, 10, 70
+    #enablesprite 3
+
+;Setup sprite 4 for address $2040
+    #poke $07fc, $81
+    #setspritecolor 4, 1
+    #setspritepos 4, 130, 190
+    #enablesprite 4   
+
+;Setup sprite 5 for address $2040
+    #poke $07fd, $81
+    #setspritecolor 5, 1
+    #setspritepos 5, 340, 200
+    #enablesprite 5
+
 ;Set multicolor colors
     #poke $d025, $06
     #poke $d026, $02
@@ -159,6 +177,9 @@ sss
     jsr loadsprite
     #ldi16 r0, sprite2addr
     lda #50
+    jsr loadsprite
+    #ldi16 r0, sprite1addr
+    lda #51
     jsr loadsprite
 
 ;Add stars to background
@@ -203,8 +224,6 @@ moveloop
     #movespriteleft 3
     #movespriteleft 4
     #movespriteleft 5
-    #movespriteleft 6
-    #movespriteleft 7
 .bend
 
 inputloop
