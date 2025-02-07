@@ -54,7 +54,6 @@ sub16i .macro
     sta \1 +1
 .endm
 
-
 ;.include "math-macros.asm"
 
 .ifne includetests
@@ -242,18 +241,37 @@ checkcollision
 enemycollision
     jmp gameover
 
+;potential bug. Fuel only added
+;once if multiple fuels collide 
+;within one frame (loop cycle)
 fuelcollision
-    ;set fuel bar here
-    .ifne includetests
-        #poke 1024,1
-    .endif
+.ifne includetests
+    pha
+    lsr
+    lsr
+    lsr
+    lsr
+    sta 53280
+    pla
+.endif
+;disable sprite colided with
+;and add fuel
+;bug in fuelbar.addfuel?
+    eor $d015
+    sta $d015
+    lda fuel
+    clc
+    adc #16
+    cmp #64
+    bcs fuelfull
+    sta fuel
     jmp nocollision
 
+fuelfull
+    lda #64
+    sta fuel
 nocollision
 .bend
-
-;To reduce fuel call
-;jsr reducefuel
 
 ;loop around!
 jmp gameloop
