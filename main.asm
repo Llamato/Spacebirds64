@@ -1,4 +1,4 @@
-includetests = 1
+includetests = 0
 includechargen = 0
 includesound = 0
 
@@ -23,38 +23,7 @@ includesound = 0
 .include "rammap.asm"
 .include "dfmacros.asm"
 .include "vicmacros.asm"
-
-add16i .macro
-    lda \1
-    clc
-    adc #<\2
-    sta \1
-    lda \1 +1
-    adc #>\2
-    sta \1 +1
-.endm
-
-add16 .macro
-    lda \1
-    clc
-    adc <\2
-    sta \1
-    lda \1 +1
-    adc >\2
-    sta \1 +1
-.endm
-
-sub16i .macro
-    lda \1
-    sec
-    sbc #<\2
-    sta \1
-    lda \1 +1
-    sbc #>\2
-    sta \1 +1
-.endm
-
-;.include "math-macros.asm"
+.include "math-macros.asm"
 
 .ifne includetests
     .include "disktests.asm"
