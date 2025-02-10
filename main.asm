@@ -181,8 +181,7 @@ sss
     jsr clrdiskiomem
     jsr initfuel
     jsr initscore
-    jsr scores_label
-    jsr updatescore
+    ;jsr scores_label
  
 
 wait_for_input
@@ -196,6 +195,10 @@ wait_for_input
 
 
 gameloop
+
+;refrash score display
+jsr dispscore
+
 ;Check for raster line to   : 
 ;determine if enemies should
 ;move
@@ -226,14 +229,14 @@ inputloop
     bne down
     dec $d001
     jsr reducefuel
-    jsr updatescore
+    jsr incscore
     down
     lda 56320
     and #2
     bne jumppad
     inc $d001
     jsr reducefuel
-    jsr updatescore
+    jsr incscore
 
 .bend
 

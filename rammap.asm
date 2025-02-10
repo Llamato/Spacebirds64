@@ -23,6 +23,8 @@ sprite5addr = sprite4addr + $40
 sprite6addr = sprite5addr + $40
 sprite7addr = sprite6addr + $40
 
+score = $C222
+
 ;primmulticolloc = primeray multiclor 
 ;location
 primmulticolloc = $d025
@@ -55,4 +57,3 @@ diskbufferend = $cf00
 
 ;Music 
 sidstart = $3000
-score =$C222
