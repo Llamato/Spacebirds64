@@ -156,7 +156,7 @@ sss
 ;Setup sprite 5 for address $2040
     #poke $07fd, $82
     #setspritecolor 5, 1
-    #setspritepos 5, 170, 125
+    #setspritepos 5, 359, 125
     #enablesprite 5
 
 ;fuel 2
