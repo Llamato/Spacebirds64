@@ -115,12 +115,12 @@ movespriteleft .macro
     sec
     sbc #1
     sta xposl
-    bcs done
-    lda #255
-    sta xposl
-    #bintobinseq \1
-    eor 53264
-    sta 53264
+    ;bcs done
+    ;lda #255
+    ;sta xposl
+    ;#bintobinseq \1
+    ;eor 53264
+    ;sta 53264
 done
 .endm
 

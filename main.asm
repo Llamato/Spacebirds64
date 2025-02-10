@@ -105,64 +105,73 @@ sss
     jsr loadchargen
 .endif
 
-;Set double height for enemy sprites (0-3)
-;and single height for fuel sprites (4-7)
-    #poke $d017, $0f
+;Set double height for enemy sprites (0-4)
+;and single height for fuel sprites (5-7)
+    #poke $d017, $1f
 
-;Set double height for enemy sprites (0-3)
-;and single height for fuel sprites (4-7)
-    #poke $d01d, $0f
+;Set double width for enemy sprites (0-4)
+;and single width for fuel sprites (5-7)
+    #poke $d01d, $1f
 
 ;Enable multicolor for all sprites
     #poke 53276, 255
 
+;spaceship
 ;Setup sprite 0 for address $2000
     #poke $07f8, $80
     #setspritecolor 0, $0f
     #setspritepos 0, 55, 125
     #enablesprite 0
 
+;enemy 1
 ;Setup sprite 1 for address $2040
     #poke $07f9, $81
     #setspritecolor 1, 1
     #setspritepos 1, 265, 125
     #enablesprite 1
 
+;enemy 2
 ;Setup sprite 2 for address $2040
-    #poke $07fa, $82
+    #poke $07fa, $81
     #setspritecolor 2, 1
-    #setspritepos 2, 265, 1
-    ;#enablesprite 2
+    #setspritepos 2, 140, 60
+    #enablesprite 2
 
-;Setup sprite 3 for address $2080
-    #poke $07fb, $83
-    #setspritecolor 3, 1
-    #setspritepos 3, 265, 145
-    ;#enablesprite 3
-
-;Setup sprite 4 for address $2040
-    #poke $07fc, $82
-    #setspritecolor 4, 1
-    #setspritepos 4, 100, 165
-    #enablesprite 4
-
+;enemy 3
 ;Setup sprite 3 for address $20c0
     #poke $07fb, $81
     #setspritecolor 3, 1
-    #setspritepos 3, 10, 70
+    #setspritepos 3, 360, 170
     #enablesprite 3
 
+;enemy 4
 ;Setup sprite 4 for address $2040
     #poke $07fc, $81
     #setspritecolor 4, 1
-    #setspritepos 4, 130, 190
-    #enablesprite 4   
+    #setspritepos 4, 319, 170
+    ;#enablesprite 4   
 
+
+;fuel 1
 ;Setup sprite 5 for address $2040
-    #poke $07fd, $81
+    #poke $07fd, $82
     #setspritecolor 5, 1
-    #setspritepos 5, 340, 200
+    #setspritepos 5, 170, 125
     #enablesprite 5
+
+;fuel 2
+;Setup sprite 6 for address $2040
+    #poke $07fe, $82
+    #setspritecolor 6, 1
+    #setspritepos 6, 400, 190
+    ;#enablesprite 6
+
+;fuel 3
+;Setup sprite 7 for address $2040
+    #poke $07ff, $82
+    #setspritecolor 7, 1
+    #setspritepos 7, 50, 70
+    ;#enablesprite 7
 
 ;Set multicolor colors
     #poke $d025, $06
@@ -177,9 +186,6 @@ sss
     jsr loadsprite
     #ldi16 r0, sprite2addr
     lda #50
-    jsr loadsprite
-    #ldi16 r0, sprite1addr
-    lda #51
     jsr loadsprite
 
 ;Add stars to background
@@ -222,8 +228,10 @@ moveloop
     #movespriteleft 1
     #movespriteleft 2
     #movespriteleft 3
-    #movespriteleft 4
+    ;#movespriteleft 4
     #movespriteleft 5
+    ;#movespriteleft 6
+    ;#movespriteleft 7
 .bend
 
 inputloop
@@ -247,9 +255,13 @@ jumppad
 
 checkcollision
 .block
+;reset collision status
+    lda #$00
+    sta $d01e
+
 ;check for collision with enemy
     lda $d01e
-    and #$0e
+    and #$1e
     bne enemycollision
 
 ;check for collision with fuel
