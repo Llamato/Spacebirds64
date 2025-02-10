@@ -1,20 +1,19 @@
 ;---------- Draw Scores Label ------------------
 scores_label
-    ldx #0                    ; X register for loop
+    ldx #0
 label_loop
-    lda scores_text, x        ; Load character from "SCORES: "
-    sta $0400 + 107, x      ;Store it on screen memory
+    lda scores_text, x  
+    sta $0400 + 107, x 
     lda #1
-    sta $d800 + 107, x        ;Set color to white
+    sta $d800 + 107, x  
     inx
-    cpx #6     ;"SCORES: " is 7 characters long
+    cpx #6  
     bne label_loop
     rts
 
 scores_text
    .byte 69, 53, 65, 68, 55, 69
-   ;.byte $45,53, $41, $44, 55, $45
-    .byte 0
+   .byte 0
 
 
 ; Initialize Score Subroutine
