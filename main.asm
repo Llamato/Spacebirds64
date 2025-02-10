@@ -23,38 +23,7 @@ includesound = 0
 .include "rammap.asm"
 .include "dfmacros.asm"
 .include "vicmacros.asm"
-
-add16i .macro
-    lda \1
-    clc
-    adc #<\2
-    sta \1
-    lda \1 +1
-    adc #>\2
-    sta \1 +1
-.endm
-
-add16 .macro
-    lda \1
-    clc
-    adc <\2
-    sta \1
-    lda \1 +1
-    adc >\2
-    sta \1 +1
-.endm
-
-sub16i .macro
-    lda \1
-    sec
-    sbc #<\2
-    sta \1
-    lda \1 +1
-    sbc #>\2
-    sta \1 +1
-.endm
-
-;.include "math-macros.asm"
+.include "math-macros.asm"
 
 .ifne includetests
     .include "disktests.asm"
@@ -104,34 +73,73 @@ sss
     jsr loadchargen
 .endif
 
-;Enable double height for all sprites
-;except 2
-    #poke $d017, $ff-4
+;Set double height for enemy sprites (0-4)
+;and single height for fuel sprites (5-7)
+    #poke $d017, $1f
 
-;Enable double width for all sprites
-;except 2
-    #poke $d01d, $ff-4
+;Set double width for enemy sprites (0-4)
+;and single width for fuel sprites (5-7)
+    #poke $d01d, $1f
 
 ;Enable multicolor for all sprites
     #poke 53276, 255
 
+;spaceship
 ;Setup sprite 0 for address $2000
     #poke $07f8, $80
     #setspritecolor 0, $0f
     #setspritepos 0, 55, 125
     #enablesprite 0
 
+;enemy 1
 ;Setup sprite 1 for address $2040
     #poke $07f9, $81
     #setspritecolor 1, 1
     #setspritepos 1, 265, 125
     #enablesprite 1
 
-;Setup sprite 2 for address $2080
-    #poke $07fa, $82
+;enemy 2
+;Setup sprite 2 for address $2040
+    #poke $07fa, $81
     #setspritecolor 2, 1
-    #setspritepos 2, 100, 125
+    #setspritepos 2, 140, 60
     #enablesprite 2
+
+;enemy 3
+;Setup sprite 3 for address $20c0
+    #poke $07fb, $81
+    #setspritecolor 3, 1
+    #setspritepos 3, 360, 170
+    #enablesprite 3
+
+;enemy 4
+;Setup sprite 4 for address $2040
+    #poke $07fc, $81
+    #setspritecolor 4, 1
+    #setspritepos 4, 319, 170
+    ;#enablesprite 4   
+
+
+;fuel 1
+;Setup sprite 5 for address $2040
+    #poke $07fd, $82
+    #setspritecolor 5, 1
+    #setspritepos 5, 359, 125
+    #enablesprite 5
+
+;fuel 2
+;Setup sprite 6 for address $2040
+    #poke $07fe, $82
+    #setspritecolor 6, 1
+    #setspritepos 6, 400, 190
+    ;#enablesprite 6
+
+;fuel 3
+;Setup sprite 7 for address $2040
+    #poke $07ff, $82
+    #setspritecolor 7, 1
+    #setspritepos 7, 50, 70
+    ;#enablesprite 7
 
 ;Set multicolor colors
     #poke $d025, $06
@@ -177,6 +185,16 @@ sss
     jsr updatescore
  
 
+wait_for_input
+    lda $dc00       ; Joystick-Port 2 auslesen
+    and #%00011111  ; Nur die Richtungstasten maskieren (Bits 0-4)
+    cmp #%00011111  ; Sind ALLE Richtungstasten NICHT gedrückt?
+    beq wait_for_input  ; Falls ja, weiter warten
+
+    ; Falls eine Richtungstaste gedrückt wurde, starte das Spiel!
+    jmp gameloop
+
+
 gameloop
 ;Check for raster line to   : 
 ;determine if enemies should
@@ -194,10 +212,10 @@ moveloop
     #movespriteleft 1
     #movespriteleft 2
     #movespriteleft 3
-    #movespriteleft 4
+    ;#movespriteleft 4
     #movespriteleft 5
-    #movespriteleft 6
-    #movespriteleft 7
+    ;#movespriteleft 6
+    ;#movespriteleft 7
 .bend
 
 inputloop
@@ -220,48 +238,66 @@ inputloop
 .bend
 
 jumppad
-jsr checkcollision
-lda 198
-bne sshss
-#poke 198, 0
 
-;To reduce fuel call
-;jsr reducefuel
+checkcollision
+.block
+;reset collision status
+    lda #$00
+    sta $d01e
 
+;check for collision with enemy
+    lda $d01e
+    and #$1e
+    bne enemycollision
 
+;check for collision with fuel
+    lda $d01e
+    and #$f0
+    bne fuelcollision
+    jmp nocollision
+
+enemycollision
+    jmp gameover
+
+;potential bug. Fuel only added
+;once if multiple fuels collide 
+;within one frame (loop cycle)
+fuelcollision
+.ifne includetests
+    pha
+    lsr
+    lsr
+    lsr
+    lsr
+    sta 53280
+    pla
+.endif
+;disable sprite colided with
+;and add fuel
+;bug in fuelbar.addfuel?
+    eor $d015
+    sta $d015
+    lda fuel
+    clc
+    adc #16
+    cmp #64
+    bcs fuelfull
+    sta fuel
+    jmp nocollision
+
+fuelfull
+    lda #64
+    sta fuel
+nocollision
+.bend
+
+;loop around!
 jmp gameloop
 
 
-checkcollision
-; Load sprite-sprite collision register
-    lda $d01e
-; Check bit 0 (collision sprite 0)            
-    and #%00000001
-; if no collision, skip to nocollision
-    beq nocollision      
-
-; Collision detected: Change 
-; color of sprite 0
-    lda #$02
-; set color for sprite 0
-    sta $d027
-;jsr update_score
-; continue   
-
-    jmp continue
-
-nocollision
- 
-; No collision detected: Reset
-; to the original color
-    lda #$01
-; color sprite 0
-    sta $d027
-;jsr update_score
-continue
-; continue with the game
- 
-    rts
+gameover
+;Clear stack
+#fmb stackstart, stackend, $00
 
 ;sshss = show save high score screen
 sshss
@@ -345,7 +381,6 @@ sshss
 
 ;Get name from user
     #print enternameprompt
-    jsr kernalgetchr
     #nullinput namearea
     #crlf
 
@@ -458,6 +493,9 @@ displayqrcode
     jmp loadqrcode
     rts
 
+;Please put game mechanic
+;subrotines here.
+
 ;Wait for user to press any key
 ;or fire button
 ;before continueing.
@@ -476,10 +514,12 @@ continue
     #poke 198, 0
     rts
 .bend
+
 ;---------------------------------------
 ;Complex Bug in here
 ;Breaks upon sprite2 load
-;Might require full recode
+;Might require full recode...
+
 ;Place background stars
 ;procedually with seed and density
 ;with the density given in
@@ -546,7 +586,7 @@ in
 
 outhigh
     #sub16i r2, 1000
-
+    jmp clamp
 eqhigh
     jmp in; temp
 
@@ -585,7 +625,7 @@ tyfps
 
 enternameprompt
 .text "Please "
-.null "enter your name?"
+.null "enter your name? "
 
 ;ecyp = enter current year prompt
 ecyp

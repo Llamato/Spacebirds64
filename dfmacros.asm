@@ -181,6 +181,15 @@ fmb .macro
         bne fillbyte
 .endm
 
+;mov = move
+;Input
+;\1 = destination address
+;\2 = source address
+mov .macro
+    lda \2
+    sta \1
+.endm
+
 ;mov16 = move 16 bit with LSB frist
 ;Input
 ;\1 = destination address of low byte

@@ -9,7 +9,7 @@ initfuel
 ldx #0
 loop
     ; draw full characters
-    lda #92
+    lda #91
     sta $0400 + 951, x
 
     ; set the color
@@ -30,7 +30,7 @@ loop
     sta $d800 + 959
 
     ;drawleftborder
-    lda #93
+    lda #92
     sta $0400 + 950
 
     ; set color of left border
@@ -41,7 +41,7 @@ loop
     ldx #0
 drawtopborder
     ; draw top border
-    lda #94
+    lda #93
     sta $0400 + 911, x
 
     ; set color of top border
@@ -56,7 +56,7 @@ drawtopborder
     ldx #0
 drawbottomborder
     ; draw bottom border
-    lda #96
+    lda #94
     sta $0400 + 991, x
 
     ; set color of bottom border
@@ -96,12 +96,13 @@ end
     rts
 
 outoffuel
-    ; game over
-    ;jmp gameover
+    jmp gameover
 
     ; -- for debugging remove 
     ; -- if we have gameOver
-    jsr addfuel
+    .ifne includetests
+        jsr addfuel
+    .endif
     ; -- end debugging
 
     rts
@@ -158,7 +159,7 @@ drawfullfuel
     dex 
 
     ;draw full characters
-    lda #92
+    lda #91
     sta $0400 + 951, x
 
     ; set the color
