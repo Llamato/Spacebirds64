@@ -110,7 +110,10 @@ setspritecolor .macro
 ;transition
 movespriteleft .macro
     xposl = \1 * 2 + $d000
-    ypos = xposl +1
+    lda xposl
+    beq remove
+
+continue
     lda xposl
     sec
     sbc #1
@@ -118,10 +121,21 @@ movespriteleft .macro
     bcs done
     lda #255
     sta xposl
-    #bintobinseq \1
-    eor 53264
-    sta 53264
+    #bintobinseq \1   
+    eor $d010         
+    sta $d010
+    jmp done
+
+    
+remove 
+#bintobinseq \1
+and $d010
+bne continue
+#disablesprite \1
+
+
 done
+
 .endm
 
 movespriteright .macro
