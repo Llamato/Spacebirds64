@@ -159,7 +159,7 @@ drawfullfuel
     dex 
 
     ;draw full characters
-    lda #92
+    lda #91
     sta $0400 + 951, x
 
     ; set the color
