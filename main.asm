@@ -179,6 +179,16 @@ sss
 
 jsr initfuel
 
+wait_for_input
+    lda $dc00       ; Joystick-Port 2 auslesen
+    and #%00011111  ; Nur die Richtungstasten maskieren (Bits 0-4)
+    cmp #%00011111  ; Sind ALLE Richtungstasten NICHT gedrückt?
+    beq wait_for_input  ; Falls ja, weiter warten
+
+    ; Falls eine Richtungstaste gedrückt wurde, starte das Spiel!
+    jmp gameloop
+
+
 gameloop
 ;Check for raster line to
 ;determine if enemies should
