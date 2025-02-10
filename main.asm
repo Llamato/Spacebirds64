@@ -54,7 +54,6 @@ sub16i .macro
     sta \1 +1
 .endm
 
-
 ;.include "math-macros.asm"
 
 .ifne includetests
@@ -136,7 +135,8 @@ sss
 
 ;Set multicolor colors
     #poke $d025, $06
-    #poke $d026, $02
+    #poke $d026, $02 
+
 
 ;Load sprites
     #ldi16 r0, sprite0addr
@@ -169,11 +169,16 @@ sss
     jsr loadsid
     jsr playsound
 .endif
-
-jsr initfuel
+    
+    jsr clrdiskiomem
+    jsr initfuel
+    jsr initscore
+    jsr scores_label
+    jsr updatescore
+ 
 
 gameloop
-;Check for raster line to
+;Check for raster line to   : 
 ;determine if enemies should
 ;move
 lda $d012
@@ -203,13 +208,15 @@ inputloop
     bne down
     dec $d001
     jsr reducefuel
-
+    jsr updatescore
     down
     lda 56320
     and #2
     bne jumppad
     inc $d001
     jsr reducefuel
+    jsr updatescore
+
 .bend
 
 jumppad
@@ -238,21 +245,23 @@ checkcollision
     lda #$02
 ; set color for sprite 0
     sta $d027
-; continue
+;jsr update_score
+; continue   
+
     jmp continue
 
 nocollision
+ 
 ; No collision detected: Reset
 ; to the original color
     lda #$01
 ; color sprite 0
     sta $d027
-
+;jsr update_score
 continue
 ; continue with the game
+ 
     rts
-
-
 
 ;sshss = show save high score screen
 sshss
@@ -332,6 +341,8 @@ sshss
 
     #print tyfps
 
+
+
 ;Get name from user
     #print enternameprompt
     jsr kernalgetchr
@@ -368,6 +379,7 @@ sshss
     #printlen yearstring, 4
     #tab 
     #printlen namestring, 4
+
     #crlf
 
 ;Print table entries
@@ -559,6 +571,7 @@ next
 .include "playsid.asm"
 .include "disksubs.asm"
 .include "fuelbar.asm"
+.include "score.asm"
 ;.include "mathsubs.asm"
 
 ;Data
@@ -568,6 +581,7 @@ tyfps
 ;line end
 .byte $0d
 .byte $00
+
 
 enternameprompt
 .text "Please "

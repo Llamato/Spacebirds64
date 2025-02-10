@@ -104,7 +104,7 @@ setspritecolor .macro
 ;Input
 ;\1 = sprite number
 ;Output
-;Sprite one more pixel to left
+;Sprite one pixel to left
 ;Bug in here
 ;Sprite flickering on
 ;transition

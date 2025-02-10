@@ -51,3 +51,4 @@ diskbufferend = $cf00
 
 ;Music 
 sidstart = $3000
+score =$C222
