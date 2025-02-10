@@ -105,9 +105,6 @@ setspritecolor .macro
 ;\1 = sprite number
 ;Output
 ;Sprite one more pixel to left
-;Bug in here
-;Sprite flickering on
-;transition
 movespriteleft .macro
     xposl = \1 * 2 + $d000
     lda xposl
