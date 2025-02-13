@@ -202,12 +202,6 @@ jsr dispscore
 ;Check for raster line to   : 
 ;determine if enemies should
 ;move
-lda $d012
-cmp #$ff
-beq moveloop
-cmp #$aa
-beq moveloop
-jmp jumppad
 
 ;move enemies one to the left
 moveloop
@@ -380,8 +374,6 @@ sshss
 
     #print tyfps
 
-
-
 ;Get name from user
     #print enternameprompt
     #nullinput namearea
@@ -392,10 +384,20 @@ sshss
     #nullinput yeararea
     #crlf
 
-;Get score from user
-    #print esp
-    #nullinput scorearea
-    #crlf
+;Get score from memory
+    #unpackbcd score+2, scorearea, scorearea+1
+    #bcdtoascii scorearea, scorearea
+    #bcdtoascii scorearea+1, scorearea+1
+    #unpackbcd score+1, scorearea+2, scorearea+3
+    #bcdtoascii scorearea+2, scorearea+2
+    #bcdtoascii scorearea+3, scorearea+3
+    lda score+3
+    lsr
+    lsr
+    lsr
+    lsr
+    sta scorearea+4
+    #bcdtoascii scorearea+4, scorearea+4
 
 ;Save score to disk
     jsr addhstodb
@@ -417,7 +419,6 @@ sshss
     #printlen yearstring, 4
     #tab 
     #printlen namestring, 4
-
     #crlf
 
 ;Print table entries

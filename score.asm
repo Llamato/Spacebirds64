@@ -4,17 +4,15 @@ scoreslbllen = 6
 scoresize = 6
 digitoffset = 95
 
-
 ;displays packedbcd digits on screen
 ;Input
 ;\1 = packed bcd address
-;\2 = displaylocation
+;\2 = display location
 ;Output
 ;Numerical characters in locations
 ;\2 and \2+1
 disppbcddigits .macro
-    lda #$f0
-    and \1
+    lda \1
     lsr
     lsr
     lsr
