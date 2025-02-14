@@ -102,21 +102,21 @@ sss
 ;Setup sprite 2 for address $2040
     #poke $07fa, $81
     #setspritecolor 2, 1
-    #setspritepos 2, 140, 60
-    #enablesprite 2
+    ;#setspritepos 2, 140, 60
+    ;#enablesprite 2
 
 ;enemy 3
 ;Setup sprite 3 for address $20c0
     #poke $07fb, $81
     #setspritecolor 3, 1
-    #setspritepos 3, 360, 170
-    #enablesprite 3
+    ;#setspritepos 3, 360, 170
+    ;#enablesprite 3
 
 ;enemy 4
 ;Setup sprite 4 for address $2040
     #poke $07fc, $81
     #setspritecolor 4, 1
-    #setspritepos 4, 319, 170
+    ;#setspritepos 4, 319, 170
     ;#enablesprite 4   
 
 
@@ -124,21 +124,21 @@ sss
 ;Setup sprite 5 for address $2040
     #poke $07fd, $82
     #setspritecolor 5, 1
-    #setspritepos 5, 359, 125
-    #enablesprite 5
+    ;#setspritepos 5, 359, 125
+    ;#enablesprite 5
 
 ;fuel 2
 ;Setup sprite 6 for address $2040
     #poke $07fe, $82
     #setspritecolor 6, 1
-    #setspritepos 6, 400, 190
+    ;#setspritepos 6, 400, 190
     ;#enablesprite 6
 
 ;fuel 3
 ;Setup sprite 7 for address $2040
     #poke $07ff, $82
     #setspritecolor 7, 1
-    #setspritepos 7, 50, 70
+    ;#setspritepos 7, 50, 70
     ;#enablesprite 7
 
 ;Set multicolor colors
@@ -179,14 +179,12 @@ sss
 
 jsr initfuel
 
-wait_for_input
-    lda $dc00       ; Joystick-Port 2 auslesen
-    and #%00011111  ; Nur die Richtungstasten maskieren (Bits 0-4)
-    cmp #%00011111  ; Sind ALLE Richtungstasten NICHT gedrückt?
-    beq wait_for_input  ; Falls ja, weiter warten
-
-    ; Falls eine Richtungstaste gedrückt wurde, starte das Spiel!
-    jmp gameloop
+waittostart
+    lda $dc00       ; Joystick auslesen
+    and #%00011111 
+    cmp #%00011111  ; nicht gedrückt?
+    beq waittostart ; weiter warten
+    jmp gameloop    ; starte Spiel
 
 
 gameloop
@@ -201,16 +199,44 @@ beq moveloop
 jmp jumppad
 
 ;move enemies one to the left
+spawn_timer .byte 0     ; Timer für das 60-Pixel-Intervall
+
 moveloop
 .block
-    #movespriteleft 1
-    #movespriteleft 2
-    #movespriteleft 3
-    ;#movespriteleft 4
-    #movespriteleft 5
-    ;#movespriteleft 6
-    ;#movespriteleft 7
+    lda spawn_timer
+    cmp #60             ; Hat Sprite 1 schon 60 Pixel bewegt?
+    bcc update_timer    ; Falls nicht, Timer erhöhen und weiterfahren lassen.
+
+    lda #0              ; Timer zurücksetzen
+    sta spawn_timer
+
+    lda $D015
+    and #%00000100      ; Ist Sprite 2 bereits aktiv?
+    bne move_sprites    ; Falls ja, direkt zu Bewegung springen
+
+    ; Falls Sprite 2 noch nicht aktiv ist, spawne es
+    #enablesprite 2
+    #setspritepos 2, 320, 70  ; Sprite 2 am rechten Rand setzen
+
+update_timer
+    inc spawn_timer
+
+move_sprites
+    #movespriteleft 1   ; Sprite 1 bewegt sich immer nach links
+    lda $D015
+    and #%00000100      ; Ist Sprite 2 noch aktiv?
+    beq end             ; Falls nicht, nicht bewegen
+    #movespriteleft 2   ; Sprite 2 bewegt sich, falls es noch aktiv ist
+
+end
+    
+
 .bend
+
+
+
+
+
 
 inputloop
 .block
