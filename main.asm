@@ -162,6 +162,25 @@ sss
     ;ldx #10
     ;jsr placestars
 
+
+;Setup interrupts
+
+    lda #$7f   ; clear high bit of
+    and $d011  ; raster llne
+    sta $d011
+
+    lda #100   ; set raster inter-
+    sta $d012  ; rupt to line 100
+
+
+    lda #<handleirq  ; set pointer
+    sta $0314    ; to raster
+    lda #>handleirq  ; interrupt
+    sta $0315
+
+    lda #$01   ; enable raster
+    sta $d01a  ; interrupt
+
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
 ;if the registeres are not cleared like
@@ -190,18 +209,28 @@ wait_for_input
     cmp #%00011111  ; Sind ALLE Richtungstasten NICHT gedrückt?
     beq wait_for_input  ; Falls ja, weiter warten
 
-    ; Falls eine Richtungstaste gedrückt wurde, starte das Spiel!
+    ;Falls eine Richtungstaste gedrückt wurde, starte das Spiel!
     jmp gameloop
 
 
 gameloop
 
 ;refrash score display
-jsr dispscore
+    jsr dispscore
 
-;Check for raster line to   : 
-;determine if enemies should
-;move
+;if moveflag set move
+;else skip moveloop
+.block
+    lda gameflags
+    and #1
+    bne gomove
+    jmp checkcollision
+
+gomove
+    lda #254
+    and gameflags
+    sta gameflags
+.bend
 
 ;move enemies one to the left
 moveloop
@@ -227,14 +256,12 @@ inputloop
     down
     lda 56320
     and #2
-    bne jumppad
+    bne checkcollision
     inc $d001
     jsr reducefuel
     jsr incscore
 
 .bend
-
-jumppad
 
 checkcollision
 .block
@@ -496,6 +523,21 @@ displayqrcode
     jsr encharset1
     jmp loadqrcode
     rts
+
+
+;Interrupt service rotine
+handleirq
+    lda #1
+    ora gameflags
+    sta gameflags
+
+;Continue sid playback
+.ifne enablesound
+    jmp srirq
+.endif
+.ifeq enablesound
+    rti
+.endif
 
 ;Please put game mechanic
 ;subrotines here.

@@ -5,24 +5,6 @@ playsound
          sta $dc0d
          sta $dd0d
 
-         ; setup Raster srirq
-
-         lda #$7f   ; clear high bit of
-         and $d011  ; raster llne
-         sta $d011
-
-         lda #100   ; set raster inter-
-         sta $d012  ; rupt to line 100
-
-
-         lda #<srirq  ; set pointer
-         sta $0314        ; to raster
-         lda #>srirq  ; interrupt
-         sta $0315
-
-         lda #$01   ; enable raster
-         sta $d01a  ; interrupt
-
 ;---------- init Music -----------------
 
          #poke sndenabled, 1
@@ -57,8 +39,12 @@ srirq
 .endif
          ; Restores A,X,Y register and
          ; CPU flags before returning
-skip         jmp $ea31
-sndenabled .byte $0  ;boolean for sound toggle
+skip         
+        jmp $ea31
+
+sndenabled
+        ;boolean for sound toggle
+        .byte $0  
 
 disablesound
         sei
