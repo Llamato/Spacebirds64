@@ -270,7 +270,7 @@ unpackbcd .macro
     lsr
     sta \2
     lda \1
-    and $0f
+    and #$0f
     sta \3
 .endm
 
@@ -282,8 +282,7 @@ unpackbcd .macro
 ;Output
 ;Ascii in \2
 bcdtoascii .macro
-    lda #48
-    clc
-    adc \1
+    lda \1
+    ora #$30
     sta \2
 .endm
