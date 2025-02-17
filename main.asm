@@ -29,6 +29,7 @@ includesound = 0
     .include "disktests.asm"
 .endif
 
+
 ;sss = show start screen
 sss
 ;Set border color
@@ -74,8 +75,8 @@ sss
     jsr loadchargen
 .endif
 
-;Setup scrolling away from star screen
-    #poke $d016, 7
+;Setup scrolling away from start screen
+    ;#poke $d016, 7
 
 ;Set double height for enemy sprites (0-4)
 ;and single height for fuel sprites (5-7)
@@ -106,21 +107,21 @@ sss
 ;Setup sprite 2 for address $2040
     #poke $07fa, $81
     #setspritecolor 2, 1
-    #setspritepos 2, 140, 60
-    #enablesprite 2
+    ;#setspritepos 2, 140, 60
+    ;#enablesprite 2
 
 ;enemy 3
 ;Setup sprite 3 for address $20c0
     #poke $07fb, $81
     #setspritecolor 3, 1
-    #setspritepos 3, 360, 170
-    #enablesprite 3
+    ;#setspritepos 3, 360, 170
+    ;#enablesprite 3
 
 ;enemy 4
 ;Setup sprite 4 for address $2040
     #poke $07fc, $81
     #setspritecolor 4, 1
-    #setspritepos 4, 319, 170
+    ;#setspritepos 4, 319, 170
     ;#enablesprite 4   
 
 
@@ -128,21 +129,21 @@ sss
 ;Setup sprite 5 for address $2040
     #poke $07fd, $82
     #setspritecolor 5, 1
-    #setspritepos 5, 359, 125
-    #enablesprite 5
+    ;#setspritepos 5, 359, 125
+    ;#enablesprite 5
 
 ;fuel 2
 ;Setup sprite 6 for address $2040
     #poke $07fe, $82
     #setspritecolor 6, 1
-    #setspritepos 6, 400, 190
+    ;#setspritepos 6, 400, 190
     ;#enablesprite 6
 
 ;fuel 3
 ;Setup sprite 7 for address $2040
     #poke $07ff, $82
     #setspritecolor 7, 1
-    #setspritepos 7, 50, 70
+    ;#setspritepos 7, 50, 70
     ;#enablesprite 7
 
 ;Set multicolor colors
@@ -208,14 +209,14 @@ sss
  
 cli
 
-wait_for_input
-    lda $dc00       ; Joystick-Port 2 auslesen
-    and #%00011111  ; Nur die Richtungstasten maskieren (Bits 0-4)
-    cmp #%00011111  ; Sind ALLE Richtungstasten NICHT gedrückt?
-    beq wait_for_input  ; Falls ja, weiter warten
 
-    ;Falls eine Richtungstaste gedrückt wurde, starte das Spiel!
-    jmp gameloop
+waittostart
+    lda $dc00       ; Joystick auslesen
+    and #%00011111 
+    cmp #%00011111  ; nicht gedrückt?
+    beq waittostart ; weiter warten
+    jmp gameloop    ; starte Spiel
+
 
 
 gameloop
@@ -238,16 +239,83 @@ gomove
 .bend
 
 ;move enemies one to the left
+
+
 moveloop
 .block
+    lda spawn_timer
+    cmp #100             ; Hat Sprite 1 schon 60 Pixel bewegt?
+    bcc update_timer    ; Falls nicht, Timer erhöhen und weiterfahren lassen.
+
+    lda #0              ; Timer zurücksetzen
+    sta spawn_timer
+
+    ; Nächstes Sprite aus `current_sprite` laden
+    lda current_sprite
+    cmp #8              ; Sind wir über Sprite 7 hinaus?
+    bcc spawn_sprite
+    lda #1              ; Falls ja, zurück zu Sprite 1
+    sta current_sprite
+
+spawn_sprite
+    lda $dc04           ; Zufallszahl vom CIA-Timer holen
+    and #$7F            ; Begrenzen auf 0-127
+    adc #50             ; Mindestens Y = 50 setzen
+    sta spritetemp      ; Speichern
+
+
+
+; set xposition
+    lda current_sprite
+    asl
+    tax
+    lda #65
+    sta $d000,x
+
+;also set high byte of xposition
+    ldx current_sprite
+    lda sprite_bitmask, x
+    ora $d010
+    sta $d010
+
+
+; set yposition
+    lda current_sprite
+    asl
+    tax
+    lda spritetemp
+    sta $d001,x
+
+
+    
+    ldy current_sprite
+    
+    lda sprite_bitmask, y   ; Hole Bitmaske aus Tabelle
+    ora $D015           ; Setze das entsprechende Bit
+    sta $D015
+
+    inc current_sprite  ; Zum nächsten Sprite wechseln
+
+update_timer
+    inc spawn_timer
+
+move_sprites
     #movespriteleft 1
-    #movespriteleft 2
+    #movespriteleft 2 
     #movespriteleft 3
-    ;#movespriteleft 4
+    #movespriteleft 4
     #movespriteleft 5
-    ;#movespriteleft 6
-    ;#movespriteleft 7
+    #movespriteleft 6
+    #movespriteleft 7
+    
+end
+
 .bend
+
+
+
+
+
 
 inputloop
 .block
@@ -695,3 +763,9 @@ yearstring
 
 scorestring
 .null "Score: "
+
+spawn_timer .byte 0     ; Timer für das 60-Pixel-Intervall
+spritetemp .byte 0   ; Temporäre Variable für den Y-Wert
+current_sprite .byte 2  ; Startet mit Sprite 2
+sprite_bitmask
+    .byte 1, 2, 4, 8, 16, 32, 64, 128  ; Bitmasken für Sprites
