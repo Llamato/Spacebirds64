@@ -254,3 +254,35 @@ bintobinseq .macro
         lda #128
     .endif
 .endm
+
+;Converts packed bcd to bcd
+;Input
+;\1 = address of packed bcd
+;\2 = more significant digit storage
+;\3 = less significant digit storage
+;Output
+;seperated bcd in \2 and \3
+unpackbcd .macro
+    lda \1
+    lsr
+    lsr
+    lsr
+    lsr
+    sta \2
+    lda \1
+    and #$0f
+    sta \3
+.endm
+
+;Converts bcd to ascii code
+;Input
+;\1 = address of bcd
+;\2 = address of ascii
+;(\1 and \2 can be equal)
+;Output
+;Ascii in \2
+bcdtoascii .macro
+    lda \1
+    ora #$30
+    sta \2
+.endm

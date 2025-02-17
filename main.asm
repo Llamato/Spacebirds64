@@ -41,6 +41,7 @@ sss
 ;on screen;
     lda #7; Yellow
     jsr recolorscreen
+    sei
 
 ;Load start screen content
 .ifne includechargen
@@ -72,6 +73,9 @@ sss
     lda #$44; D in ascii
     jsr loadchargen
 .endif
+
+;Setup scrolling away from star screen
+    #poke $d016, 7
 
 ;Set double height for enemy sprites (0-4)
 ;and single height for fuel sprites (5-7)
@@ -143,7 +147,8 @@ sss
 
 ;Set multicolor colors
     #poke $d025, $06
-    #poke $d026, $02
+    #poke $d026, $02 
+
 
 ;Load sprites
     #ldi16 r0, sprite0addr
@@ -161,6 +166,25 @@ sss
     ;ldx #10
     ;jsr placestars
 
+
+;Setup interrupts
+
+    lda #$7f   ; clear high bit of
+    and $d011  ; raster llne
+    sta $d011
+
+    lda #100   ; set raster inter-
+    sta $d012  ; rupt to line 100
+
+
+    lda #<handleirq  ; set pointer
+    sta $0314    ; to raster
+    lda #>handleirq  ; interrupt
+    sta $0315
+
+    lda #$01   ; enable raster
+    sta $d01a  ; interrupt
+
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
 ;if the registeres are not cleared like
@@ -176,8 +200,13 @@ sss
     jsr loadsid
     jsr playsound
 .endif
-
-jsr initfuel
+    
+    jsr clrdiskiomem
+    jsr initfuel
+    jsr initscore
+    ;jsr scores_label
+ 
+cli
 
 wait_for_input
     lda $dc00       ; Joystick-Port 2 auslesen
@@ -185,20 +214,28 @@ wait_for_input
     cmp #%00011111  ; Sind ALLE Richtungstasten NICHT gedrückt?
     beq wait_for_input  ; Falls ja, weiter warten
 
-    ; Falls eine Richtungstaste gedrückt wurde, starte das Spiel!
+    ;Falls eine Richtungstaste gedrückt wurde, starte das Spiel!
     jmp gameloop
 
 
 gameloop
-;Check for raster line to
-;determine if enemies should
-;move
-lda $d012
-cmp #$ff
-beq moveloop
-cmp #$aa
-beq moveloop
-jmp jumppad
+
+;refrash score display
+    jsr dispscore
+
+;if moveflag set move
+;else skip moveloop
+.block
+    lda gameflags
+    and #1
+    bne gomove
+    jmp checkcollision
+
+gomove
+    lda #254
+    and gameflags
+    sta gameflags
+.bend
 
 ;move enemies one to the left
 moveloop
@@ -220,16 +257,16 @@ inputloop
     bne down
     dec $d001
     jsr reducefuel
-
+    jsr incscore
     down
     lda 56320
     and #2
-    bne jumppad
+    bne checkcollision
     inc $d001
     jsr reducefuel
-.bend
+    jsr incscore
 
-jumppad
+.bend
 
 checkcollision
 .block
@@ -379,10 +416,20 @@ sshss
     #nullinput yeararea
     #crlf
 
-;Get score from user
-    #print esp
-    #nullinput scorearea
-    #crlf
+;Get score from memory
+    #unpackbcd score+2, scorearea, scorearea+1
+    #bcdtoascii scorearea, scorearea
+    #bcdtoascii scorearea+1, scorearea+1
+    #unpackbcd score+1, scorearea+2, scorearea+3
+    #bcdtoascii scorearea+2, scorearea+2
+    #bcdtoascii scorearea+3, scorearea+3
+    lda score+3
+    lsr
+    lsr
+    lsr
+    lsr
+    sta scorearea+4
+    #bcdtoascii scorearea+4, scorearea+4
 
 ;Save score to disk
     jsr addhstodb
@@ -481,6 +528,21 @@ displayqrcode
     jsr encharset1
     jmp loadqrcode
     rts
+
+
+;Interrupt service rotine
+handleirq
+    lda #1
+    ora gameflags
+    sta gameflags
+
+;Continue sid playback
+.ifne enablesound
+    jmp srirq
+.endif
+.ifeq enablesound
+    rti
+.endif
 
 ;Please put game mechanic
 ;subrotines here.
@@ -600,6 +662,7 @@ next
 .include "playsid.asm"
 .include "disksubs.asm"
 .include "fuelbar.asm"
+.include "score.asm"
 ;.include "mathsubs.asm"
 
 ;Data
@@ -609,6 +672,7 @@ tyfps
 ;line end
 .byte $0d
 .byte $00
+
 
 enternameprompt
 .text "Please "
