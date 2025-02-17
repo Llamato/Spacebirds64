@@ -243,22 +243,22 @@ gomove
 
 moveloop
 .block
-    lda spawn_timer
-    cmp #100             ; Hat Sprite 1 schon 60 Pixel bewegt?
-    bcc update_timer    ; Falls nicht, Timer erhöhen und weiterfahren lassen.
+    lda spawntimer
+    cmp #100             ;100 bewegt?
+    bcc updatetimer    ; nein, Timer erhoehen
 
     lda #0              ; Timer zurücksetzen
-    sta spawn_timer
+    sta spawntimer
 
     ; Nächstes Sprite aus `current_sprite` laden
-    lda current_sprite
-    cmp #8              ; Sind wir über Sprite 7 hinaus?
-    bcc spawn_sprite
-    lda #1              ; Falls ja, zurück zu Sprite 1
-    sta current_sprite
+    lda currentsprite
+    cmp #8              ; ueber Sprite 7 
+    bcc spawnsprite
+    lda #1              ; ja, zurück zu Sprite 1
+    sta currentsprite
 
-spawn_sprite
-    lda $dc04           ; Zufallszahl vom CIA-Timer holen
+spawnsprite
+    lda $dc04           ; Zufallszahl CIA-Timer
     and #$7F            ; Begrenzen auf 0-127
     adc #50             ; Mindestens Y = 50 setzen
     sta spritetemp      ; Speichern
@@ -266,21 +266,21 @@ spawn_sprite
 
 
 ; set xposition
-    lda current_sprite
+    lda currentsprite
     asl
     tax
     lda #65
     sta $d000,x
 
 ;also set high byte of xposition
-    ldx current_sprite
-    lda sprite_bitmask, x
+    ldx currentsprite
+    lda spritebitmask, x
     ora $d010
     sta $d010
 
 
 ; set yposition
-    lda current_sprite
+    lda currentsprite
     asl
     tax
     lda spritetemp
@@ -288,18 +288,18 @@ spawn_sprite
 
 
     
-    ldy current_sprite
+    ldy currentsprite
     
-    lda sprite_bitmask, y   ; Hole Bitmaske aus Tabelle
-    ora $D015           ; Setze das entsprechende Bit
+    lda spritebitmask, y  ; hole Bitmask
+    ora $D015           ; Setze Bit
     sta $D015
 
-    inc current_sprite  ; Zum nächsten Sprite wechseln
+    inc currentsprite  ; naechster Sprite
 
-update_timer
-    inc spawn_timer
+updatetimer
+    inc spawntimer
 
-move_sprites
+movesprites
     #movespriteleft 1
     #movespriteleft 2 
     #movespriteleft 3
@@ -764,8 +764,8 @@ yearstring
 scorestring
 .null "Score: "
 
-spawn_timer .byte 0     ; Timer für das 60-Pixel-Intervall
+spawntimer .byte 0     ; Timer für das 60-Pixel-Intervall
 spritetemp .byte 0   ; Temporäre Variable für den Y-Wert
-current_sprite .byte 2  ; Startet mit Sprite 2
-sprite_bitmask
+currentsprite .byte 2  ; Startet mit Sprite 2
+spritebitmask
     .byte 1, 2, 4, 8, 16, 32, 64, 128  ; Bitmasken für Sprites
