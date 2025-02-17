@@ -215,7 +215,7 @@ sprite_bitmask
 moveloop
 .block
     lda spawn_timer
-    cmp #60             ; Hat Sprite 1 schon 60 Pixel bewegt?
+    cmp #100             ; Hat Sprite 1 schon 60 Pixel bewegt?
     bcc update_timer    ; Falls nicht, Timer erhöhen und weiterfahren lassen.
 
     lda #0              ; Timer zurücksetzen
@@ -223,7 +223,7 @@ moveloop
 
     ; Nächstes Sprite aus `current_sprite` laden
     lda current_sprite
-    cmp #3              ; Sind wir über Sprite 7 hinaus?
+    cmp #8              ; Sind wir über Sprite 7 hinaus?
     bcc spawn_sprite
     lda #1              ; Falls ja, zurück zu Sprite 1
     sta current_sprite
@@ -234,25 +234,29 @@ spawn_sprite
     adc #50             ; Mindestens Y = 50 setzen
     sta spritetemp      ; Speichern
 
+
+
+; set xposition
     lda current_sprite
-    cmp #1
-    beq set_sprite_1
-    cmp #2
-    beq set_sprite_2
+    asl
+    tax
+    lda #65
+    sta $d000,x
 
-set_sprite_1
-    #setspritepos 1, 320, spritetemp
-    jmp done_setting_sprites
-
-set_sprite_2
-    #setspritepos 2, 320, spritetemp
-    jmp done_setting_sprites
+;also set high byte of xposition
+    ldx current_sprite
+    lda sprite_bitmask, x
+    ora $d010
+    sta $d010
 
 
-done_setting_sprites
+; set yposition
+    lda current_sprite
+    asl
+    tax
+    lda spritetemp
+    sta $d001,x
 
-
-    #setspritepos 2, 320, spritetemp  ; Sprite x am rechten Rand setzen
 
     
     ldy current_sprite
