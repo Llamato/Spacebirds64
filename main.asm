@@ -532,9 +532,24 @@ displayqrcode
 
 ;Interrupt service rotine
 handleirq
+;Set time to move flag
     lda #1
     ora gameflags
     sta gameflags
+
+;scroll screen
+.block
+    lda $d019
+    and #7
+    beq charscrolled
+    dec $d019
+charscrolled
+;Load new stuff here
+;clear old stuff out
+    lda $d019
+    ora #7
+    sta $d019
+.bend
 
 ;Continue sid playback
 .ifne enablesound
