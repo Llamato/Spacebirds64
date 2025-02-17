@@ -11,7 +11,8 @@ digitoffset = 95
 ;Output
 ;Numerical characters in locations
 ;\2 and \2+1
-disppbcddigits .macro
+;dbcdd = display bcd digits
+dbcdd .macro
     lda \1
     lsr
     lsr
@@ -27,18 +28,18 @@ disppbcddigits .macro
     sta \2+1
 .endm
 
-;---------- Draw Scores Label ------------------
-scores_label
+;---------- Draw Scores Label ----------
+scoreslabel
 .block
     ldx #0
-label_loop
-    lda scores_text, x  
+labelloop
+    lda scorestext, x  
     sta txtscreenstart + scorepos, x 
     lda #1
     sta colorramstart + scorepos, x  
     inx
     cpx #scoreslbllen  
-    bne label_loop
+    bne labelloop
     rts
 .bend
 
@@ -74,11 +75,11 @@ dispscore
     #mov 1063, score+1
     #mov 1062, score+2
 .endif
-    #disppbcddigits score, txtscreenstart+scorepos+scoreslbllen+4
-    #disppbcddigits score+1, txtscreenstart+scorepos+scoreslbllen+2
-    #disppbcddigits score+2, txtscreenstart+scorepos+scoreslbllen
+    #dbcdd score, 1141
+    #dbcdd score+1, 1139
+    #dbcdd score+2, 1137
 rts
 
-scores_text
+scorestext
    .byte 69, 53, 65, 68, 55, 69
    .byte 0

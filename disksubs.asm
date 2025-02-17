@@ -12,19 +12,19 @@ device = 8
 ;eorp = end of records pointer
 eorp = $c000
 
-;Staging Area
-scorearea = diskbufferend +1
+;Score Staging Area
+sca = diskbufferend +1
 ;    .text "00000"; temp
-yeararea = scorearea +6
+yeararea = sca +6
 ;    .text "2024"
 namearea =  yeararea  +5
 ;    .repeat 20, 32
 nameend = namearea +20
 
-scorelength = yeararea - scorearea
+scorelength = yeararea - sca
 yearlength = namearea - yeararea
 namelength = nameend - namearea
-recordlength = nameend - scorearea
+recordlength = nameend - sca
 
 
 ;This variable seems redundent to me.
@@ -147,7 +147,7 @@ clrdiskiomem
 ;Appends high score in staging Area to
 ;disk Buffer
 addhstodb
-    #ldi16 r0, scorearea
+    #ldi16 r0, sca
     #mov16 r2, eorp
     ldy #recordlength
     sty r4

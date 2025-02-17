@@ -78,12 +78,12 @@ sss
 ;Setup scrolling away from start screen
     ;#poke $d016, 7
 
-;Set double height for enemy sprites (0-4)
-;and single height for fuel sprites (5-7)
+;Set double height for enemy sprites 0-4
+;and single height for fuel sprites 5-7
     #poke $d017, $1f
 
-;Set double width for enemy sprites (0-4)
-;and single width for fuel sprites (5-7)
+;Set double width for enemy sprites 0-4
+;and single width for fuel sprites 5-7
     #poke $d01d, $1f
 
 ;Enable multicolor for all sprites
@@ -211,11 +211,15 @@ cli
 
 
 waittostart
-    lda $dc00       ; Joystick auslesen
+    ; Joystick auslesen
+    lda $dc00       
     and #%00011111 
-    cmp #%00011111  ; nicht gedrückt?
-    beq waittostart ; weiter warten
-    jmp gameloop    ; starte Spiel
+    ; nicht gedrückt?
+    cmp #%00011111  
+    ; weiter warten
+    beq waittostart 
+    ; starte Spiel
+    jmp gameloop    
 
 
 
@@ -244,24 +248,32 @@ gomove
 moveloop
 .block
     lda spawntimer
-    cmp #100             ;100 bewegt?
-    bcc updatetimer    ; nein, Timer erhoehen
-
-    lda #0              ; Timer zurücksetzen
+    ;100 bewegt?
+    cmp #100             
+    ; nein, Timer erhoehen
+    bcc updatetimer    
+    ; Timer zurücksetzen
+    lda #0              
     sta spawntimer
 
-    ; Nächstes Sprite aus `current_sprite` laden
+    ; Nächstes Sprite
     lda currentsprite
-    cmp #8              ; ueber Sprite 7 
+    ; ueber Sprite 7 
+    cmp #8              
     bcc spawnsprite
-    lda #1              ; ja, zurück zu Sprite 1
+    ; ja, zurück zu Sprite 1
+    lda #1              
     sta currentsprite
 
 spawnsprite
-    lda $dc04           ; Zufallszahl CIA-Timer
-    and #$7F            ; Begrenzen auf 0-127
-    adc #50             ; Mindestens Y = 50 setzen
-    sta spritetemp      ; Speichern
+    ; Zufallszahl CIA-Timer
+    lda $dc04           
+    ; Begrenzen auf 0-127
+    and #$7f            
+    ; Mindestens Y = 50 setzen
+    adc #50             
+    ; Speichern
+    sta spritetemp      
 
 
 
@@ -279,22 +291,20 @@ spawnsprite
     sta $d010
 
 
-; set yposition
+;set yposition
     lda currentsprite
     asl
     tax
     lda spritetemp
     sta $d001,x
-
-
-    
     ldy currentsprite
-    
-    lda spritebitmask, y  ; hole Bitmask
-    ora $D015           ; Setze Bit
-    sta $D015
-
-    inc currentsprite  ; naechster Sprite
+    ; hole Bitmask
+    lda spritebitmask, y  
+    ; Setze Bit
+    ora $d015           
+    sta $d015
+    ; naechster Sprite
+    inc currentsprite 
 
 updatetimer
     inc spawntimer
@@ -309,13 +319,7 @@ movesprites
     #movespriteleft 7
     
 end
-
 .bend
-
-
-
-
-
 
 inputloop
 .block
@@ -485,19 +489,19 @@ sshss
     #crlf
 
 ;Get score from memory
-    #unpackbcd score+2, scorearea, scorearea+1
-    #bcdtoascii scorearea, scorearea
-    #bcdtoascii scorearea+1, scorearea+1
-    #unpackbcd score+1, scorearea+2, scorearea+3
-    #bcdtoascii scorearea+2, scorearea+2
-    #bcdtoascii scorearea+3, scorearea+3
+    #unpackbcd score+2, sca, sca+1
+    #bcdtoascii sca, sca
+    #bcdtoascii sca+1, sca+1
+    #unpackbcd score+1, sca+2, sca+3
+    #bcdtoascii sca+2, sca+2
+    #bcdtoascii sca+3, sca+3
     lda score+3
     lsr
     lsr
     lsr
     lsr
-    sta scorearea+4
-    #bcdtoascii scorearea+4, scorearea+4
+    sta sca+4
+    #bcdtoascii sca+4, sca+4
 
 ;Save score to disk
     jsr addhstodb
@@ -605,12 +609,8 @@ handleirq
     sta gameflags
 
 ;Continue sid playback
-.ifne enablesound
     jmp srirq
-.endif
-.ifeq enablesound
     rti
-.endif
 
 ;Please put game mechanic
 ;subrotines here.
@@ -764,8 +764,10 @@ yearstring
 scorestring
 .null "Score: "
 
-spawntimer .byte 0     ; Timer für das 60-Pixel-Intervall
-spritetemp .byte 0   ; Temporäre Variable für den Y-Wert
-currentsprite .byte 2  ; Startet mit Sprite 2
+; Timer fur das 60-Pixel-Intervall
+spawntimer .byte 0
+; Temporare Variable fuer den Y-Wert
+spritetemp .byte 0   
+currentsprite .byte 2
 spritebitmask
-    .byte 1, 2, 4, 8, 16, 32, 64, 128  ; Bitmasken für Sprites
+    .byte 1, 2, 4, 8, 16, 32, 64, 128  

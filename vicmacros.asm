@@ -49,14 +49,6 @@ enablesprite .macro
     sta $d015
 .endm
 
-enablespritevar .macro
-    ldy \1              ; Sprite-Nummer in Y speichern
-    lda sprite_bitmask, y   ; Hole Bitmaske aus Tabelle
-    ora $D015           ; Setze das entsprechende Bit
-    sta $D015
-.endm
-
-
 enspritedheight .macro
     #bintobinseq \1
     ora $d017

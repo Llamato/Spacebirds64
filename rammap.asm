@@ -24,7 +24,7 @@ sprite6addr = sprite5addr + $40
 sprite7addr = sprite6addr + $40
 
 ;gamestate
-gameflags = $99FC
+gameflags = $99fc
 ;bit 7 = None
 ;bit 6 = None
 ;bit 5 = None
@@ -34,7 +34,7 @@ gameflags = $99FC
 ;bit 1 = None
 ;bit 0 = time to move
 
-score = $9FFD
+score = $9ffd
 
 ;primmulticolloc = primeray multiclor 
 ;location

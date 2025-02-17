@@ -54,7 +54,7 @@ drawtopborder
 
 
     ldx #0
-drawbottomborder
+drawbtmborder
     ; draw bottom border
     lda #94
     sta $0400 + 991, x
@@ -65,7 +65,7 @@ drawbottomborder
 
     inx
     cpx #8
-    bne drawbottomborder
+    bne drawbtmborder
 
     rts
 .bend
