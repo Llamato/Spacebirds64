@@ -34,9 +34,20 @@ setspritepos .macro
 .endif
     lda #xposv
     sta xposl
+    lda yposv
+    sta ypos
+.endm
+
+setspriteypos .macro
+    yposv = \2
+    xposl = \1 * 2 + $d000
+    ypos = xposl +1
     lda #yposv
     sta ypos
 .endm
+
+
+
 
 ;Displays sprite \1 on screen
 ;Input
@@ -48,6 +59,14 @@ enablesprite .macro
     ora $d015
     sta $d015
 .endm
+
+enablespritevar .macro
+    ldy \1              ; Sprite-Nummer in Y speichern
+    lda sprite_bitmask, y   ; Hole Bitmaske aus Tabelle
+    ora $D015           ; Setze das entsprechende Bit
+    sta $D015
+.endm
+
 
 enspritedheight .macro
     #bintobinseq \1
