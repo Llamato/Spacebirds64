@@ -89,24 +89,18 @@ sss
 ;Enable multicolor for all sprites
     #poke 53276, 255
 
-
-;spritetempy .byte 0   ; Temporäre Variable für den Y-Wert
-;    lda #125
-;    sta spritetempy 
 ;spaceship
 ;Setup sprite 0 for address $2000
     #poke $07f8, $80
     #setspritecolor 0, $0f
-    #setspritepos 0, 55, 0
-    #setspriteypos 0, 125
+    #setspritepos 0, 55, 125
     #enablesprite 0
 
 ;enemy 1
 ;Setup sprite 1 for address $2040
     #poke $07f9, $81
     #setspritecolor 1, 1
-    #setspritepos 1, 265, 0
-    #setspriteypos 1, 125
+    #setspritepos 1, 265, 125
     #enablesprite 1
 
 ;enemy 2
@@ -245,11 +239,7 @@ gomove
 .bend
 
 ;move enemies one to the left
-spawn_timer .byte 0     ; Timer für das 60-Pixel-Intervall
-spritetemp .byte 0   ; Temporäre Variable für den Y-Wert
-current_sprite .byte 2  ; Startet mit Sprite 2
-sprite_bitmask
-    .byte 1, 2, 4, 8, 16, 32, 64, 128  ; Bitmasken für Sprites
+
 
 moveloop
 .block
@@ -773,3 +763,9 @@ yearstring
 
 scorestring
 .null "Score: "
+
+spawn_timer .byte 0     ; Timer für das 60-Pixel-Intervall
+spritetemp .byte 0   ; Temporäre Variable für den Y-Wert
+current_sprite .byte 2  ; Startet mit Sprite 2
+sprite_bitmask
+    .byte 1, 2, 4, 8, 16, 32, 64, 128  ; Bitmasken für Sprites

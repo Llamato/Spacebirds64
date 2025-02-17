@@ -34,20 +34,9 @@ setspritepos .macro
 .endif
     lda #xposv
     sta xposl
-    lda yposv
-    sta ypos
-.endm
-
-setspriteypos .macro
-    yposv = \2
-    xposl = \1 * 2 + $d000
-    ypos = xposl +1
     lda #yposv
     sta ypos
 .endm
-
-
-
 
 ;Displays sprite \1 on screen
 ;Input
