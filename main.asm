@@ -74,8 +74,8 @@ sss
     jsr loadchargen
 .endif
 
-;Setup scrolling away from star screen
-    #poke $d016, 7
+;Setup scrolling away from start screen
+    ;#poke $d016, 7
 
 ;Set double height for enemy sprites (0-4)
 ;and single height for fuel sprites (5-7)
