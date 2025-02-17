@@ -41,6 +41,7 @@ sss
 ;on screen;
     lda #7; Yellow
     jsr recolorscreen
+    sei
 
 ;Load start screen content
 .ifne includechargen
@@ -72,6 +73,9 @@ sss
     lda #$44; D in ascii
     jsr loadchargen
 .endif
+
+;Setup scrolling away from star screen
+    #poke $d016, 7
 
 ;Set double height for enemy sprites (0-4)
 ;and single height for fuel sprites (5-7)
@@ -202,6 +206,7 @@ sss
     jsr initscore
     ;jsr scores_label
  
+cli
 
 wait_for_input
     lda $dc00       ; Joystick-Port 2 auslesen
