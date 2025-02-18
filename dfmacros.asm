@@ -286,3 +286,23 @@ bcdtoascii .macro
     ora #$30
     sta \2
 .endm
+
+;Pushes byte from address \1 onto stack
+;Input
+;\1 = address holding contents to push
+;Output
+;conetens of \1 at stack pointer address
+push .macro
+    lda \1
+    pha
+.endm
+
+;Pulls byte from stack into location \1
+;Input
+;\1 = address to store contents pulled
+;Output
+;contents of stack top in \1
+pull .macro
+    pla
+    sta \1
+.endm

@@ -34,9 +34,9 @@ scoreslabel
     ldx #0
 labelloop
     lda scorestext, x  
-    sta txtscreenstart + scorepos, x 
+    sta txtscreenstart+scorepos, x 
     lda #1
-    sta colorramstart + scorepos, x  
+    sta colorramstart+scorepos, x  
     inx
     cpx #scoreslbllen  
     bne labelloop
@@ -49,6 +49,7 @@ initscore
     #poke score, 0
     #poke score+1, 0
     #poke score+2, 0
+    jsr dispscore
     rts
 
 incscore

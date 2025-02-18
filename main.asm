@@ -29,7 +29,10 @@ includesound = 0
     .include "disktests.asm"
 .endif
 
-
+;Setup gamestate
+    #poke gameflags, 0
+    #poke scrollcolumn, 0
+sei
 ;sss = show start screen
 sss
 ;Set border color
@@ -42,7 +45,6 @@ sss
 ;on screen;
     lda #7; Yellow
     jsr recolorscreen
-    sei
 
 ;Load start screen content
 .ifne includechargen
@@ -74,9 +76,6 @@ sss
     lda #$44; D in ascii
     jsr loadchargen
 .endif
-
-;Setup scrolling away from start screen
-    ;#poke $d016, 7
 
 ;Set double height for enemy sprites 0-4
 ;and single height for fuel sprites 5-7
@@ -174,7 +173,7 @@ sss
     and $d011  ; raster llne
     sta $d011
 
-    lda #100   ; set raster inter-
+    lda #0   ; set raster inter-
     sta $d012  ; rupt to line 100
 
 
@@ -201,27 +200,22 @@ sss
     jsr loadsid
     jsr playsound
 .endif
-    
     jsr clrdiskiomem
-    jsr initfuel
-    jsr initscore
-    ;jsr scores_label
- 
-cli
+    cli
 
 
 waittostart
-    ; Joystick auslesen
+;Joystick auslesen
     lda $dc00       
     and #%00011111 
-    ; nicht gedrückt?
+;nicht gedrueckt?
     cmp #%00011111  
-    ; weiter warten
+;weiter warten
     beq waittostart 
-    ; starte Spiel
-    jmp gameloop    
-
-
+    
+;starte Spiel  
+;start scrolling away from start screen
+    #poke gameflags, 2
 
 gameloop
 
@@ -241,10 +235,8 @@ gomove
     and gameflags
     sta gameflags
 .bend
-
+    
 ;move enemies one to the left
-
-
 moveloop
 .block
     lda spawntimer
@@ -601,16 +593,76 @@ displayqrcode
     jmp loadqrcode
     rts
 
-
 ;Interrupt service rotine
 handleirq
+.block
+    php
+    pha
+    phx
+    phy
     lda #1
     ora gameflags
     sta gameflags
+    and #2
+    beq noscroll
+    
+scrollscreen
+    lda $d016
+    and #$07
+    bne hwscroll
 
-;Continue sid playback
+fillcolumn
+;calculate start address
+    #push r0
+    #push r1
+    #ldi16 r0, txtscreenstart
+
+;loop though lines and fill in
+;blanks
+    ldy scrollcolumn
+    ldx #25
+fillloop
+    lda #23
+    sta (r0), y
+    #add16i r0, 40
+    dex
+    bne fillloop
+    iny
+    cpy #40
+    bne scrollcolumnend
+
+stopscrolling
+    #poke scrollcolumn, 255
+    lda gameflags
+    and #253
+    sta gameflags
+;This is a bad way to handle things.
+;Let's see if we can move this outside
+;of ISR to prevent IRQ flooding.
+    jsr initscore
+    jsr initfuel
+
+scrollcolumnend
+    sty scrollcolumn
+    #pull r1
+    #pull r0
+    jmp noscroll
+
+hwscroll
+    dec $d016
+
+noscroll
+    ply
+    plx
+    pla
+    plp
+
+sidplayback
+.ifne enablesound
     jmp srirq
+.endif
     rti
+.bend
 
 ;Please put game mechanic
 ;subrotines here.

@@ -123,16 +123,13 @@ continue
     sta $d010
     jmp done
 
-    
 remove 
 #bintobinseq \1
 and $d010
 bne continue
 #disablesprite \1
 
-
 done
-
 .endm
 
 movespriteright .macro
@@ -146,5 +143,44 @@ movespriteright .macro
     #bintobinseq \1
     eor 53264
     sta 53264
+done
+.endm
+
+;Fills one screen row with char in \2
+;Input
+;\1 = screen row number
+;\2 = fillent char
+;Output
+;Screen row filled with \2
+fillscreenrow .macro
+rowaddr = 40*\1+txtscreenstart
+    ldx #0
+    lda #\2
+fillchar
+    cpx #40
+    beq done
+    sta rowaddr, x
+    inx
+    jmp fillchar
+done
+.endm
+
+;Fills one screen column with char in \2
+;Input
+;\1 = screen column number
+;\2 = fillent char
+;Output
+;Screen column filled with \2
+fillscreencol .macro
+startaddr = txtscreenstart+\1
+    #ldi16 r0, startaddr
+    ldy #0
+    ldx #25
+fillloop
+    lda #\2
+    sta (r0), y
+    #add16i r0, 40
+    dex
+    bne fillloop
 done
 .endm

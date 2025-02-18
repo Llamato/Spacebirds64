@@ -10,9 +10,9 @@ add16i .macro
     clc
     adc #<\2
     sta \1
-    lda \1 +1
+    lda \1+1
     adc #>\2
-    sta \1 +1
+    sta \1+1
 .endm
 
 ;adds two 16 bit values from
@@ -27,9 +27,9 @@ add16 .macro
     clc
     adc <\2
     sta \1
-    lda \1 +1
+    lda \1+1
     adc >\2
-    sta \1 +1
+    sta \1+1
 .endm
 
 ;subtracts a 16 bit imidiate from a value
@@ -44,7 +44,7 @@ sub16i .macro
     sec
     sbc #<\2
     sta \1
-    lda \1 +1
+    lda \1+1
     sbc #>\2
-    sta \1 +1
+    sta \1+1
 .endm
