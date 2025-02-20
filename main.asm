@@ -588,10 +588,6 @@ handleirq
 ; set bit 0 in ISR to ack IRQ
 inc $d019 
 .block
-    php
-    pha
-    phx
-    phy
     lda #1
     ora gameflags
     sta gameflags
@@ -644,16 +640,12 @@ hwscroll
     dec $d016
 
 noscroll
-    ply
-    plx
-    pla
-    plp
 
-sidplayback
-.ifne enablesound
-    jmp srirq
-.endif
-    rti
+; JUMP to KERNAL return routine that
+; restores registers/status and returns
+jmp $ea31
+
+
 .bend
 
 ;Please put game mechanic
