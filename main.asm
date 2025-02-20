@@ -169,21 +169,11 @@ sss
 
 ;Setup interrupts
 
-    lda #$7f   ; clear high bit of
-    and $d011  ; raster llne
-    sta $d011
+    #setuprasterint 0, handleirq
 
-    lda #0   ; set raster inter-
-    sta $d012  ; rupt to line 100
-
-
-    lda #<handleirq  ; set pointer
-    sta $0314    ; to raster
-    lda #>handleirq  ; interrupt
-    sta $0315
-
-    lda #$01   ; enable raster
-    sta $d01a  ; interrupt
+    ; enable raster interrupt
+    lda #$01  
+    sta $d01a 
 
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry

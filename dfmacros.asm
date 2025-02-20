@@ -306,3 +306,27 @@ pull .macro
     pla
     sta \1
 .endm
+
+
+; Setup an Interrupt at specific
+; Rasterline 
+; Input:
+;   \1 - Raster Line
+;   \2 - Address to ISR
+setuprasterint .macro
+; clear high bit of raster line
+    lda #$7f  
+    and $d011      
+    sta $d011
+
+; set raster interrupt to
+; trigger on given  line
+    lda #\1   
+    sta $d012     
+
+; set pointer to ISR
+    lda #<\2      
+    sta $0314     
+    lda #>\2
+    sta $0315
+.endm
