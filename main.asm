@@ -585,6 +585,8 @@ displayqrcode
 
 ;Interrupt service rotine
 handleirq
+; set bit 0 in ISR to ack IRQ
+inc $d019 
 .block
     php
     pha
