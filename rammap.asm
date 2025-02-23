@@ -1,3 +1,16 @@
+;gamestate
+score = $9ff0; -> 9ff4
+scrollcolumn = $9ff5; -> 99f6
+gameflags = $9fff
+;bit 7 = None
+;bit 6 = None
+;bit 5 = None
+;bit 4 = None
+;bit 3 = None
+;bit 2 = None
+;bit 1 = on start screen
+;bit 0 = time to move
+
 ;Programm flow
 stackstart = $100
 stackend = $1ff
@@ -22,19 +35,6 @@ sprite4addr = sprite3addr + $40
 sprite5addr = sprite4addr + $40
 sprite6addr = sprite5addr + $40
 sprite7addr = sprite6addr + $40
-
-;gamestate
-gameflags = $99FC
-;bit 7 = None
-;bit 6 = None
-;bit 5 = None
-;bit 4 = None
-;bit 3 = None
-;bit 2 = None
-;bit 1 = None
-;bit 0 = time to move
-
-score = $9FFD
 
 ;primmulticolloc = primeray multiclor 
 ;location

@@ -286,3 +286,47 @@ bcdtoascii .macro
     ora #$30
     sta \2
 .endm
+
+;Pushes byte from address \1 onto stack
+;Input
+;\1 = address holding contents to push
+;Output
+;conetens of \1 at stack pointer address
+push .macro
+    lda \1
+    pha
+.endm
+
+;Pulls byte from stack into location \1
+;Input
+;\1 = address to store contents pulled
+;Output
+;contents of stack top in \1
+pull .macro
+    pla
+    sta \1
+.endm
+
+
+; Setup an Interrupt at specific
+; Rasterline 
+; Input:
+;   \1 - Raster Line
+;   \2 - Address to ISR
+setuprasterint .macro
+; clear high bit of raster line
+    lda #$7f  
+    and $d011      
+    sta $d011
+
+; set raster interrupt to
+; trigger on given  line
+    lda #\1   
+    sta $d012     
+
+; set pointer to ISR
+    lda #<\2      
+    sta $0314     
+    lda #>\2
+    sta $0315
+.endm

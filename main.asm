@@ -29,7 +29,10 @@ includesound = 0
     .include "disktests.asm"
 .endif
 
-
+;Setup gamestate
+    #poke gameflags, 0
+    #poke scrollcolumn, 0
+sei
 ;sss = show start screen
 sss
 ;Set border color
@@ -42,7 +45,6 @@ sss
 ;on screen;
     lda #7; Yellow
     jsr recolorscreen
-    sei
 
 ;Load start screen content
 .ifne includechargen
@@ -75,15 +77,12 @@ sss
     jsr loadchargen
 .endif
 
-;Setup scrolling away from start screen
-    ;#poke $d016, 7
-
-;Set double height for enemy sprites (0-4)
-;and single height for fuel sprites (5-7)
+;Set double height for enemy sprites 0-4
+;and single height for fuel sprites 5-7
     #poke $d017, $1f
 
-;Set double width for enemy sprites (0-4)
-;and single width for fuel sprites (5-7)
+;Set double width for enemy sprites 0-4
+;and single width for fuel sprites 5-7
     #poke $d01d, $1f
 
 ;Enable multicolor for all sprites
@@ -170,21 +169,11 @@ sss
 
 ;Setup interrupts
 
-    lda #$7f   ; clear high bit of
-    and $d011  ; raster llne
-    sta $d011
+    #setuprasterint 0, handleirq
 
-    lda #100   ; set raster inter-
-    sta $d012  ; rupt to line 100
-
-
-    lda #<handleirq  ; set pointer
-    sta $0314    ; to raster
-    lda #>handleirq  ; interrupt
-    sta $0315
-
-    lda #$01   ; enable raster
-    sta $d01a  ; interrupt
+    ; enable raster interrupt
+    lda #$01  
+    sta $d01a 
 
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
@@ -201,23 +190,22 @@ sss
     jsr loadsid
     jsr playsound
 .endif
-    
     jsr clrdiskiomem
-    jsr initfuel
-    jsr initscore
-    ;jsr scores_label
- 
-cli
+    cli
 
 
 waittostart
-    lda $dc00       ; Joystick auslesen
+;Joystick auslesen
+    lda $dc00       
     and #%00011111 
-    cmp #%00011111  ; nicht gedrückt?
-    beq waittostart ; weiter warten
-    jmp gameloop    ; starte Spiel
-
-
+;nicht gedrueckt?
+    cmp #%00011111  
+;weiter warten
+    beq waittostart 
+    
+;starte Spiel  
+;start scrolling away from start screen
+    #poke gameflags, 2
 
 gameloop
 
@@ -237,24 +225,26 @@ gomove
     and gameflags
     sta gameflags
 .bend
-
+    
 ;move enemies one to the left
-
-
 moveloop
 .block
     lda spawntimer
-    cmp #100             ;100 bewegt?
-    bcc updatetimer    ; nein, Timer erhoehen
-
-    lda #0              ; Timer zurücksetzen
+    ;100 bewegt?
+    cmp #100             
+    ; nein, Timer erhoehen
+    bcc updatetimer    
+    ; Timer zurücksetzen
+    lda #0              
     sta spawntimer
 
-    ; Nächstes Sprite aus `current_sprite` laden
+    ; Nächstes Sprite
     lda currentsprite
-    cmp #8              ; ueber Sprite 7 
+    ; ueber Sprite 7 
+    cmp #8              
     bcc spawnsprite
-    lda #1              ; ja, zurück zu Sprite 1
+    ; ja, zurück zu Sprite 1
+    lda #1              
     sta currentsprite
 
 ;spawnsprite
@@ -284,22 +274,20 @@ spawnsprite
     sta $d010
 
 
-; set yposition
+;set yposition
     lda currentsprite
     asl
     tax
     lda spritetemp
     sta $d001,x
-
-
-    
     ldy currentsprite
-    
-    lda spritebitmask, y  ; hole Bitmask
-    ora $D015           ; Setze Bit
-    sta $D015
-
-    inc currentsprite  ; naechster Sprite
+    ; hole Bitmask
+    lda spritebitmask, y  
+    ; Setze Bit
+    ora $d015           
+    sta $d015
+    ; naechster Sprite
+    inc currentsprite 
 
 updatetimer
     inc spawntimer
@@ -314,13 +302,7 @@ movesprites
     #movespriteleft 7
     
 end
-
 .bend
-
-
-
-
-
 
 inputloop
 .block
@@ -490,19 +472,19 @@ sshss
     #crlf
 
 ;Get score from memory
-    #unpackbcd score+2, scorearea, scorearea+1
-    #bcdtoascii scorearea, scorearea
-    #bcdtoascii scorearea+1, scorearea+1
-    #unpackbcd score+1, scorearea+2, scorearea+3
-    #bcdtoascii scorearea+2, scorearea+2
-    #bcdtoascii scorearea+3, scorearea+3
+    #unpackbcd score+2, sca, sca+1
+    #bcdtoascii sca, sca
+    #bcdtoascii sca+1, sca+1
+    #unpackbcd score+1, sca+2, sca+3
+    #bcdtoascii sca+2, sca+2
+    #bcdtoascii sca+3, sca+3
     lda score+3
     lsr
     lsr
     lsr
     lsr
-    sta scorearea+4
-    #bcdtoascii scorearea+4, scorearea+4
+    sta sca+4
+    #bcdtoascii sca+4, sca+4
 
 ;Save score to disk
     jsr addhstodb
@@ -602,20 +584,70 @@ displayqrcode
     jmp loadqrcode
     rts
 
-
 ;Interrupt service rotine
 handleirq
+; set bit 0 in ISR to ack IRQ
+inc $d019 
+.block
     lda #1
     ora gameflags
     sta gameflags
+    and #2
+    beq noscroll
+    
+scrollscreen
+    lda $d016
+    and #$07
+    bne hwscroll
 
-;Continue sid playback
-.ifne enablesound
-    jmp srirq
-.endif
-.ifeq enablesound
-    rti
-.endif
+fillcolumn
+;calculate start address
+    #push r0
+    #push r1
+    #ldi16 r0, txtscreenstart
+
+;loop though lines and fill in
+;blanks
+    ldy scrollcolumn
+    ldx #25
+fillloop
+    lda #23
+    sta (r0), y
+    #add16i r0, 40
+    dex
+    bne fillloop
+    iny
+    cpy #40
+    bne scrollcolumnend
+
+stopscrolling
+    #poke scrollcolumn, 255
+    lda gameflags
+    and #253
+    sta gameflags
+;This is a bad way to handle things.
+;Let's see if we can move this outside
+;of ISR to prevent IRQ flooding.
+    jsr initscore
+    jsr initfuel
+
+scrollcolumnend
+    sty scrollcolumn
+    #pull r1
+    #pull r0
+    jmp noscroll
+
+hwscroll
+    dec $d016
+
+noscroll
+
+; JUMP to KERNAL return routine that
+; restores registers/status and returns
+jmp $ea31
+
+
+.bend
 
 ;Please put game mechanic
 ;subrotines here.
@@ -769,8 +801,10 @@ yearstring
 scorestring
 .null "Score: "
 
-spawntimer .byte 0     ; Timer für das 60-Pixel-Intervall
-spritetemp .byte 0   ; Temporäre Variable für den Y-Wert
-currentsprite .byte 2  ; Startet mit Sprite 2
+; Timer fur das 60-Pixel-Intervall
+spawntimer .byte 0
+; Temporare Variable fuer den Y-Wert
+spritetemp .byte 0   
+currentsprite .byte 2
 spritebitmask
-    .byte 1, 2, 4, 8, 16, 32, 64, 128  ; Bitmasken für Sprites
+    .byte 1, 2, 4, 8, 16, 32, 64, 128  
