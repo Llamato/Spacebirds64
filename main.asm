@@ -257,10 +257,15 @@ moveloop
     lda #1              ; ja, zurück zu Sprite 1
     sta currentsprite
 
+;spawnsprite
+;    lda $dc04           ; Zufallszahl CIA-Timer
+;    and #$7F            ; Begrenzen auf 0-127
+;    adc #50             ; Mindestens Y = 50 setzen
+;    sta spritetemp      ; Speichern
+
 spawnsprite
-    lda $dc04           ; Zufallszahl CIA-Timer
-    and #$7F            ; Begrenzen auf 0-127
-    adc #50             ; Mindestens Y = 50 setzen
+    lda $dc04           ; Zufallszahl vom CIA-Timer holen
+    and #$FF            ; Sicherstellen, dass der Wert im Bereich 0-255 liegt
     sta spritetemp      ; Speichern
 
 
