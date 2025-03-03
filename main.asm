@@ -231,7 +231,7 @@ moveloop
 .block
     lda spawntimer
     ;100 bewegt?
-    cmp #100             
+    cmp #70             
     ; nein, Timer erhoehen
     bcc updatetimer    
     ; Timer zurücksetzen
@@ -256,7 +256,13 @@ moveloop
 spawnsprite
     lda $dc04           ; Zufallszahl vom CIA-Timer holen
     and #$FF            ; Sicherstellen, dass der Wert im Bereich 0-255 liegt
-    sta spritetemp      ; Speichern
+    sec
+    sbc #30             ; Bereich auf 0-205 reduzieren
+    cmp #206            ; Ist die Zahl größer als 205?
+    bcs spawnsprite     ; Falls ja, neue Zahl holen
+    adc #30             ; Zurück in den Bereich 30-235 bringen
+    sta spritetemp      ; Zufallswert speichern
+
 
 
 
@@ -286,8 +292,20 @@ spawnsprite
     ; Setze Bit
     ora $d015           
     sta $d015
-    ; naechster Sprite
-    inc currentsprite 
+
+selectsprite
+    lda $dc04          ; Zufallszahl vom CIA-Timer holen
+    and #$07           ; Begrenzen auf 0-7
+    beq selectsprite   ; Falls 0, neue Zahl holen (nur 1-7 nutzen)
+    
+    tax                ; X = currentsprite-Kandidat
+    lda spritebitmask, x  ; Hole die Bitmaske für das Sprite
+    and $d015          ; Ist das Sprite aktiv?
+    bne selectsprite   ; Falls ja, neue Zahl holen
+
+    stx currentsprite  ; Speichern, wenn Sprite nicht aktiv ist
+
+
 
 updatetimer
     inc spawntimer
