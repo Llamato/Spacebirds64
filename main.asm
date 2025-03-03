@@ -1,9 +1,9 @@
 includetests = 0
 includechargen = 0
-includesound = 0
+includesound = 1
 
 *=2049
-;BASIC starter (ldraddr $0801 / 2049)
+;BASIC starter (ldraddr $0801 / 2049)   
 ;Load address for next BASIC line (2064)
     .byte $0b, $08
 ;Line number (10)         
@@ -630,6 +630,7 @@ stopscrolling
 ;of ISR to prevent IRQ flooding.
     jsr initscore
     jsr initfuel
+    jsr scoreslabel
 
 scrollcolumnend
     sty scrollcolumn

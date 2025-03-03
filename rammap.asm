@@ -1,5 +1,5 @@
 ;gamestate
-score = $9ff0; -> 9ff4
+score = $9ffd; -> 9ff4
 scrollcolumn = $9ff5; -> 99f6
 gameflags = $9fff
 ;bit 7 = None

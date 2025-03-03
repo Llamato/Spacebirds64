@@ -34,9 +34,9 @@ scoreslabel
     ldx #0
 labelloop
     lda scorestext, x  
-    sta txtscreenstart+scorepos, x 
+    sta txtscreenstart+33, x 
     lda #1
-    sta colorramstart+scorepos, x  
+    sta colorramstart+33, x  
     inx
     cpx #scoreslbllen  
     bne labelloop

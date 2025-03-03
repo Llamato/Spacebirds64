@@ -201,7 +201,7 @@ loadsid
 ;Overwrites programm
 loadqrcode
 .block
-destaddr = $c000
+destaddr = $c222
 .ifne includesound
     jsr disablesound
     jsr disrasterirq
