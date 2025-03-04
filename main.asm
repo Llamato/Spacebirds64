@@ -1,6 +1,6 @@
 includetests = 0
 includechargen = 0
-includesound = 0
+includesound = 1
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -686,96 +686,6 @@ waitsomemore
     jmp waitsomemore 
 continue
     #poke 198, 0
-    rts
-.bend
-
-;---------------------------------------
-;Complex Bug in here
-;Breaks upon sprite2 load
-;Might require full recode...
-
-;Place background stars
-;procedually with seed and density
-;with the density given in
-;stars per screen page (40x25 chars).
-;Input
-;A = star density (amount of stars)
-;X = seed
-;Output
-;Stars on screen
-placestars
-.block
-setup
-    pha
-    #ldi16 r2, 1024
-    #poke r1, 0
-    pla
-    sta r0
-    pha
-    lda #0
-    sta r1
-    #ldi16 r2, 1024
-    phx
-    ;#div16 r2, r0, r4, r6
-    ldx #0
-    ldy #0
-placestar
-
-    #add16 r2, r0
-
-clamp
-checklow
-    lda r2
-    cmp #>1024
-    beq checklowlb
-    bcc outlow
-    bcs notlow
-
-checklowlb
-    lda r2
-    cmp #<1024
-    beq eqlow
-    bcc outlow
-    bcs notlow
-
-notlow
-checkhigh
-    lda r3
-    cmp #>2024
-    beq checkhighlb
-    bcc in
-    bcs outhigh
-
-checkhighlb
-    lda r2
-    cmp #<2024
-    beq eqhigh
-    bcc in
-    bcs outhigh
-
-in
-    lda #78
-    sta (r2),y
-    jmp next
-
-outhigh
-    #sub16i r2, 1000
-    jmp clamp
-eqhigh
-    jmp in; temp
-
-outlow
-    #add16i r2, 1000
-
-eqlow
-    jmp in; temp
-
-next
-    inx
-    cpx r4+1
-    bne placestar
-    plx
-    pla
     rts
 .bend
 ;------------------------------
