@@ -186,7 +186,7 @@ sss
 
 
 jsr enablerasterint
-jsr enablesnd
+
 
 
 
@@ -204,7 +204,7 @@ waittostart
 ;starte Spiel  
 ;start scrolling away from start screen
     #poke gameflags, 2
-
+    jsr enablesnd
 gameloop
 
 ;refrash score display
@@ -617,6 +617,7 @@ continue
 .include "disksubs.asm"
 .include "fuelbar.asm"
 .include "score.asm"
+.include "sound.asm"
 ;.include "mathsubs.asm"
 
 ;Data
@@ -658,7 +659,5 @@ currentsprite .byte 2
 spritebitmask
     .byte 1, 2, 4, 8, 16, 32, 64, 128  
 
-;boolean for sound toggle
-sndenabled .byte $0  
 
 

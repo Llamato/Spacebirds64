@@ -17,28 +17,14 @@ sei
 cli
 rts
 
-   
-
-;---------- disable Sound -----------
-disablesnd 
-        #poke sndenabled, 0
-        #poke $d404, 0     ; deactivate Voice1
-        #poke $d40b, 0     ; deactivate Voice2
-        #poke $d412, 0     ; deactivate Voice3
-        rts
 
 
-;---------- enable Sound -----------
-enablesnd
-        #poke sndenabled, 1
-
-; reinitialize sound
-; with Track Number 0
-        lda #0
-        tax
-        tay
-        jsr sidstart
-
+;----- disable raster interrupt -----
+disrasterirq
+        sei
+        lda #$00   
+        sta $d01a  
+        cli
         rts
 
 
@@ -48,7 +34,6 @@ enablesnd
 soundisr
         inc $d019
 
-        inc $d020
 
         lda sndenabled
         beq nosound
@@ -56,7 +41,6 @@ soundisr
         jsr sidstart + 6
 
 nosound
-        dec $d020
         #setuprasterint 0, handlemove
         jmp $ea31
 
@@ -126,11 +110,4 @@ noscroll
 .bend
         #setuprasterint 100, soundisr
         jmp $ea81
-
-
-
-
-
-
-
 

@@ -202,6 +202,8 @@ loadsid
 loadqrcode
 .block
 destaddr = $c000
+jsr disrasterirq
+
     #ldi16 r0, startddr
     #ldi16 r2, destaddr
     #poke r4, endaddr-startddr+1
