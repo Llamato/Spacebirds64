@@ -1,6 +1,5 @@
 includetests = 0
 includechargen = 0
-includesound = 1
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -32,7 +31,7 @@ includesound = 1
 ;Setup gamestate
     #poke gameflags, 0
     #poke scrollcolumn, 0
-sei
+
 ;sss = show start screen
 sss
 ;Set border color
@@ -161,19 +160,10 @@ sss
     lda #50
     jsr loadsprite
 
-;Add stars to background
-    ;lda #69
-    ;ldx #10
-    ;jsr placestars
 
 
 ;Setup interrupts
 
-    #setuprasterint 0, handleirq
-
-    ; enable raster interrupt
-    lda #$01  
-    sta $d01a 
 
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
@@ -186,12 +176,20 @@ sss
     lda #0
     ldx #0
     ldy #0
-.ifne includesound
+
+
     jsr loadsid
-    jsr playsound
-.endif
+
+
     jsr clrdiskiomem
-    cli
+
+
+
+jsr enablerasterint
+jsr enablesnd
+
+
+
 
 
 waittostart
@@ -398,6 +396,7 @@ jmp gameloop
 
 
 gameover
+jsr disablesnd
 ;Clear stack
 #fmb stackstart, stackend, $00
 
@@ -426,9 +425,6 @@ sshss
     jsr encharrom
 .endif
 
-.ifne includesound
-    jsr disablesound
-.endif
 
 ;Load custom font
 .ifne includechargen
@@ -443,17 +439,11 @@ sshss
     jsr encharset2
 .endif
 
-.ifne includesound
-    jsr disablesound
-.endif
 
 ;Load scores from disk
     jsr clrdiskiomem
     jsr loadhighscores
 
-.ifne includesound
-    jsr enablesound
-.endif
 
 .ifne includetests
     #ddbts
@@ -579,15 +569,11 @@ done
     #ddbts
 .endif
 
-.ifne includesound
-    jsr disablesound
-.endif
+
     
-    jsr savehighscores
+jsr savehighscores
     
-.ifne includesound
-    jsr enablesound
-.endif
+
 
 .ifne includetests
     #ddbts
@@ -601,71 +587,6 @@ displayqrcode
     jsr encharset1
     jmp loadqrcode
     rts
-
-;Interrupt service rotine
-handleirq
-; set bit 0 in ISR to ack IRQ
-inc $d019 
-.block
-    lda #1
-    ora gameflags
-    sta gameflags
-    and #2
-    beq noscroll
-    
-scrollscreen
-    lda $d016
-    and #$07
-    bne hwscroll
-
-fillcolumn
-;calculate start address
-    #push r0
-    #push r1
-    #ldi16 r0, txtscreenstart
-
-;loop though lines and fill in
-;blanks
-    ldy scrollcolumn
-    ldx #25
-fillloop
-    lda #23
-    sta (r0), y
-    #add16i r0, 40
-    dex
-    bne fillloop
-    iny
-    cpy #40
-    bne scrollcolumnend
-
-stopscrolling
-    #poke scrollcolumn, 255
-    lda gameflags
-    and #253
-    sta gameflags
-;This is a bad way to handle things.
-;Let's see if we can move this outside
-;of ISR to prevent IRQ flooding.
-    jsr initscore
-    jsr initfuel
-
-scrollcolumnend
-    sty scrollcolumn
-    #pull r1
-    #pull r0
-    jmp noscroll
-
-hwscroll
-    dec $d016
-
-noscroll
-
-; JUMP to KERNAL return routine that
-; restores registers/status and returns
-jmp $ea31
-
-
-.bend
 
 ;Please put game mechanic
 ;subrotines here.
@@ -692,7 +613,7 @@ continue
 
 .include "vicsubs.asm"
 .include "dataflowsubs.asm"
-.include "playsid.asm"
+.include "interrupts.asm"
 .include "disksubs.asm"
 .include "fuelbar.asm"
 .include "score.asm"
@@ -736,3 +657,8 @@ spritetemp .byte 0
 currentsprite .byte 2
 spritebitmask
     .byte 1, 2, 4, 8, 16, 32, 64, 128  
+
+;boolean for sound toggle
+sndenabled .byte $0  
+
+
