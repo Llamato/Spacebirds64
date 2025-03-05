@@ -177,20 +177,9 @@ sss
     ldx #0
     ldy #0
 
-
     jsr loadsid
-
-
     jsr clrdiskiomem
-
-
-
-jsr enablerasterint
-
-
-
-
-
+    jsr enablerasterint
 
 waittostart
 ;Joystick auslesen
@@ -260,8 +249,6 @@ spawnsprite
     bcs spawnsprite     ; Falls ja, neue Zahl holen
     adc #30             ; Zurück in den Bereich 30-235 bringen
     sta spritetemp      ; Zufallswert speichern
-
-
 
 
 ; set xposition
@@ -658,6 +645,3 @@ spritetemp .byte 0
 currentsprite .byte 2
 spritebitmask
     .byte 1, 2, 4, 8, 16, 32, 64, 128  
-
-
-

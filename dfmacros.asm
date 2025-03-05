@@ -291,9 +291,29 @@ bcdtoascii .macro
 ;Input
 ;\1 = address holding contents to push
 ;Output
-;conetens of \1 at stack pointer address
+;Contents of \1 at stack pointer address
 push .macro
     lda \1
+    pha
+.endm
+
+;Pushes x to stack
+;Input
+;None
+;Output
+;Contents of x at stack pointer address
+phx .macro
+    txa
+    pha
+.endm
+
+;Pushes y to stack
+;Input
+;None
+;Output
+;Contents of y at stack pointer address
+phy .macro
+    tya
     pha
 .endm
 
@@ -307,6 +327,25 @@ pull .macro
     sta \1
 .endm
 
+;Pulls byte from stack into x
+;Input
+;None
+;Output 
+;Contents of stack top in x
+plx .macro
+    pla
+    tax
+.endm
+
+;Pulls byte from stack into y
+;Input
+;None
+;Output 
+;Contents of stack top in y
+ply .macro
+    pla
+    tay 
+.endm
 
 ; Setup an Interrupt at specific
 ; Rasterline 
