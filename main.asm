@@ -161,7 +161,6 @@ sss
     jsr loadsprite
 
 
-
 ;Setup interrupts
 
 
@@ -199,8 +198,25 @@ gameloop
 ;refrash score display
     jsr dispscore
 
+;Determine time to move
+checkmove
+    inc movetimer
+    lda moveth
+    cmp movetimer
+    bcc setmove
+    jmp checkmove
+
+setmove
+    lda #1
+    ora gameflags
+    sta gameflags
+    lda #0
+    sta movetimer
+
+
 ;if moveflag set move
 ;else skip moveloop
+checkttm
 .block
     lda gameflags
     and #1
@@ -213,12 +229,12 @@ gomove
     sta gameflags
 .bend
     
-;move enemies one to the left
 moveloop
+spawnsprites
 .block
     lda spawntimer
     ;100 bewegt?
-    cmp #70             
+    cmp #70            
     ; nein, Timer erhoehen
     bcc updatetimer    
     ; Timer zurücksetzen
@@ -234,15 +250,8 @@ moveloop
     lda #1              
     sta currentsprite
 
-;spawnsprite
-;    lda $dc04           ; Zufallszahl CIA-Timer
-;    and #$7F            ; Begrenzen auf 0-127
-;    adc #50             ; Mindestens Y = 50 setzen
-;    sta spritetemp      ; Speichern
-
 spawnsprite
-    lda $dc04           ; Zufallszahl vom CIA-Timer holen
-    and #$FF            ; Sicherstellen, dass der Wert im Bereich 0-255 liegt
+    lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
     sec
     sbc #30             ; Bereich auf 0-205 reduzieren
     cmp #206            ; Ist die Zahl größer als 205?
@@ -279,7 +288,7 @@ spawnsprite
     sta $d015
 
 selectsprite
-    lda $dc04          ; Zufallszahl vom CIA-Timer holen
+    lda $dc04          ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
     and #$07           ; Begrenzen auf 0-7
     beq selectsprite   ; Falls 0, neue Zahl holen (nur 1-7 nutzen)
     
@@ -295,6 +304,7 @@ selectsprite
 updatetimer
     inc spawntimer
 
+;move enemies one to the left
 movesprites
     #movespriteleft 1
     #movespriteleft 2 
@@ -645,3 +655,9 @@ spritetemp .byte 0
 currentsprite .byte 2
 spritebitmask
     .byte 1, 2, 4, 8, 16, 32, 64, 128  
+
+;Controls game speed
+;Adjust moveth = move threshhold upwards
+;to decrease game speed.
+movetimer .byte 0
+moveth .byte 128

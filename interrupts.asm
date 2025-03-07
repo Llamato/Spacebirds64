@@ -53,9 +53,7 @@ handlemove
         inc $d019
 
 .block
-        lda #1
-        ora gameflags
-        sta gameflags
+        lda gameflags
         and #2
         beq noscroll
     
