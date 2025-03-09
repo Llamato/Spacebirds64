@@ -657,7 +657,7 @@ spritebitmask
     .byte 1, 2, 4, 8, 16, 32, 64, 128  
 
 ;Controls game speed
-;Adjust moveth = move threshhold upwards
+;increase moveth to descrease speed
 ;to decrease game speed.
 movetimer .byte 0
-moveth .byte 128
+moveth .byte 224
