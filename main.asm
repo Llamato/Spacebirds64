@@ -221,7 +221,7 @@ checkttm
     lda gameflags
     and #1
     bne gomove
-    jmp checkcollision
+    jmp moveloop
 
 gomove
     lda #254
@@ -660,4 +660,4 @@ spritebitmask
 ;increase moveth to descrease speed
 ;to decrease game speed.
 movetimer .byte 0
-moveth .byte 224
+moveth .byte 240
