@@ -76,13 +76,13 @@ sss
     jsr loadchargen
 .endif
 
-;Set double height for enemy sprites 0-4
-;and single height for fuel sprites 5-7
-    #poke $d017, $1f
+;Set double height for enemy sprites 0-6
+;and single height for fuel sprites 7
+    #poke $d017, $7f
 
-;Set double width for enemy sprites 0-4
-;and single width for fuel sprites 5-7
-    #poke $d01d, $1f
+;Set double width for enemy sprites 0-6
+;and single width for fuel sprites 7
+    #poke $d01d, $7f
 
 ;Enable multicolor for all sprites
     #poke 53276, 255
@@ -123,21 +123,24 @@ sss
     ;#enablesprite 4   
 
 
-;fuel 1
+;fuel 1 (alt)
+;enemy 5
 ;Setup sprite 5 for address $2040
-    #poke $07fd, $82
+    #poke $07fd, $81
     #setspritecolor 5, 1
     ;#setspritepos 5, 359, 125
     ;#enablesprite 5
 
-;fuel 2
+;fuel 2 (alt)
+;enemy 6
 ;Setup sprite 6 for address $2040
-    #poke $07fe, $82
+    #poke $07fe, $81
     #setspritecolor 6, 1
     ;#setspritepos 6, 400, 190
     ;#enablesprite 6
 
-;fuel 3
+;fuel 3 (alt)
+;fuel 1
 ;Setup sprite 7 for address $2040
     #poke $07ff, $82
     #setspritecolor 7, 1
@@ -348,12 +351,12 @@ checkcollision
 
 ;check for collision with enemy
     lda $d01e
-    and #$1e
+    and #$7e
     bne enemycollision
 
 ;check for collision with fuel
     lda $d01e
-    and #$f0
+    and #$80
     bne fuelcollision
     jmp nocollision
 
