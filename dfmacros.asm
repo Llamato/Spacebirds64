@@ -291,9 +291,29 @@ bcdtoascii .macro
 ;Input
 ;\1 = address holding contents to push
 ;Output
-;conetens of \1 at stack pointer address
+;Contents of \1 at stack pointer address
 push .macro
     lda \1
+    pha
+.endm
+
+;Pushes x to stack
+;Input
+;None
+;Output
+;Contents of x at stack pointer address
+pushx .macro
+    txa
+    pha
+.endm
+
+;Pushes y to stack
+;Input
+;None
+;Output
+;Contents of y at stack pointer address
+pushy .macro
+    tya
     pha
 .endm
 
@@ -307,6 +327,25 @@ pull .macro
     sta \1
 .endm
 
+;Pulls byte from stack into x
+;Input
+;None
+;Output 
+;Contents of stack top in x
+pullx .macro
+    pla
+    tax
+.endm
+
+;Pulls byte from stack into y
+;Input
+;None
+;Output 
+;Contents of stack top in y
+pully .macro
+    pla
+    tay 
+.endm
 
 ; Setup an Interrupt at specific
 ; Rasterline 
@@ -329,4 +368,18 @@ setuprasterint .macro
     sta $0314     
     lda #>\2
     sta $0315
+.endm
+
+;ack vic irq
+;\1 = irq id
+;0 = Raster compare IRQ
+;1 = Sprite to background collision IRQ
+;2 = Sprite to Sprite Collision IRQ
+;3 = Light-Pen Triggered IRQ Flag
+;7 = IRQ has been generated
+ackvicirq .macro
+    #bintobinseq \1
+    ora $d019
+    ora #128
+    sta $d019
 .endm

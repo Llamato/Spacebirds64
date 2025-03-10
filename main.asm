@@ -1,9 +1,8 @@
 includetests = 0
 includechargen = 0
-includesound = 1
 
 *=2049
-;BASIC starter (ldraddr $0801 / 2049)   
+;BASIC starter (ldraddr $0801 / 2049)
 ;Load address for next BASIC line (2064)
     .byte $0b, $08
 ;Line number (10)         
@@ -32,7 +31,7 @@ includesound = 1
 ;Setup gamestate
     #poke gameflags, 0
     #poke scrollcolumn, 0
-sei
+
 ;sss = show start screen
 sss
 ;Set border color
@@ -77,13 +76,13 @@ sss
     jsr loadchargen
 .endif
 
-;Set double height for enemy sprites 0-4
-;and single height for fuel sprites 5-7
-    #poke $d017, $1f
+;Set double height for enemy sprites 0-6
+;and single height for fuel sprites 7
+    #poke $d017, $7f
 
-;Set double width for enemy sprites 0-4
-;and single width for fuel sprites 5-7
-    #poke $d01d, $1f
+;Set double width for enemy sprites 0-6
+;and single width for fuel sprites 7
+    #poke $d01d, $7f
 
 ;Enable multicolor for all sprites
     #poke 53276, 255
@@ -124,21 +123,24 @@ sss
     ;#enablesprite 4   
 
 
-;fuel 1
+;fuel 1 (alt)
+;enemy 5
 ;Setup sprite 5 for address $2040
-    #poke $07fd, $82
+    #poke $07fd, $81
     #setspritecolor 5, 1
     ;#setspritepos 5, 359, 125
     ;#enablesprite 5
 
-;fuel 2
+;fuel 2 (alt)
+;enemy 6
 ;Setup sprite 6 for address $2040
-    #poke $07fe, $82
+    #poke $07fe, $81
     #setspritecolor 6, 1
     ;#setspritepos 6, 400, 190
     ;#enablesprite 6
 
-;fuel 3
+;fuel 3 (alt)
+;fuel 1
 ;Setup sprite 7 for address $2040
     #poke $07ff, $82
     #setspritecolor 7, 1
@@ -161,19 +163,9 @@ sss
     lda #50
     jsr loadsprite
 
-;Add stars to background
-    ;lda #69
-    ;ldx #10
-    ;jsr placestars
-
 
 ;Setup interrupts
 
-    #setuprasterint 0, handleirq
-
-    ; enable raster interrupt
-    lda #$01  
-    sta $d01a 
 
 ;For some reason enemy movement breaks
 ;at the low byte, high byte boundry
@@ -186,13 +178,11 @@ sss
     lda #0
     ldx #0
     ldy #0
-.ifne includesound
-    jsr loadsid
-    jsr playsound
-.endif
-    jsr clrdiskiomem
-    cli
 
+    jsr loadsid
+    jsr clrdiskiomem
+    jsr enablerasterint
+    jsr enablesscolirq
 
 waittostart
 ;Joystick auslesen
@@ -206,14 +196,36 @@ waittostart
 ;starte Spiel  
 ;start scrolling away from start screen
     #poke gameflags, 2
+    jsr enablesnd
+
+;reset collision status
+    lda #$00
+    sta $d01e
 
 gameloop
 
 ;refrash score display
     jsr dispscore
 
+;Determine time to move
+checkmove
+    inc movetimer
+    lda moveth
+    cmp movetimer
+    bcc setmove
+    jmp checkcollision
+
+setmove
+    lda #1
+    ora gameflags
+    sta gameflags
+    lda #0
+    sta movetimer
+
+
 ;if moveflag set move
 ;else skip moveloop
+checkttm
 .block
     lda gameflags
     and #1
@@ -226,12 +238,12 @@ gomove
     sta gameflags
 .bend
     
-;move enemies one to the left
 moveloop
+spawnsprites
 .block
     lda spawntimer
     ;100 bewegt?
-    cmp #100             
+    cmp #70            
     ; nein, Timer erhoehen
     bcc updatetimer    
     ; Timer zurücksetzen
@@ -247,17 +259,14 @@ moveloop
     lda #1              
     sta currentsprite
 
-;spawnsprite
-;    lda $dc04           ; Zufallszahl CIA-Timer
-;    and #$7F            ; Begrenzen auf 0-127
-;    adc #50             ; Mindestens Y = 50 setzen
-;    sta spritetemp      ; Speichern
-
 spawnsprite
-    lda $dc04           ; Zufallszahl vom CIA-Timer holen
-    and #$FF            ; Sicherstellen, dass der Wert im Bereich 0-255 liegt
-    sta spritetemp      ; Speichern
-
+    lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
+    sec
+    sbc #30             ; Bereich auf 0-205 reduzieren
+    cmp #206            ; Ist die Zahl größer als 205?
+    bcs spawnsprite     ; Falls ja, neue Zahl holen
+    adc #30             ; Zurück in den Bereich 30-235 bringen
+    sta spritetemp      ; Zufallswert speichern
 
 
 ; set xposition
@@ -273,7 +282,6 @@ spawnsprite
     ora $d010
     sta $d010
 
-
 ;set yposition
     lda currentsprite
     asl
@@ -286,12 +294,25 @@ spawnsprite
     ; Setze Bit
     ora $d015           
     sta $d015
-    ; naechster Sprite
-    inc currentsprite 
+
+selectsprite
+    lda $dc04          ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
+    and #$07           ; Begrenzen auf 0-7
+    beq selectsprite   ; Falls 0, neue Zahl holen (nur 1-7 nutzen)
+    
+    tax                ; X = currentsprite-Kandidat
+    lda spritebitmask, x  ; Hole die Bitmaske für das Sprite
+    and $d015          ; Ist das Sprite aktiv?
+    bne selectsprite   ; Falls ja, neue Zahl holen
+
+    stx currentsprite  ; Speichern, wenn Sprite nicht aktiv ist
+
+
 
 updatetimer
     inc spawntimer
 
+;move enemies one to the left
 movesprites
     #movespriteleft 1
     #movespriteleft 2 
@@ -306,13 +327,15 @@ end
 
 inputloop
 .block
-    up
+up
     lda 56320
     and #1
     bne down
     dec $d001
     jsr reducefuel
     jsr incscore
+    jsr incspeed
+
     down
     lda 56320
     and #2
@@ -320,23 +343,20 @@ inputloop
     inc $d001
     jsr reducefuel
     jsr incscore
-
+    jsr incspeed
 .bend
 
 checkcollision
 .block
-;reset collision status
-    lda #$00
-    sta $d01e
 
 ;check for collision with enemy
     lda $d01e
-    and #$1e
+    and #$7e
     bne enemycollision
 
 ;check for collision with fuel
     lda $d01e
-    and #$f0
+    and #$80
     bne fuelcollision
     jmp nocollision
 
@@ -367,12 +387,18 @@ fuelcollision
     cmp #64
     bcs fuelfull
     sta fuel
+
+;reset collision status
+    lda #$00
+    sta $d01e
     jmp nocollision
 
 fuelfull
     lda #64
     sta fuel
+
 nocollision
+    pla
 .bend
 
 ;loop around!
@@ -380,6 +406,7 @@ jmp gameloop
 
 
 gameover
+jsr disablesnd
 ;Clear stack
 #fmb stackstart, stackend, $00
 
@@ -408,9 +435,6 @@ sshss
     jsr encharrom
 .endif
 
-.ifne includesound
-    jsr disablesound
-.endif
 
 ;Load custom font
 .ifne includechargen
@@ -425,17 +449,11 @@ sshss
     jsr encharset2
 .endif
 
-.ifne includesound
-    jsr disablesound
-.endif
 
 ;Load scores from disk
     jsr clrdiskiomem
     jsr loadhighscores
 
-.ifne includesound
-    jsr enablesound
-.endif
 
 .ifne includetests
     #ddbts
@@ -561,15 +579,11 @@ done
     #ddbts
 .endif
 
-.ifne includesound
-    jsr disablesound
-.endif
+
     
-    jsr savehighscores
+jsr savehighscores
     
-.ifne includesound
-    jsr enablesound
-.endif
+
 
 .ifne includetests
     #ddbts
@@ -584,74 +598,29 @@ displayqrcode
     jmp loadqrcode
     rts
 
-;Interrupt service rotine
-handleirq
-; set bit 0 in ISR to ack IRQ
-inc $d019 
-.block
-    lda #1
-    ora gameflags
-    sta gameflags
-    and #2
-    beq noscroll
-    
-scrollscreen
-    lda $d016
-    and #$07
-    bne hwscroll
-
-fillcolumn
-;calculate start address
-    #push r0
-    #push r1
-    #ldi16 r0, txtscreenstart
-
-;loop though lines and fill in
-;blanks
-    ldy scrollcolumn
-    ldx #25
-fillloop
-    lda #23
-    sta (r0), y
-    #add16i r0, 40
-    dex
-    bne fillloop
-    iny
-    cpy #40
-    bne scrollcolumnend
-
-stopscrolling
-    #poke scrollcolumn, 255
-    lda gameflags
-    and #253
-    sta gameflags
-;This is a bad way to handle things.
-;Let's see if we can move this outside
-;of ISR to prevent IRQ flooding.
-    jsr initscore
-    jsr initfuel
-    jsr scoreslabel
-
-scrollcolumnend
-    sty scrollcolumn
-    #pull r1
-    #pull r0
-    jmp noscroll
-
-hwscroll
-    dec $d016
-
-noscroll
-
-; JUMP to KERNAL return routine that
-; restores registers/status and returns
-jmp $ea31
-
-
-.bend
-
 ;Please put game mechanic
 ;subrotines here.
+
+;increase game speed
+incspeed
+.block
+    lda moveth
+    beq done
+
+;Speed control logic is here
+    lda score+1
+    cmp scorecp
+    beq done
+    dec moveth
+    sta scorecp
+.ifne includetests
+    clc
+    adc #$5f
+    sta $405
+.endif
+done
+    rts
+.bend
 
 ;Wait for user to press any key
 ;or fire button
@@ -671,104 +640,15 @@ continue
     #poke 198, 0
     rts
 .bend
-
-;---------------------------------------
-;Complex Bug in here
-;Breaks upon sprite2 load
-;Might require full recode...
-
-;Place background stars
-;procedually with seed and density
-;with the density given in
-;stars per screen page (40x25 chars).
-;Input
-;A = star density (amount of stars)
-;X = seed
-;Output
-;Stars on screen
-placestars
-.block
-setup
-    pha
-    #ldi16 r2, 1024
-    #poke r1, 0
-    pla
-    sta r0
-    pha
-    lda #0
-    sta r1
-    #ldi16 r2, 1024
-    phx
-    ;#div16 r2, r0, r4, r6
-    ldx #0
-    ldy #0
-placestar
-
-    #add16 r2, r0
-
-clamp
-checklow
-    lda r2
-    cmp #>1024
-    beq checklowlb
-    bcc outlow
-    bcs notlow
-
-checklowlb
-    lda r2
-    cmp #<1024
-    beq eqlow
-    bcc outlow
-    bcs notlow
-
-notlow
-checkhigh
-    lda r3
-    cmp #>2024
-    beq checkhighlb
-    bcc in
-    bcs outhigh
-
-checkhighlb
-    lda r2
-    cmp #<2024
-    beq eqhigh
-    bcc in
-    bcs outhigh
-
-in
-    lda #78
-    sta (r2),y
-    jmp next
-
-outhigh
-    #sub16i r2, 1000
-    jmp clamp
-eqhigh
-    jmp in; temp
-
-outlow
-    #add16i r2, 1000
-
-eqlow
-    jmp in; temp
-
-next
-    inx
-    cpx r4+1
-    bne placestar
-    plx
-    pla
-    rts
-.bend
 ;------------------------------
 
 .include "vicsubs.asm"
 .include "dataflowsubs.asm"
-.include "playsid.asm"
+.include "interrupts.asm"
 .include "disksubs.asm"
 .include "fuelbar.asm"
 .include "score.asm"
+.include "sound.asm"
 ;.include "mathsubs.asm"
 
 ;Data
@@ -809,3 +689,10 @@ spritetemp .byte 0
 currentsprite .byte 2
 spritebitmask
     .byte 1, 2, 4, 8, 16, 32, 64, 128  
+
+;Controls game speed
+;increase moveth
+;to decrease game speed.
+movetimer .byte 0
+moveth .byte 128
+scorecp .byte 0
