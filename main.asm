@@ -611,7 +611,11 @@ incspeed
     lda score+1
     cmp scorecp
     beq done
-    dec moveth
+    lda moveth
+    sec
+    sbc #10
+    sta moveth
+    lda score+1
     sta scorecp
 .ifne includetests
     clc
