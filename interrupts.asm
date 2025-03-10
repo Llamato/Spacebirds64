@@ -40,11 +40,7 @@ rts
 
 ; ----- sound  ISR ----------------
 soundisr
-        php
-        pha
-        #ackvicirq 1
-        plp
-        pla
+        inc $d019
 
         lda sndenabled
         beq nosound
@@ -61,11 +57,7 @@ nosound
 
 ; ----- movement ISR ----------------
 handlemove
-        php
-        pha
-        #ackvicirq 1
-        plp
-        pla
+        inc $d019
 
 .block
         lda gameflags
@@ -123,73 +115,3 @@ noscroll
 .bend
         #setuprasterint 100, soundisr
         jmp $ea81
-
-
-;sprite-sprite collision isr------------
-php
-pha
-sscolirq
-#ackvicirq 3
-#pushx
-#pushy
-.block
-;check for collision with enemy
-    lda $d01e
-    and #$1e
-    bne enemycollision
-
-;check for collision with fuel
-    lda $d01e
-    pha
-    and #$f0
-    bne fuelcollision
-    jmp nocollision
-
-enemycollision
-    ;reset collision status
-    lda #$00
-    sta $d01e
-    jmp gameover
-
-;potential bug. Fuel only added
-;once if multiple fuels collide 
-;within one frame (loop cycle)
-fuelcollision
-.ifne includetests
-    pha
-    lsr
-    lsr
-    lsr
-    lsr
-    sta 53280
-    pla
-.endif
-;disable sprite colided with
-;and add fuel
-;bug in fuelbar.addfuel?
-        pla
-        ;ora #1
-        eor $d015
-        sta $d015
-        lda fuel
-        clc
-        adc #16
-        cmp #64
-        bcs fuelfull
-        sta fuel
-        jmp nocollision
-
-fuelfull
-        lda #64
-        sta fuel
-
-nocollision
-;reset collision status
-        lda #$00
-        sta $d01e
-.bend
-#pully
-#pullx
-pla
-plp
-rti
