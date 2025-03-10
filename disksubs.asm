@@ -202,10 +202,7 @@ loadsid
 loadqrcode
 .block
 destaddr = $c222
-.ifne includesound
-    jsr disablesound
     jsr disrasterirq
-.endif
     #ldi16 r0, startddr
     #ldi16 r2, destaddr
     #poke r4, endaddr-startddr+1
