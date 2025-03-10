@@ -331,6 +331,8 @@ up
     dec $d001
     jsr reducefuel
     jsr incscore
+    jsr incspeed
+
     down
     lda 56320
     and #2
@@ -338,6 +340,7 @@ up
     inc $d001
     jsr reducefuel
     jsr incscore
+    jsr incspeed
 .bend
 
 checkcollision
@@ -595,6 +598,27 @@ displayqrcode
 ;Please put game mechanic
 ;subrotines here.
 
+;increase game speed
+incspeed
+.block
+    lda moveth
+    beq done
+
+;Speed control logic is here
+    lda score+1
+    cmp scorecp
+    beq done
+    dec moveth
+    sta scorecp
+.ifne includetests
+    clc
+    adc #$5f
+    sta $405
+.endif
+done
+    rts
+.bend
+
 ;Wait for user to press any key
 ;or fire button
 ;before continueing.
@@ -664,7 +688,8 @@ spritebitmask
     .byte 1, 2, 4, 8, 16, 32, 64, 128  
 
 ;Controls game speed
-;increase moveth to descrease speed
+;increase moveth
 ;to decrease game speed.
 movetimer .byte 0
 moveth .byte 128
+scorecp .byte 0
