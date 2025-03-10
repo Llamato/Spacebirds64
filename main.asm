@@ -279,7 +279,6 @@ spawnsprite
     ora $d010
     sta $d010
 
-
 ;set yposition
     lda currentsprite
     asl
