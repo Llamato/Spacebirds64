@@ -302,7 +302,7 @@ push .macro
 ;None
 ;Output
 ;Contents of x at stack pointer address
-phx .macro
+pushx .macro
     txa
     pha
 .endm
@@ -312,7 +312,7 @@ phx .macro
 ;None
 ;Output
 ;Contents of y at stack pointer address
-phy .macro
+pushy .macro
     tya
     pha
 .endm
@@ -332,7 +332,7 @@ pull .macro
 ;None
 ;Output 
 ;Contents of stack top in x
-plx .macro
+pullx .macro
     pla
     tax
 .endm
@@ -342,7 +342,7 @@ plx .macro
 ;None
 ;Output 
 ;Contents of stack top in y
-ply .macro
+pully .macro
     pla
     tay 
 .endm
@@ -368,4 +368,18 @@ setuprasterint .macro
     sta $0314     
     lda #>\2
     sta $0315
+.endm
+
+;ack vic irq
+;\1 = irq id
+;0 = Raster compare IRQ
+;1 = Sprite to background collision IRQ
+;2 = Sprite to Sprite Collision IRQ
+;3 = Light-Pen Triggered IRQ Flag
+;7 = IRQ has been generated
+ackvicirq .macro
+    #bintobinseq \1
+    ora $d019
+    ora #128
+    sta $d019
 .endm

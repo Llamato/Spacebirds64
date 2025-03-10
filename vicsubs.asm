@@ -57,7 +57,7 @@ rts
 ;Output
 ;Sprite at position
 ;Note
-;Please referactor this away and
+;Please refactor this away and
 ;combine with input gathering.
 setplayerpos
 sta $d001 ;y Sprite0

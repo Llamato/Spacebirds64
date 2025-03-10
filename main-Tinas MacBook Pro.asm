@@ -179,7 +179,6 @@ sss
     jsr loadsid
     jsr clrdiskiomem
     jsr enablerasterint
-    jsr enablesscolirq
 
 waittostart
 ;Joystick auslesen
@@ -195,10 +194,6 @@ waittostart
     #poke gameflags, 2
     jsr enablesnd
 
-;reset collision status
-    lda #$00
-    sta $d01e
-
 gameloop
 
 ;refrash score display
@@ -210,7 +205,7 @@ checkmove
     lda moveth
     cmp movetimer
     bcc setmove
-    jmp checkcollision
+    jmp checkmove
 
 setmove
     lda #1
@@ -236,81 +231,9 @@ gomove
 .bend
     
 moveloop
-spawnsprites
-.block
-    lda spawntimer
-    ;100 bewegt?
-    cmp #70            
-    ; nein, Timer erhoehen
-    bcc updatetimer    
-    ; Timer zurücksetzen
-    lda #0              
-    sta spawntimer
-
-    ; Nächstes Sprite
-    lda currentsprite
-    ; ueber Sprite 7 
-    cmp #8              
-    bcc spawnsprite
-    ; ja, zurück zu Sprite 1
-    lda #1              
-    sta currentsprite
-
-spawnsprite
-    lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
-    sec
-    sbc #30             ; Bereich auf 0-205 reduzieren
-    cmp #206            ; Ist die Zahl größer als 205?
-    bcs spawnsprite     ; Falls ja, neue Zahl holen
-    adc #30             ; Zurück in den Bereich 30-235 bringen
-    sta spritetemp      ; Zufallswert speichern
-
-
-; set xposition
-    lda currentsprite
-    asl
-    tax
-    lda #65
-    sta $d000,x
-
-;also set high byte of xposition
-    ldx currentsprite
-    lda spritebitmask, x
-    ora $d010
-    sta $d010
-
-
-;set yposition
-    lda currentsprite
-    asl
-    tax
-    lda spritetemp
-    sta $d001,x
-    ldy currentsprite
-    ; hole Bitmask
-    lda spritebitmask, y  
-    ; Setze Bit
-    ora $d015           
-    sta $d015
-
-selectsprite
-    lda $dc04          ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
-    and #$07           ; Begrenzen auf 0-7
-    beq selectsprite   ; Falls 0, neue Zahl holen (nur 1-7 nutzen)
-    
-    tax                ; X = currentsprite-Kandidat
-    lda spritebitmask, x  ; Hole die Bitmaske für das Sprite
-    and $d015          ; Ist das Sprite aktiv?
-    bne selectsprite   ; Falls ja, neue Zahl holen
-
-    stx currentsprite  ; Speichern, wenn Sprite nicht aktiv ist
-
-
-
-updatetimer
-    inc spawntimer
 
 ;move enemies one to the left
+.block
 movesprites
     #movespriteleft 1
     #movespriteleft 2 
@@ -325,7 +248,7 @@ end
 
 inputloop
 .block
-up
+    up
     lda 56320
     and #1
     bne down
@@ -339,10 +262,14 @@ up
     inc $d001
     jsr reducefuel
     jsr incscore
+
 .bend
 
 checkcollision
 .block
+;reset collision status
+    lda #$00
+    sta $d01e
 
 ;check for collision with enemy
     lda $d01e
@@ -382,18 +309,12 @@ fuelcollision
     cmp #64
     bcs fuelfull
     sta fuel
-
-;reset collision status
-    lda #$00
-    sta $d01e
     jmp nocollision
 
 fuelfull
     lda #64
     sta fuel
-
 nocollision
-    pla
 .bend
 
 ;loop around!
@@ -668,4 +589,4 @@ spritebitmask
 ;increase moveth to descrease speed
 ;to decrease game speed.
 movetimer .byte 0
-moveth .byte 128
+moveth .byte 240
