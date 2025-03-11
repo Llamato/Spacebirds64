@@ -322,13 +322,13 @@ extraasteroid
 
 
     lda #65             ; X-Position von Haupt-Asteroid übernehmen
-    sta $d000 + (6*2)   ; Setzt X-Position für Sprite 6
+    sta 6*2+$d000   ; Setzt X-Position für Sprite 6
     lda #$40
     ora $d010
     sta $d010
 
     lda fueltemp        ; Y-Position setzen
-    sta $d001 + (6*2)
+    sta 6*2+$d001
 
     lda #$40            ; Setzt Sprite 6 in der Aktivierungsmaske
     ora $d015
@@ -362,13 +362,13 @@ fuelspawn
 
 
     lda #65             ; X-Position von Haupt-Asteroid übernehmen
-    sta $d000 + (7*2)   ; Setzt X-Position für Sprite 6
+    sta 7*2+$d000   ; Setzt X-Position für Sprite 6
     lda #$80
     ora $d010
     sta $d010
 
     lda fueltemp        ; Y-Position setzen
-    sta $d001 + (7*2)
+    sta 7*2+$d001
 
     lda #$80            ; Setzt Sprite 6 in der Aktivierungsmaske
     ora $d015
