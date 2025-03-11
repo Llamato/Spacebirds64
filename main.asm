@@ -237,13 +237,15 @@ gomove
     and gameflags
     sta gameflags
 .bend
-    
+
+;______________________________________________________________________________
+
 moveloop
 spawnsprites
 .block
     lda spawntimer
     ;100 bewegt?
-    cmp #70            
+    cmp #100            
     ; nein, Timer erhoehen
     bcc updatetimer    
     ; Timer zurücksetzen
@@ -252,12 +254,18 @@ spawnsprites
 
     ; Nächstes Sprite
     lda currentsprite
-    ; ueber Sprite 7 
-    cmp #8              
+    ; ueber Sprite 5 
+    cmp #6              
     bcc spawnsprite
     ; ja, zurück zu Sprite 1
     lda #1              
     sta currentsprite
+    jmp spawnsprite
+
+updatetimer
+    inc spawntimer
+    jmp movesprites
+
 
 spawnsprite
     lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
@@ -288,6 +296,7 @@ spawnsprite
     tax
     lda spritetemp
     sta $d001,x
+
     ldy currentsprite
     ; hole Bitmask
     lda spritebitmask, y  
@@ -295,22 +304,93 @@ spawnsprite
     ora $d015           
     sta $d015
 
-selectsprite
-    lda $dc04          ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
-    and #$07           ; Begrenzen auf 0-7
-    beq selectsprite   ; Falls 0, neue Zahl holen (nur 1-7 nutzen)
-    
-    tax                ; X = currentsprite-Kandidat
-    lda spritebitmask, x  ; Hole die Bitmaske für das Sprite
-    and $d015          ; Ist das Sprite aktiv?
-    bne selectsprite   ; Falls ja, neue Zahl holen
+; -------------------------------
+; Zufälliger zusätzlicher Asteroid (Sprite 6)
+; -------------------------------
+    lda secondenemy
+    beq extraasteroid
+    jmp skipextraasteroid
 
-    stx currentsprite  ; Speichern, wenn Sprite nicht aktiv ist
+extraasteroid
+    lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
+    sec
+    sbc #30             ; Bereich auf 0-205 reduzieren
+    cmp #206            ; Ist die Zahl größer als 205?
+    bcs extraasteroid     ; Falls ja, neue Zahl holen
+    adc #30             ; Zurück in den Bereich 30-235 bringen
+    sta fueltemp      ; Zufallswert speichern
+
+
+    lda #65             ; X-Position von Haupt-Asteroid übernehmen
+    sta $d000 + (6*2)   ; Setzt X-Position für Sprite 6
+    lda #$40
+    ora $d010
+    sta $d010
+
+    lda fueltemp        ; Y-Position setzen
+    sta $d001 + (6*2)
+
+    lda #$40            ; Setzt Sprite 6 in der Aktivierungsmaske
+    ora $d015
+    sta $d015           ; Aktiviert Sprite 6
+
+    lda $dc04
+    and #$03            ; 25% Wahrscheinlichkeit für Spawning (0-3 → nur bei 0 spawnen)
+    clc
+    adc #5
+    sta secondenemy
+
+
+skipextraasteroid
+
+; -------------------------------
+; Zufälliger zusätzlicher Asteroid (Sprite 6)
+; -------------------------------
+
+    lda fueltimer
+    beq fuelspawn
+    jmp skipfuel
+
+fuelspawn
+    lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
+    sec
+    sbc #30             ; Bereich auf 0-205 reduzieren
+    cmp #206            ; Ist die Zahl größer als 205?
+    bcs fuelspawn     ; Falls ja, neue Zahl holen
+    adc #30             ; Zurück in den Bereich 30-235 bringen
+    sta fueltemp      ; Zufallswert speichern
+
+
+    lda #65             ; X-Position von Haupt-Asteroid übernehmen
+    sta $d000 + (7*2)   ; Setzt X-Position für Sprite 6
+    lda #$80
+    ora $d010
+    sta $d010
+
+    lda fueltemp        ; Y-Position setzen
+    sta $d001 + (7*2)
+
+    lda #$80            ; Setzt Sprite 6 in der Aktivierungsmaske
+    ora $d015
+    sta $d015           ; Aktiviert Sprite 6
+
+    lda $dc04
+    and #$03            ; 25% Wahrscheinlichkeit für Spawning (0-3 → nur bei 0 spawnen)
+    clc
+    adc #5
+    sta fueltimer
+
+
+skipfuel
 
 
 
-updatetimer
-    inc spawntimer
+
+;Sprite und Timer inkrementieren    
+    inc currentsprite  ; Sprite erhöhen
+    inc spawntimer     ; Timer erhöhen
+    dec secondenemy    ; Timer für zweiten Asteroiden dekrementieren
+    dec fueltimer      ; Timer für Treibstoff dekrementieren
 
 ;move enemies one to the left
 movesprites
@@ -324,6 +404,7 @@ movesprites
     
 end
 .bend
+;______________________________________________________________________________
 
 inputloop
 .block
@@ -607,12 +688,11 @@ incspeed
     beq done
     lda moveth
     sec
-    sbc #5
-    cmp #0
-    bpl setspeed
-    lda #0
-
-setspeed
+    sbc #10
+    cmp #30
+    bcs storemoveth
+    lda #30
+storemoveth
     sta moveth
     lda score+1
     sta scorecp
@@ -688,6 +768,8 @@ scorestring
 
 ; Timer fur das 60-Pixel-Intervall
 spawntimer .byte 0
+secondenemy .byte 0
+fueltimer .byte 0
 ; Temporare Variable fuer den Y-Wert
 spritetemp .byte 0   
 currentsprite .byte 2
@@ -700,3 +782,4 @@ spritebitmask
 movetimer .byte 0
 moveth .byte 128
 scorecp .byte 0
+fueltemp .byte 0
