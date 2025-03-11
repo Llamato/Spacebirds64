@@ -578,18 +578,12 @@ done
 .ifne includetests
     #ddbts
 .endif
-
-
     
 jsr savehighscores
-    
-
 
 .ifne includetests
     #ddbts
 .endif
-
-jsr waitforinput
 
 displayqrcode
     jsr basiccls
@@ -613,10 +607,16 @@ incspeed
     beq done
     lda moveth
     sec
-    sbc #10
+    sbc #5
+    cmp #0
+    bpl setspeed
+    lda #0
+
+setspeed
     sta moveth
     lda score+1
     sta scorecp
+
 .ifne includetests
     clc
     adc #$5f
