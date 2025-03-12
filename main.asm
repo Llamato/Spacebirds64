@@ -479,7 +479,6 @@ fuelfull
     sta fuel
 
 nocollision
-    pla
 .bend
 
 ;loop around!
@@ -494,8 +493,7 @@ jsr disablesnd
 ;sshss = show save high score screen
 sshss
 ;Disable all sprites
-    #poke $d015, 0
-    
+    #poke $d015, 0 
     jsr basiccls
 
 .ifne includetests
