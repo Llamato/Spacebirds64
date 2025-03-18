@@ -17,6 +17,8 @@ def flattenIncludes(file_path):
             else:
                 output_string += line
         input_file.close()
+        if not output_string.endswith("\n"):
+            output_string += '\n'
         return output_string
     except FileNotFoundError:
         print("Error:", file_path, "not found!", file=sys.stderr)
