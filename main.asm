@@ -307,7 +307,7 @@ spawnsprite
 
     lda secondenemy
     beq extraasteroid
-    jmp skipextraasteroid
+    jmp skipextraenemy
 
 extraasteroid
     lda $dc04           
@@ -339,9 +339,7 @@ extraasteroid
     sta secondenemy
 
 
-skipextraasteroid
-
-
+skipextraenemy
     lda fueltimer
     beq fuelspawn
     jmp skipfuel
