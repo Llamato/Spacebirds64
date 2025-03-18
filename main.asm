@@ -241,7 +241,6 @@ gomove
     sta gameflags
 .bend
 
-;______________________________________________________________________________
 
 moveloop
 spawnsprites
@@ -271,13 +270,13 @@ updatetimer
 
 
 spawnsprite
-    lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
+    lda $dc04           
     sec
-    sbc #30             ; Bereich auf 0-205 reduzieren
-    cmp #206            ; Ist die Zahl größer als 205?
-    bcs spawnsprite     ; Falls ja, neue Zahl holen
-    adc #30             ; Zurück in den Bereich 30-235 bringen
-    sta spritetemp      ; Zufallswert speichern
+    sbc #30             
+    cmp #206            
+    bcs spawnsprite     
+    adc #30             
+    sta spritetemp      
 
 
 ; set xposition
@@ -287,7 +286,6 @@ spawnsprite
     lda #65
     sta $d000,x
 
-;also set high byte of xposition
     ldx currentsprite
     lda spritebitmask, x
     ora $d010
@@ -307,38 +305,35 @@ spawnsprite
     ora $d015           
     sta $d015
 
-; -------------------------------
-; Zufälliger zusätzlicher Asteroid (Sprite 6)
-; -------------------------------
     lda secondenemy
     beq extraasteroid
     jmp skipextraasteroid
 
 extraasteroid
-    lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
+    lda $dc04           
     sec
-    sbc #30             ; Bereich auf 0-205 reduzieren
-    cmp #206            ; Ist die Zahl größer als 205?
-    bcs extraasteroid     ; Falls ja, neue Zahl holen
-    adc #30             ; Zurück in den Bereich 30-235 bringen
-    sta fueltemp      ; Zufallswert speichern
+    sbc #30             
+    cmp #206            
+    bcs extraasteroid    
+    adc #30             
+    sta fueltemp     
 
 
-    lda #65             ; X-Position von Haupt-Asteroid übernehmen
-    sta 6*2+$d000   ; Setzt X-Position für Sprite 6
+    lda #65           
+    sta 6*2+$d000   
     lda #$40
     ora $d010
     sta $d010
 
-    lda fueltemp        ; Y-Position setzen
+    lda fueltemp   
     sta 6*2+$d001
 
-    lda #$40            ; Setzt Sprite 6 in der Aktivierungsmaske
+    lda #$40           
     ora $d015
-    sta $d015           ; Aktiviert Sprite 6
+    sta $d015         
 
     lda $dc04
-    and #$03            ; 25% Wahrscheinlichkeit für Spawning (0-3 → nur bei 0 spawnen)
+    and #$03            
     clc
     adc #5
     sta secondenemy
@@ -346,39 +341,36 @@ extraasteroid
 
 skipextraasteroid
 
-; -------------------------------
-; Zufälliger zusätzlicher Asteroid (Sprite 6)
-; -------------------------------
 
     lda fueltimer
     beq fuelspawn
     jmp skipfuel
 
 fuelspawn
-    lda $dc04           ; Zufallszahl vom CIA-Timer holen; Replace with sid noise gen
+    lda $dc04          
     sec
-    sbc #30             ; Bereich auf 0-205 reduzieren
-    cmp #206            ; Ist die Zahl größer als 205?
-    bcs fuelspawn     ; Falls ja, neue Zahl holen
-    adc #30             ; Zurück in den Bereich 30-235 bringen
-    sta fueltemp      ; Zufallswert speichern
+    sbc #30            
+    cmp #206           
+    bcs fuelspawn     
+    adc #30            
+    sta fueltemp      
 
 
-    lda #65             ; X-Position von Haupt-Asteroid übernehmen
-    sta 7*2+$d000   ; Setzt X-Position für Sprite 6
+    lda #65             
+    sta 7*2+$d000   
     lda #$80
     ora $d010
     sta $d010
 
-    lda fueltemp        ; Y-Position setzen
+    lda fueltemp        
     sta 7*2+$d001
 
-    lda #$80            ; Setzt Sprite 6 in der Aktivierungsmaske
+    lda #$80           
     ora $d015
-    sta $d015           ; Aktiviert Sprite 6
+    sta $d015          
 
     lda $dc04
-    and #$03            ; 25% Wahrscheinlichkeit für Spawning (0-3 → nur bei 0 spawnen)
+    and #$03            
     clc
     adc #5
     sta fueltimer
@@ -389,13 +381,11 @@ skipfuel
 
 
 
-;Sprite und Timer inkrementieren    
-    inc currentsprite  ; Sprite erhöhen
-    inc spawntimer     ; Timer erhöhen
-    dec secondenemy    ; Timer für zweiten Asteroiden dekrementieren
-    dec fueltimer      ; Timer für Treibstoff dekrementieren
+    inc currentsprite  
+    inc spawntimer     
+    dec secondenemy    
+    dec fueltimer      
 
-;move enemies one to the left
 movesprites
     #movespriteleft 1
     #movespriteleft 2 
@@ -407,7 +397,6 @@ movesprites
     
 end
 .bend
-;______________________________________________________________________________
 
 inputloop
 .block
