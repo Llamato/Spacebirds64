@@ -202,12 +202,11 @@ waittostart
     lda #$00
     sta $d01e
 
-;place stars
-    ;jsr placestars
-
 gameloop
+;update stars
+    jsr placestar
 
-;refrash score display
+;refresh score display
     jsr dispscore
 
 ;Determine time to move
@@ -375,10 +374,6 @@ fuelspawn
 
 
 skipfuel
-
-
-
-
     inc currentsprite  
     inc spawntimer     
     dec secondenemy    
@@ -721,6 +716,7 @@ continue
 .include "fuelbar.asm"
 .include "score.asm"
 .include "sound.asm"
+.include "stars.asm"
 
 ;Data
 ;tyfps = thank you for playing string

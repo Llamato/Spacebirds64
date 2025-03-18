@@ -1,4 +1,5 @@
 ;gamestate
+starposmap = $9f00; -> 9f32
 score = $9ffd; -> 9ff4
 scrollcolumn = $9ff5; -> 99f6
 gameflags = $9fff
