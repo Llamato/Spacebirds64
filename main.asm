@@ -472,6 +472,7 @@ jmp gameloop
 
 gameover
 jsr disablesnd
+jsr playcrashsound
 ;Clear stack
 #fmb stackstart, stackend, $00
 
