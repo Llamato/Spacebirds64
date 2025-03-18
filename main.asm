@@ -202,6 +202,9 @@ waittostart
     lda #$00
     sta $d01e
 
+;place stars
+    ;jsr placestars
+
 gameloop
 
 ;refrash score display
@@ -731,7 +734,6 @@ continue
 .include "fuelbar.asm"
 .include "score.asm"
 .include "sound.asm"
-;.include "mathsubs.asm"
 
 ;Data
 ;tyfps = thank you for playing string
