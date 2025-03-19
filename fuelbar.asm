@@ -115,13 +115,12 @@ outoffuel
 addfuel
 .block
     lda fuel
+    clc
     adc #16 
-    tax
     ; if fuel is greater than max
     ; set fuel to max
-    and #64
-    bne maxfuel
-    txa
+    cmp #64
+    bcs maxfuel
     sta fuel
     jsr updatefuelbar
     rts
