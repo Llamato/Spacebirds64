@@ -164,21 +164,6 @@ sss
     jsr loadsprite
 
 
-;Setup interrupts
-
-
-;For some reason enemy movement breaks
-;at the low byte, high byte boundry
-;if the registeres are not cleared like
-;done here. if anybody got any idea on
-;why that might be please let me know.
-;stranger still if any of those is not
-;cleared then the whole programm
-;crashes
-    lda #0
-    ldx #0
-    ldy #0
-
     jsr loadsid
     jsr clrdiskiomem
     jsr enablerasterint
