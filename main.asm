@@ -183,6 +183,7 @@ sss
     jsr clrdiskiomem
     jsr enablerasterint
     jsr enablesscolirq
+    jsr playreadysound
 
 waittostart
 ;Joystick auslesen
