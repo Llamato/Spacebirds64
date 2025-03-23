@@ -521,13 +521,13 @@ sshss
     #unpackbcd score+1, sca+2, sca+3
     #bcdtoascii sca+2, sca+2
     #bcdtoascii sca+3, sca+3
-    lda score+3
-    lsr
-    lsr
-    lsr
-    lsr
-    sta sca+4
+    lda sca+5
+    pha
+    #unpackbcd score, sca+4, sca+5
+    pla
+    sta sca+5
     #bcdtoascii sca+4, sca+4
+    
 
 ;Save score to disk
     jsr addhstodb

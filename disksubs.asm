@@ -14,8 +14,8 @@ eorp = $c000
 
 ;Score Staging Area
 sca = diskbufferend +1
-;    .text "00000"; temp
-yeararea = sca +6
+;    .text "000000"; temp
+yeararea = sca +7
 ;    .text "2024"
 namearea =  yeararea  +5
 ;    .repeat 20, 32
