@@ -168,7 +168,6 @@ sss
     jsr clrdiskiomem
     jsr enablerasterint
     jsr enablesscolirq
-    jsr playreadysound
 
 waittostart
 ;Joystick auslesen
@@ -432,7 +431,6 @@ jmp gameloop
 
 gameover
 jsr disablesnd
-jsr playcrashsound
 ;Clear stack
 #fmb stackstart, stackend, $00
 
