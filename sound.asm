@@ -23,6 +23,75 @@ enablesnd
         rts
 
 
+;------------ PlayReadySound -----------
+; STOPS the game and plays Start Sound
+; assumes that NO other sound is playing
+;---------------------------------------
+playreadysound
+.block
+;prepare sid
+        #fmb $d400, $d424, 0
+        #poke $d400+5, $0f ;AD
+        #poke $d400+6, 128 ;SR
+
+;volume to max
+        #poke $d400+24, 15 
+
+;set frequency for note 1
+        lda #$11
+        sta $d400+1 ; hi freq
+        lda #$50
+        sta $d400   ; lo freq
+
+;play note 1
+        lda #%00100001  
+        sta $d400+4
+        lda #7
+        jsr delay
+        lda #0
+        sta $d400+4
+
+;wait for 7/60 seconds
+        lda #7
+        jsr delay
+
+;play note 1
+        lda #%00100001  
+        sta $d400+4
+        lda #7
+        jsr delay
+        lda #0
+        sta $d400+4
+
+;set frequency for note 2
+        lda #$22
+        sta $d400+1 ; hi freq
+        lda #$a0
+        sta $d400   ; lo freq
+
+;play note 2 
+        lda #%00100001  
+        sta $d400+4
+        lda #7
+        jsr delay
+        lda #0
+        sta $d400+4
+
+        rts
+.bend
+
+;------------ delay --------------------
+; a = count of 1/60 seconds
+;---------------------------------------
+delay
+.block
+        clc
+        adc $a2
+loop    cmp $a2
+        bne loop
+        rts
+.bend
+
 
 ;boolean for sound toggle
 sndenabled .byte $0  

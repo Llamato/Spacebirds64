@@ -163,11 +163,11 @@ sss
     lda #50
     jsr loadsprite
 
-
     jsr loadsid
     jsr clrdiskiomem
     jsr enablerasterint
     jsr enablesscolirq
+    jsr playreadysound
 
 waittostart
 ;Joystick auslesen
