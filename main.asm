@@ -444,6 +444,7 @@ sshss
     #ddbts
 .endif
 
+
 ;Set border color
     #poke 53280, 0
 
@@ -452,7 +453,11 @@ sshss
 
 ;Set basic text color
     #poke 646, 7
-    
+
+
+jsr playcrashsound
+
+
 
 .ifeq includechargen
     jsr encharrom

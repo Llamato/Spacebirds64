@@ -80,6 +80,47 @@ playreadysound
         rts
 .bend
 
+;------------ PlayCrashSound -----------
+; STOPS the game and plays Start Sound
+; assumes that NO other sound is playing
+;---------------------------------------
+playcrashsound
+.block
+;prepare sid
+        #fmb $d400, $d424, 0
+        #poke $d400+5, $0f ;AD
+        #poke $d400+6, 128 ;SR
+
+;volume to max
+        #poke $d400+24, 15 
+
+; set frequency
+        lda #$10
+        sta $d400+1 ; hi freq
+        lda #$c8 
+        sta $d400   ; lo freq
+
+; set waveform to noise 
+; and activate voice 1 
+        lda #$81 
+        sta $d400+4
+
+; reduce volume step by step
+        ldx #15
+loop    dex
+        sta $d400+24
+        lda #4
+        jsr delay
+        txa
+        bne loop
+
+; deactivate voice 1
+        lda #0
+        sta $d400+4 
+        
+        rts
+.bend
+
 ;------------ delay --------------------
 ; a = count of 1/60 seconds
 ;---------------------------------------
