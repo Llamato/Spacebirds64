@@ -1,3 +1,8 @@
+;-------------------------------------
+;This file contains everything related
+;to the score that is not also related
+;to disk operations
+;--------------------------------------
 ;Constants
 scorepos = 107
 scoreslbllen = 6

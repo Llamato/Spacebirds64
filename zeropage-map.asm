@@ -1,3 +1,10 @@
+;--------------------------------------
+;This file maps the zero page to avr
+;like registers and ranks them by
+;likelyhood of getting overwritten by
+;kernal actions
+;--------------------------------------
+
 ;Completely Save
 r0 = $fb
 r1 = $fc

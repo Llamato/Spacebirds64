@@ -1,3 +1,8 @@
+;--------------------------------------
+;This file contains macros for
+;interfacing with the vic chip
+;--------------------------------------
+
 ;Get sprite position
 ;Input
 ;\1 = sprite number

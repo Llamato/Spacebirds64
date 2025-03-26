@@ -1,3 +1,8 @@
+;--------------------------------------
+;This file contains subrotines for
+;interfacing with the vic chip
+;--------------------------------------
+
 ;Fills color ram 
 ;with value in A
 ;Input

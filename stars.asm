@@ -1,3 +1,9 @@
+;--------------------------------------
+;This file contains all the code
+;Needed to sprinkel nice sparkly stars
+;into the darkness of space
+;--------------------------------------
+
 ;Adds static stars to the background
 ;might crash game somehow. 
 ;might not. .-)

@@ -1,3 +1,8 @@
+;--------------------------------------
+;This file maps kernal rotines to 
+;human readable labels
+;-------------------------------------
+
 ;Please do not use any kernal rotines
 ;in the game loop.
 ;They are all extremely inefficant

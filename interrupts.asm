@@ -1,3 +1,6 @@
+;--------------------------------------
+;This file contains all interrupt
+;service rotines.
 ;----- setup raster interrupt -----
 enablerasterint
 sei

@@ -1,3 +1,8 @@
+;--------------------------------------
+;This file contains a bunch of general
+;use subrotines related to dataflow
+;--------------------------------------
+
 ;memcpy = memory copy
 ;copies a block of data 
 ;(max 256 byte size) from one location

@@ -1,3 +1,7 @@
+;--------------------------------------
+;This file maps ram to game variable
+;and hardware register names
+;--------------------------------------
 ;gamestate
 starposmap = $9f00; -> 9f32
 score = $9ffd; -> 9ff4

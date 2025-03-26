@@ -1,3 +1,7 @@
+;------------------------------------
+;Rotines in this file handle everything
+;related to sound.
+
 ;---------- disable Sound -----------
 disablesnd 
         #poke sndenabled, 0
