@@ -608,6 +608,8 @@ jsr savehighscores
     #ddbts
 .endif
 
+    jsr waitforinput
+
 displayqrcode
     jsr basiccls
     jsr encharrom
