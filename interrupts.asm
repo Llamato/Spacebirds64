@@ -114,7 +114,6 @@ hwscroll
 
 noscroll
 
-
 .bend
         #setuprasterint 100, soundisr
         jmp $ea81

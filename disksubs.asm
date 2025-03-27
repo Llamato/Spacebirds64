@@ -60,9 +60,9 @@ lfd .macro
     ldx #<\3
     ldy #>\3
     jsr kernalsetnam
-    lda #0
     ldx r0
     ldy r1
+    lda #0
     jsr kernalload
 .endm
 

@@ -47,14 +47,19 @@ sss
 
 ;Load start screen content
 .ifne includechargen
-    #ldi16 r0, txtscreenstart 
+    #ldi16 r0, $c100 
     lda #$53; S in ascii
     jsr loadtextscreen
 .endif
 
 .ifeq includechargen
     #ldi16 r0, txtcharsetstart
-    lda #$44
+    lda #$44; D in ascii
+
+;if I load this with loadchargen
+;it does not work.
+;Why do we need to load this charset
+;like it is a screen here?
     jsr loadtextscreen
 .endif
 
@@ -63,7 +68,7 @@ sss
     jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$53; S in ascii
-    jsr loadchargen
+    ;jsr loadchargen
 .endif
 
 ;Temporary solution because I could not
@@ -73,8 +78,9 @@ sss
     jsr encharram
     #ldi16 r0, txtcharsetstart
     lda #$44; D in ascii
-    jsr loadchargen
+    ;jsr loadchargen
 .endif
+
 
 ;Set double height for enemy sprites 0-6
 ;and single height for fuel sprites 7
@@ -155,15 +161,15 @@ sss
 ;Load sprites
     #ldi16 r0, sprite0addr
     lda #48
-    jsr loadsprite
+    ;jsr loadsprite
     #ldi16 r0, sprite1addr
     lda #49
-    jsr loadsprite
+    ;jsr loadsprite
     #ldi16 r0, sprite2addr
     lda #50
-    jsr loadsprite
+    ;jsr loadsprite
 
-    jsr loadsid
+    ;jsr loadsid
     jsr clrdiskiomem
     jsr enablerasterint
     jsr enablesscolirq
@@ -727,3 +733,22 @@ movetimer .byte 0
 moveth .byte 128
 scorecp .byte 0
 fueltemp .byte 0
+
+;Statically loading assets
+*=sprite0addr
+.binary "assets/sprite0", 2
+
+*=sprite1addr
+.binary "assets/sprite1", 2
+
+*=sprite2addr
+.binary "assets/sprite2", 2
+
+;*=$0400
+;.binary "assets/screend", 2
+
+*=charsetstart
+.binary "assets/chargend"
+
+*=$3000
+.binary "assets/sid", 2
