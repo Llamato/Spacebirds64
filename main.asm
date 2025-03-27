@@ -427,6 +427,9 @@ fuelcollision
     eor $d015
     sta $d015
     jsr addfuel
+    lda #0
+    sta $d01e
+
 
 nocollision
 .bend
