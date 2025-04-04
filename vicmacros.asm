@@ -189,3 +189,36 @@ fillloop
     bne fillloop
 done
 .endm
+
+;Fill color ram
+;Input
+;\1 = color
+;Output
+;all bytes in color ram equal to \1
+fillcolorram .macro
+    ldx #0
+    lda #\1
+loop
+    sta 55296, x
+    sta 55296+256, x
+    sta 55296+512, x
+    sta 55296+768, x
+    inx
+    bne loop
+.endm
+
+;Color line
+;Input
+;\1 = line number
+;\2 = color
+;Output
+;line with number \1 colored in \2
+colorline .macro
+    ldx #0
+    lda #\2
+loop
+    sta 40*\1+$D800, x
+    inx
+    cpx #40
+    bne loop
+.endm

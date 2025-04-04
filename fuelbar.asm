@@ -96,6 +96,7 @@ end
     rts
 
 outoffuel
+    #poke 56296, 2
     jmp gameover
 
     ; -- for debugging remove 

@@ -1,5 +1,6 @@
 includetests = 0
 includechargen = 0
+gamespeedlimit = 30
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -418,8 +419,25 @@ checkcollision
     jmp nocollision
 
 enemycollision
+    lda $d01e
+    and #1
+    .ifne includetests
+        beq ghostcollision
+    .endif
+    .ifeq includetests
+        beq nocollision
+    .endif
+    #poke 56296, 1
     jmp gameover
 
+
+;Those caused a lot of trouble in 1.0
+.ifne includetests
+ghostcollision
+    #poke 56296, 5
+    #poke 53280, 1
+    jmp nocollision
+.endif
 
 fuelcollision
 ;disable sprite colided with
@@ -430,13 +448,11 @@ fuelcollision
     lda #0
     sta $d01e
 
-
 nocollision
 .bend
 
 ;loop around!
 jmp gameloop
-
 
 gameover
 jsr disablesnd
@@ -460,7 +476,7 @@ sshss
     #poke 53281, 0
 
 ;Set basic text color
-    #poke 646, 7
+    #mov 646, 56296
     
 
 .ifeq includechargen
@@ -509,7 +525,11 @@ sshss
     #ddbts
 .endif
 
+;Print thank you for playing string
     #print tyfps
+
+;Set basic text color
+    #poke 646, 7
 
 ;Get name from user
     #print enternameprompt
@@ -642,9 +662,9 @@ incspeed
     lda moveth
     sec
     sbc #10
-    cmp #30
+    cmp #gamespeedlimit
     bcs storemoveth
-    lda #30
+    lda #gamespeedlimit
 storemoveth
     sta moveth
     lda score+1
