@@ -1,7 +1,7 @@
 ;Build type adjustments
 includetests = 0
 includechargen = 0
-
+webversion = 0
 
 ;Game design parameters
 gamespeedlimit = 32
@@ -164,7 +164,6 @@ sss
     #poke $d025, $06
     #poke $d026, $02 
 
-
 ;Load sprites
     #ldi16 r0, sprite0addr
     lda #48
@@ -304,7 +303,7 @@ spawnsprite
     adc #30             
     sta spritetemp      
 
-; set xposition
+;set xposition
     lda currentsprite
     asl
     tax
@@ -604,6 +603,7 @@ getuserinput
     #nullinput yeararea
     #crlf
 
+.ifeq webversion
 ;Save score to disk
     jsr addhstodb
 
@@ -675,6 +675,8 @@ jumppad; Needed because of long branch
 done
 .bend
 
+    jsr disablenmi
+
 .ifne includetests
     #ddbts
 .endif
@@ -702,6 +704,7 @@ continue
     tax
     #poke 198, 0
 .bend
+.endif
 
 displayqrcode
     jsr basiccls

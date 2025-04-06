@@ -145,8 +145,14 @@ enablenmi
 
 ;--------;disabled restart on NMI------
 disablenmi
+.ifeq webversion
         #poke 792, <$fe47
         #poke 793, >$fe47
+.endif
+.ifne webversion
+        #poke 792, <nothingnmi
+        #poke 793, >nothingnmi
+.endif
         rts
 
 ;---;Restart Interrupt handler---------
@@ -159,4 +165,5 @@ nmisr
     #fmb stackstart, stackend, $00
     cli
     jmp init
+nothingnmi
     rti
