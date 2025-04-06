@@ -43,6 +43,9 @@ rts
 
 ; ----- sound  ISR ----------------
 soundisr
+        .ifne includetests
+                inc 53280
+        .endif
         inc $d019
 
         lda sndenabled
@@ -52,6 +55,9 @@ soundisr
 
 nosound
         #setuprasterint 0, handlemove
+        .ifne includetests
+                dec 53280
+        .endif
         jmp $ea31
 
 
@@ -60,6 +66,9 @@ nosound
 
 ; ----- movement ISR ----------------
 handlemove
+        .ifne includetests
+                inc 53280
+        .endif
         inc $d019
 
 .block
@@ -107,13 +116,17 @@ scrollcolumnend
         sty scrollcolumn
         #pull r1
         #pull r0
-        jmp noscroll
+        jmp isrend
 
 hwscroll
         dec $d016
 
 noscroll
-
+        inc starposmapptr
+isrend   
 .bend
         #setuprasterint 100, soundisr
+        .ifne includetests
+                dec 53280
+        .endif
         jmp $ea81

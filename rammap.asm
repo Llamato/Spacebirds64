@@ -3,7 +3,8 @@
 ;and hardware register names
 ;--------------------------------------
 ;gamestate
-starposmap = $9f00; -> 9f32
+starposmap = $9f00; -> 9f80
+starposmapptr = $9f81
 score = $9ff0; -> 9ff4
 scrollcolumn = $9ff5; -> 99f6
 gameflags = $9fff
@@ -12,7 +13,7 @@ gameflags = $9fff
 ;bit 5 = None
 ;bit 4 = None
 ;bit 3 = None
-;bit 2 = None
+;bit 2 = skip star placement
 ;bit 1 = on start screen
 ;bit 0 = time to move
 

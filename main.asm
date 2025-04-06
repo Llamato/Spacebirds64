@@ -1,6 +1,10 @@
+;Build type adjustments
 includetests = 0
 includechargen = 0
-gamespeedlimit = 30
+
+;Game design parameters
+gamespeedlimit = 32
+gamespeedmin = 128
 
 *=2049
 ;BASIC starter (ldraddr $0801 / 2049)
@@ -188,17 +192,48 @@ waittostart
 ;starte Spiel  
 ;start scrolling away from start screen
     #poke gameflags, 2
+    jsr initfuel
     jsr enablesnd
+    jsr initstars
 
 ;reset collision status
-    lda #$00
-    sta $d01e
+    #poke $d01e, 0
 
 gameloop
-;update stars
-    jsr placestar
+;Clear stack
+    ;#fmb $100, $1ff, 0
 
-;refresh score display
+;Update stars
+    lda gameflags
+    and #4
+    bne skipstarplace
+smcplacestars
+    jsr placestars
+
+skipstarplace
+    lda starposmapptr
+    cmp #250
+    bne skipstarmove
+    #poke starposmapptr, 0
+    lda #4
+    ora gameflags
+    sta gameflags
+    jsr movestarsleft
+
+skipstarmove
+    lda starposmapptr
+    cmp #240
+    bne refrashscore
+    ;jsr spawnnewstar
+    lda gameflags
+    eor #4
+    sta gameflags
+    lda #<spawnnewstar
+    sta smcplacestars+1
+    lda #>spawnnewstar
+    sta smcplacestars+2
+
+refrashscore
     jsr dispscore
 
 ;Determine time to move
@@ -259,7 +294,6 @@ updatetimer
     inc spawntimer
     jmp movesprites
 
-
 spawnsprite
     lda $dc04           
     sec
@@ -268,7 +302,6 @@ spawnsprite
     bcs spawnsprite     
     adc #30             
     sta spritetemp      
-
 
 ; set xposition
     lda currentsprite
@@ -309,7 +342,6 @@ extraasteroid
     adc #30             
     sta fueltemp     
 
-
     lda #65           
     sta 6*2+$d000   
     lda #$40
@@ -329,7 +361,6 @@ extraasteroid
     adc #5
     sta secondenemy
 
-
 skipextraenemy
     lda fueltimer
     beq fuelspawn
@@ -343,7 +374,6 @@ fuelspawn
     bcs fuelspawn     
     adc #30            
     sta fueltemp      
-
 
     lda #65             
     sta 7*2+$d000   
@@ -753,7 +783,7 @@ spritebitmask
 ;increase moveth
 ;to decrease game speed.
 movetimer .byte 0
-moveth .byte 128
+moveth .byte gamespeedmin
 scorecp .byte 0
 fueltemp .byte 0
 

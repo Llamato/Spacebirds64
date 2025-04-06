@@ -29,10 +29,23 @@ add16i .macro
 add16 .macro
     lda \1
     clc
-    adc <\2
+    adc \2
     sta \1
     lda \1+1
-    adc >\2
+    adc \2+1
+    sta \1+1
+.endm
+
+;Adds A to a 16 bit value from memory
+;Input
+;\1 Operant and storage
+;Output \1+A in \1
+add16a .macro
+    clc
+    adc \1
+    sta \1
+    lda #0
+    adc \1+1
     sta \1+1
 .endm
 
