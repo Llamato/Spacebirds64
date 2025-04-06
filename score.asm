@@ -9,30 +9,6 @@ scoreslbllen = 6
 scoresize = 6
 digitoffset = 95
 
-;displays packedbcd digits on screen
-;Input
-;\1 = packed bcd address
-;\2 = display location
-;Output
-;Numerical characters in locations
-;\2 and \2+1
-;dbcdd = display bcd digits
-dbcdd .macro
-    lda \1
-    lsr
-    lsr
-    lsr
-    lsr
-    clc
-    adc #digitoffset
-    sta \2
-    lda \1
-    and #$0f
-    clc
-    adc #digitoffset
-    sta \2+1
-.endm
-
 ;---------- Draw Scores Label ----------
 scoreslabel
 .block

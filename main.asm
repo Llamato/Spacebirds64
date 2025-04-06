@@ -504,11 +504,7 @@ sshss
 
 ;Set background color
     #poke 53281, 0
-
-;Set basic text color
-    #mov 646, 56296
     
-
 .ifeq includechargen
     jsr encharrom
 .endif
@@ -527,11 +523,9 @@ sshss
     jsr encharset2
 .endif
 
-
 ;Load scores from disk
     jsr clrdiskiomem
     jsr loadhighscores
-
 
 .ifne includetests
     #ddbts
@@ -555,12 +549,48 @@ sshss
     #ddbts
 .endif
 
+;Set text color
+    #fillcolorram 7
+    #poke 646, 7
+
+printtyfps
 ;Print thank you for playing string
     #print tyfps
 
-;Set basic text color
-    #poke 646, 7
+;Print score
+    #print playerscorestr
+    #crlf
+    #unpackbcd score+2, sca, sca+1
+    #bcdtoascii sca, sca
+    #bcdtoascii sca+1, sca+1
+    #unpackbcd score+1, sca+2, sca+3
+    #bcdtoascii sca+2, sca+2
+    #bcdtoascii sca+3, sca+3
+    #unpackbcd score, sca+4, sca+5
+    #bcdtoascii sca+4, sca+4
+    #bcdtoascii sca+5, sca+5
+    #mov $400+40+15, sca
+    #mov $400+40+16, sca+1
+    #mov $400+40+17, sca+2
+    #mov $400+40+18, sca+3
+    #mov $400+40+19, sca+4
+    #mov $400+40+20, sca+5
 
+;Print reason for death
+    lda 56296
+    cmp #1
+    beq enemydeath
+
+fueldeath
+    #print fueldeathstr
+    #crlf
+    jmp getuserinput
+
+enemydeath
+    #print enemydeathstr
+    #crlf
+
+getuserinput
 ;Get name from user
     #print enternameprompt
     #nullinput namearea
@@ -739,13 +769,22 @@ continue
 .include "stars.asm"
 
 ;Data
+playerscorestr
+.null "Your score is: "
+
+fueldeathstr
+.null "You died from lack of fuel"
+
+enemydeathstr
+.text "You died from colliding with a "
+.null "snowman."
+
 ;tyfps = thank you for playing string
 tyfps
-.text "Thank you for playing"
+.text "Thank you for playing."
 ;line end
 .byte $0d
 .byte $00
-
 
 enternameprompt
 .text "Please "
@@ -754,11 +793,6 @@ enternameprompt
 ;ecyp = enter current year prompt
 ecyp
 .null "and the current year? "
-
-;esp = enter score prompt
-esp
-.text "and your score "
-.null "for debugging? "
 
 namestring
 .null "Name: "
