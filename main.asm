@@ -4,7 +4,7 @@ includechargen = 0
 webversion = 0
 
 ;Game design parameters
-gamespeedlimit = 32
+gamespeedlimit = 24
 gamespeedmin = 128
 
 *=2049
@@ -551,14 +551,30 @@ sshss
 .endif
 
 ;Set text color
-    #fillcolorram 7
     #poke 646, 7
 
 printtyfps
 ;Print thank you for playing string
     #print tyfps
 
+;Print reason for death
+    lda 56296
+    cmp #2
+    beq fueldeath
+    jmp enemydeath
+
+fueldeath
+    #print fueldeathstr
+    #crlf
+    jmp printscore
+
+enemydeath
+    #print enemydeathstr
+    #crlf
+
 ;Print score
+printscore
+    #fillcolorram 7
     #print playerscorestr
     #crlf
     #unpackbcd score+2, sca, sca+1
@@ -570,27 +586,12 @@ printtyfps
     #unpackbcd score, sca+4, sca+5
     #bcdtoascii sca+4, sca+4
     #bcdtoascii sca+5, sca+5
-    #mov $400+40+15, sca
-    #mov $400+40+16, sca+1
-    #mov $400+40+17, sca+2
-    #mov $400+40+18, sca+3
-    #mov $400+40+19, sca+4
-    #mov $400+40+20, sca+5
-
-;Print reason for death
-    lda 56296
-    cmp #2
-    beq fueldeath
-    jmp enemydeath
-
-fueldeath
-    #print fueldeathstr
-    #crlf
-    jmp getuserinput
-
-enemydeath
-    #print enemydeathstr
-    #crlf
+    #mov $400+80+15, sca
+    #mov $400+80+16, sca+1
+    #mov $400+80+17, sca+2
+    #mov $400+80+18, sca+3
+    #mov $400+80+19, sca+4
+    #mov $400+80+20, sca+5
 
 getuserinput
 ;Get name from user
@@ -762,7 +763,7 @@ playerscorestr
 .null "Your score is: "
 
 fueldeathstr
-.null "You died from lack of fuel"
+.null "You died from lack of fuel."
 
 enemydeathstr
 .text "You died from colliding with a "
