@@ -2,6 +2,7 @@
 includetests = 0
 includechargen = 0
 
+
 ;Game design parameters
 gamespeedlimit = 32
 gamespeedmin = 128
@@ -33,6 +34,7 @@ gamespeedmin = 128
     .include "disktests.asm"
 .endif
 
+init
 ;Setup gamestate
     #poke gameflags, 0
     #poke scrollcolumn, 0
@@ -178,6 +180,7 @@ sss
     jsr clrdiskiomem
     jsr enablerasterint
     jsr enablesscolirq
+    jsr disablenmi
     jsr playreadysound
 
 waittostart
@@ -200,8 +203,6 @@ waittostart
     #poke $d01e, 0
 
 gameloop
-;Clear stack
-    ;#fmb $100, $1ff, 0
 
 ;Update stars
     lda gameflags
@@ -486,6 +487,8 @@ jmp gameloop
 
 gameover
 jsr disablesnd
+jsr enablenmi
+
 ;Clear stack
 #fmb stackstart, stackend, $00
 
@@ -508,7 +511,6 @@ sshss
 .ifeq includechargen
     jsr encharrom
 .endif
-
 
 ;Load custom font
 .ifne includechargen
@@ -578,8 +580,9 @@ printtyfps
 
 ;Print reason for death
     lda 56296
-    cmp #1
-    beq enemydeath
+    cmp #2
+    beq fueldeath
+    jmp enemydeath
 
 fueldeath
     #print fueldeathstr
@@ -601,21 +604,6 @@ getuserinput
     #nullinput yeararea
     #crlf
 
-;Get score from memory
-    #unpackbcd score+2, sca, sca+1
-    #bcdtoascii sca, sca
-    #bcdtoascii sca+1, sca+1
-    #unpackbcd score+1, sca+2, sca+3
-    #bcdtoascii sca+2, sca+2
-    #bcdtoascii sca+3, sca+3
-    lda sca+5
-    pha
-    #unpackbcd score, sca+4, sca+5
-    pla
-    sta sca+5
-    #bcdtoascii sca+4, sca+4
-    
-
 ;Save score to disk
     jsr addhstodb
 
@@ -632,7 +620,7 @@ getuserinput
 ;Print table header
     #poke 646, theadcolor
     #printlen scorestring, 5
-    #tab
+    #tabfive
     #printlen yearstring, 4
     #tab 
     #printlen namestring, 4
@@ -697,7 +685,23 @@ jsr savehighscores
     #ddbts
 .endif
 
-    jsr waitforinput
+;Wait for keyboard input
+;Output
+;Input Matrix keycode in X
+.block
+    #poke 198, 0
+waitsomemore
+;Char in keyboard buffer?
+;Aka. Keyboard key pressed?
+    lda 198
+    bne continue
+
+;Nothing pressed
+    jmp waitsomemore 
+continue
+    tax
+    #poke 198, 0
+.bend
 
 displayqrcode
     jsr basiccls
@@ -739,24 +743,6 @@ done
     rts
 .bend
 
-;Wait for user to press any key
-;or fire button
-;before continueing.
-waitforinput
-.block
-    #poke 198, 0
-waitsomemore
-;Char in keyboard buffer?
-;Aka. Keyboard key pressed?
-    lda 198
-    bne continue
-
-;Nothing pressed
-    jmp waitsomemore 
-continue
-    #poke 198, 0
-    rts
-.bend
 ;------------------------------
 
 .include "vicsubs.asm"

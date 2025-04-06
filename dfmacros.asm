@@ -118,6 +118,11 @@ tab .macro; Tab of IBM PC fame
     jsr kernalchrout
 .endm
 
+tabfive .macro
+    #tab
+    jsr kernalchrout
+.endm
+
 ;The ASM equivalent of basics input func
 ;Including everything but the forced
 ;question mark.

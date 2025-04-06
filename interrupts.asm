@@ -106,9 +106,15 @@ stopscrolling
         lda gameflags
         and #253
         sta gameflags
+
 ;This is a bad way to handle things.
 ;Let's see if we can move this outside
 ;of ISR to prevent IRQ flooding.
+;Addenum
+;Well actually,
+;It turns out to not be a problem
+;at all. At least not in this specific
+;instance
         jsr initscore
         jsr initfuel
 
@@ -130,3 +136,27 @@ isrend
                 dec 53280
         .endif
         jmp $ea81
+
+;--------;Enable restart on NMI--------
+enablenmi
+        #poke 792, <nmisr
+        #poke 793, >nmisr
+        rts
+
+;--------;disabled restart on NMI------
+disablenmi
+        #poke 792, <$fe47
+        #poke 793, >$fe47
+        rts
+
+;---;Restart Interrupt handler---------
+nmisr
+;undo smc
+    lda #<placestars
+    sta smcplacestars+1
+    lda #>placestars
+    sta smcplacestars+2
+    #fmb stackstart, stackend, $00
+    cli
+    jmp init
+    rti
