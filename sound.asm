@@ -1,6 +1,6 @@
 ;------------------------------------
-;Rotines in this file handle everything
-;related to sound.
+;Routines in this file handle
+;everything related to sound.
 
 ;---------- disable Sound -----------
 disablesnd 

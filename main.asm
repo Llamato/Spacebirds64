@@ -38,6 +38,15 @@ init
 ;Setup gamestate
     #poke gameflags, 0
     #poke scrollcolumn, 0
+    #poke spawntimer, 0
+    #poke secondenemy, 0
+    #poke fueltimer, 0
+    #poke spritetemp, 0
+    #poke currentsprite, 2
+    #poke movetimer, 0
+    #poke moveth, gamespeedmin
+    #poke scorecp, 0
+    #poke fueltemp, 0
 
 ;sss = show start screen
 sss
@@ -250,7 +259,6 @@ setmove
     sta gameflags
     lda #0
     sta movetimer
-
 
 ;if moveflag set move
 ;else skip moveloop
@@ -676,8 +684,6 @@ jumppad; Needed because of long branch
 done
 .bend
 
-    jsr disablenmi
-
 .ifne includetests
     #ddbts
 .endif
@@ -711,6 +717,7 @@ displayqrcode
     jsr basiccls
     jsr encharrom
     jsr encharset1
+    jsr disablenmi
     jmp loadqrcode
     rts
 
@@ -763,7 +770,7 @@ playerscorestr
 .null "Your score is: "
 
 fueldeathstr
-.null "You died from lack of fuel."
+.null "You died from lack a of fuel."
 
 enemydeathstr
 .text "You died from colliding with a "

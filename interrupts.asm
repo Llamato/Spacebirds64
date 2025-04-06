@@ -157,13 +157,19 @@ disablenmi
 
 ;---;Restart Interrupt handler---------
 nmisr
+;Reset gamestate
+;Calling this here. Breaks the software
+;for some reason
+        ;jsr disablesnd
+
 ;undo smc
-    lda #<placestars
-    sta smcplacestars+1
-    lda #>placestars
-    sta smcplacestars+2
-    #fmb stackstart, stackend, $00
-    cli
-    jmp init
+        lda #<placestars
+        sta smcplacestars+1
+        lda #>placestars
+        sta smcplacestars+2
+        #fmb stackstart, stackend, $00
+        cli
+        jmp init
+
 nothingnmi
-    rti
+        rti
