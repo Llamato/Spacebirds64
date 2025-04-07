@@ -4,7 +4,7 @@ import os
 def binToByteStr(file_path, skip_byte_count=0):
     input_file = open(file_path, 'rb')
     input_bytes = bytearray(input_file.read())
-    output_string = ".bytes "
+    output_string = ".byte "
     byte_count = 0
     for byte in input_bytes:
         byte_count += 1
@@ -12,7 +12,7 @@ def binToByteStr(file_path, skip_byte_count=0):
             byte_string = "0x%0.2X" % byte
             output_string += byte_string.replace("0x", "$").lower()
         if (byte_count - skip_byte_count) % 4 == 0:
-            output_string += "\n.bytes "
+            output_string += "\n.byte "
         else:
             output_string += ","
     if skip_byte_count >= byte_count:
@@ -21,7 +21,7 @@ def binToByteStr(file_path, skip_byte_count=0):
         output_string = output_string[:-1] + "\n"
     return output_string
 
-def flattenIncludes(file_path, flatten_bin=False):
+def flattenIncludes(file_path, flatten_bin=True):
     output_string = ""
     input_file = None
     try:
