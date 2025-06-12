@@ -1,6 +1,7 @@
 ;Build type adjustments
 includetests = 0
 includechargen = 0
+includesound = 0
 webversion = 0
 
 ;Game design parameters
@@ -189,7 +190,10 @@ sss
     jsr enablerasterint
     jsr enablesscolirq
     jsr disablenmi
+
+.ifne includesound
     jsr playreadysound
+.endif
 
 waittostart
 ;Joystick auslesen
@@ -204,10 +208,14 @@ waittostart
 ;start scrolling away from start screen
     #poke gameflags, 2
     jsr initfuel
+
+.ifne includesound
     jsr enablesnd
+.endif
+
     jsr initstars
 
-;reset collision status
+;reset collision status^
     #poke $d01e, 0
 
 gameloop
@@ -493,7 +501,10 @@ nocollision
 jmp gameloop
 
 gameover
-jsr disablesnd
+.ifne includesound
+    jsr disablesnd
+.endif
+
 jsr enablenmi
 
 ;Clear stack
@@ -762,7 +773,10 @@ done
 .include "disksubs.asm"
 .include "fuelbar.asm"
 .include "score.asm"
-.include "sound.asm"
+
+.ifne includesound
+    .include "sound.asm"
+.endif
 .include "stars.asm"
 
 ;Data
@@ -834,5 +848,7 @@ fueltemp .byte 0
 *=charsetstart
 .binary "assets/chargend"
 
-*=$3000
-.binary "assets/sid", 2
+.ifne includesound
+    *=$3000
+    .binary "assets/sid", 2
+.endif

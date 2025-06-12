@@ -48,8 +48,14 @@ soundisr
         .endif
         inc $d019
 
+.ifne includesound
         lda sndenabled
         beq nosound
+.endif
+
+.ifeq includesound
+        jmp nosound
+.endif
 
         jsr sidstart + 6
 
