@@ -8,7 +8,7 @@
 ;the same.
 ;Input
 ;\1 = target address
-;\2 = value to be loded into address
+;\2 = value to be loaded into address
 ;Output
 ;\2 value in \1 address
 poke .macro
@@ -29,9 +29,9 @@ wait .macro
     bne waitmore
 .endm
 
-;ldi16 load imidiate 16 bit.
+;ldi16 load immediate 16 bit.
 ;Meaning load a value present in memory
-;directly after the instuction.
+;directly after the instruction.
 ;As in the value supplied as an argument
 ;Input
 ;\1 = target address of lower byte
@@ -162,7 +162,7 @@ nullinput .macro
 
 ;fmb fill memory block
 ;fills memory block from start address
-;to end address with imidiate value.
+;to end address with immediate value.
 ;Input
 ;\1 = Start address
 ;\2 = End address
@@ -200,7 +200,7 @@ mov .macro
     sta \1
 .endm
 
-;mov16 = move 16 bit with LSB frist
+;mov16 = move 16 bit with LSB first
 ;Input
 ;\1 = destination address of low byte
 ;\2 = source address of high byte.

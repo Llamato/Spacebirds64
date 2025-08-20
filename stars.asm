@@ -1,6 +1,6 @@
 ;--------------------------------------
 ;This file contains all the code
-;Needed to sprinkel nice sparkly stars
+;Needed to sprinkle nice sparkly stars
 ;into the darkness of space
 ;--------------------------------------
 

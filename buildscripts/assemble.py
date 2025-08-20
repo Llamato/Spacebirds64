@@ -9,10 +9,10 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         relativeFile = sys.argv[1]
         fileBasename = sys.argv[2]
-        fileBasenameNoExtention = fileBasename.split('.')[0]
+        fileBasenameNoExtension = fileBasename.split('.')[0]
     elif len(sys.argv) > 1:
         relativeFile = sys.argv[1]
-    output = helpers.syscmd(f'tmpx -i {relativeFile} -o {fileBasenameNoExtention}.prg -l {fileBasenameNoExtention}.report')
+    output = helpers.syscmd(f'tmpx -i {relativeFile} -o {fileBasenameNoExtension}.prg -l {fileBasenameNoExtension}.report')
     if " : error " in output:
         print(output, file=sys.stderr)
         exit(1)

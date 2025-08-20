@@ -1,8 +1,8 @@
 ;--------------------------------------
 ;This file maps the zero page to avr
 ;like registers and ranks them by
-;likelyhood of getting overwritten by
-;kernal actions
+;likelihood of getting overwritten by
+;kernel actions
 ;--------------------------------------
 
 ;Completely Save

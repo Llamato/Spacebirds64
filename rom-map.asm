@@ -1,13 +1,13 @@
 ;--------------------------------------
-;This file maps kernal rotines to 
+;This file maps kernel rotines to 
 ;human readable labels
 ;-------------------------------------
 
-;Please do not use any kernal rotines
+;Please do not use any kernel rotines
 ;in the game loop.
 ;They are all extremely inefficant
 
-;For more detailed kernal map see
+;For more detailed kernel map see
 ;https://www.pagetable.com/c64ref/kernal
 ;---------------------------------------
 
@@ -83,7 +83,7 @@ kernalload = $ffd5
 kernalopen = $ffc0
 
 ;Reads IO status word into A
-;hard to descripe here see online
+;hard to describe here see online
 ;resources for a nice table.
 kernalreadst = $ffb7
 
@@ -97,7 +97,7 @@ kernalreadst = $ffb7
 kernalgetin = $ffe4
 
 ;Clear I/O Channels
-;resets I/O configureation set by
+;resets I/O configuration set by
 ;Open checkin, setnam and setlfs
 ;and the like back to default
 ;The default being the screen as
@@ -108,7 +108,7 @@ kernalgetin = $ffe4
 kernalclrchn = $ffcc
 
 ;Close I/O Channel
-;Closes an I/0 Channel opend by open
+;Closes an I/0 Channel opened by open
 ;dues removing it from the list of
 ;active input channels or
 ;from the list of active output channels
@@ -147,7 +147,7 @@ basiccursorhome = $e566
 ;stored in X/Y
 ;if the carry flag is clear
 ;the current cursor position will be
-;set to X/Y and A destoryed
+;set to X/Y and A destroyed
 basicplot = $fff0
 
 ;Prints null terminated string

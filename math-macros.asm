@@ -2,7 +2,7 @@
 ;This file contains basic math rotines
 ;--------------------------------------
  
-;adds a 16 bit imidiate to a value
+;adds a 16 bit immediate to a value
 ;stored in memory
 ;Input
 ;\1 = Operant and storage
@@ -49,7 +49,7 @@ add16a .macro
     sta \1+1
 .endm
 
-;subtracts a 16 bit imidiate from a value
+;subtracts a 16 bit immediate from a value
 ;stored in memory
 ;Input
 ;\1 = Operant and storage

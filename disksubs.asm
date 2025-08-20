@@ -27,7 +27,7 @@ namelength = nameend - namearea
 recordlength = nameend - sca
 
 
-;This variable seems redundent to me.
+;This variable seems redundant to me.
 ;Once the first completely working
 ;version of the save and retiveal system
 ;is done, I will try to optimize it away
@@ -198,7 +198,7 @@ loadsid
 
 ;Loads and displays qr code
 ;Warning: ireversable actionrun
-;Overwrites programm
+;Overwrites program
 loadqrcode
 .block
 destaddr = $c222

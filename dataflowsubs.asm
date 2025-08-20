@@ -24,7 +24,7 @@ copybyte
 .bend
 
 ;Tabulator function. Behaviour is
-;comperable to the one found on MS-DOS
+;comparable to the one found on MS-DOS
 ;systems.
 ;Input
 ;x = initial spacing size
