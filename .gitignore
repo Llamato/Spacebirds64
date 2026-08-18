@@ -1,10 +1,2 @@
-.vscode/6502-project.json
-.vscode/launch.json
-.vscode/settings-Tinas MacBook Pro.json
-.vscode/settings.json
-build/
-buildscripts/__pycache__
-scrap/
-.VSCodeCounter/
-fonts/
 result
+docs
