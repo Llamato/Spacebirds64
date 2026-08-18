@@ -1,7 +1,7 @@
 ;Build type adjustments
 includetests = 0
 includechargen = 0
-includesound = 0
+includesound = 1
 webversion = 0
 
 ;Game design parameters
