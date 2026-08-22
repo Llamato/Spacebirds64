@@ -15,9 +15,9 @@
 
     diskName = "spacebirds64";
     diskTyp = "d64";
-    formatCommand = (diskFileName: filePath: cbmFileName: "${pkgs.vice}/bin/c1541 -format ${diskName},0 ${diskTyp} $out/${diskFileName} -attach $out/${diskFileName} -write ${filePath} ${cbmFileName}");
-    writeCommand = (diskFileName: filePath: cbmFileName: "${pkgs.vice}/bin/c1541 -attach $out/${diskFileName} -write ${filePath} ${cbmFileName}");
-    flattenTmpAsm = (basedir: asm: 
+    formatCommand = diskFileName: filePath: cbmFileName: "${pkgs.vice}/bin/c1541 -format ${diskName},0 ${diskTyp} $out/${diskFileName} -attach $out/${diskFileName} -write ${filePath} ${cbmFileName}";
+    writeCommand = diskFileName: filePath: cbmFileName: "${pkgs.vice}/bin/c1541 -attach $out/${diskFileName} -write ${filePath} ${cbmFileName}";
+    flattenTmpAsm = basedir: asm: 
       lib.concatLines (map 
           (line: let 
             matches = builtins.match ".*\\.include[[:space:]]+\"([^\"]+\\.asm)\".*" line; in 
@@ -30,7 +30,6 @@
             flattenTmpAsm basedir (builtins.readFile absoluteFilePath) 
           ) 
         (lib.splitString "\n" asm)
-      )
     );
   in {
     packages."${system}" = rec {
@@ -100,6 +99,15 @@
           ${assetCommands}
         '';
       };
+    
+      default = prgdisk;
+    };
+
+    apps."${system}".default = {
+      type = "app";
+      program = "${pkgs.writeShellScript "run-spacebirds64" ''
+        exec ${pkgs.vice}/bin/x64sc ${self.packages.${system}.default}/prgdisk.d64 "$@"
+      ''}";
     };
 
     devShells."${system}".default = pkgs.mkShell {
