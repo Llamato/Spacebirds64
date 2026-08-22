@@ -7,7 +7,6 @@
   };
 
   outputs = { self, nixpkgs, dotfiles-llamato }: let
-    pythonVersion = "3.10.1";
     system = "x86_64-linux";
   in let
     pkgs = nixpkgs.legacyPackages."${system}";
@@ -18,9 +17,7 @@
     diskTyp = "d64";
     formatCommand = (diskFileName: filePath: cbmFileName: "${pkgs.vice}/bin/c1541 -format ${diskName},0 ${diskTyp} $out/${diskFileName} -attach $out/${diskFileName} -write ${filePath} ${cbmFileName}");
     writeCommand = (diskFileName: filePath: cbmFileName: "${pkgs.vice}/bin/c1541 -attach $out/${diskFileName} -write ${filePath} ${cbmFileName}");
-
-    splitLines = (str: lib.splitString "\n"  str);
-    flatTmpAsm = (basedir: asm: 
+    flattenTmpAsm = (basedir: asm: 
       lib.concatLines (map 
           (line: let 
             matches = builtins.match ".*\\.include[[:space:]]+\"([^\"]+\\.asm)\".*" line; in 
@@ -30,9 +27,9 @@
             includedFilePath = builtins.head matches;
             absoluteFilePath = "${basedir}/${includedFilePath}";
           in
-            flatTmpAsm basedir (builtins.readFile absoluteFilePath) 
+            flattenTmpAsm basedir (builtins.readFile absoluteFilePath) 
           ) 
-        (splitLines asm)
+        (lib.splitString "\n" asm)
       )
     );
   in {
@@ -56,7 +53,7 @@
           prgFilePath = "${prg}/${prgFile}";
           prgCbmName = removeSuffix ".prg" prgFile;
           assetFiles = attrNames (filterAttrs (n: v: v == "regular") (readDir assetsDir));
-          prgCommand = formatCommand prgFilePath prgCbmName;
+          prgCommand = formatCommand diskFileName prgFilePath prgCbmName;
           assetCommands = concatLines (map (assetFile: writeCommand diskFileName "${assetsDir}/${assetFile}" assetFile) assetFiles);
         in ''
           mkdir $out
@@ -72,7 +69,9 @@
           diskFileName = "asmdisk.d64";
           asmFileSuffix = ".asm";
           asmFiles = attrNames (filterAttrs (n: v: v == "regular" && hasSuffix asmFileSuffix n) (readDir src));
-          asmCommands = concatLines ([(formatCommand diskFileName (head asmFiles) (head asmFiles))] ++ map (asmFile: writeCommand diskFileName "${src}/${asmFile}" asmFile) (tail asmFiles));
+          first = head asmFiles;
+          rest = tail asmFiles;
+          asmCommands = concatLines ([(formatCommand diskFileName first first)] ++ map (asmFile: writeCommand diskFileName "${src}/${asmFile}" asmFile) rest);
         in ''
           mkdir $out
           ${asmCommands}
@@ -89,7 +88,7 @@
           flatFileName = "flatmain.asm";
           assetsDir = src + "/assets";
           mainFilePath = "${src}/${mainFileName}";
-          flatAsm = flatTmpAsm src (readFile mainFilePath);
+          flatAsm = flattenTmpAsm src (readFile mainFilePath);
           flatAsmFilePath = toFile flatFileName flatAsm;
           assetFiles = attrNames (filterAttrs (n: v: v == "regular") (readDir assetsDir));
           assetCommands = concatLines (map (assetFile: writeCommand diskFileName "${assetsDir}/${assetFile}" assetFile) assetFiles);
